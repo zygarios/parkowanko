@@ -1,0 +1,25 @@
+::ng-deep {
+  .mat-step-label {
+    display: none !important;
+  }
+  .mat-horizontal-stepper-header-container {
+    position: sticky;
+    top: 0;
+    background-color: var(--mat-sys-surface);
+  }
+}
+
+.title {
+  font-size: 20px;
+  padding: 24px 24px 0;
+}
+.content {
+  overflow: hidden;
+  flex: 1;
+}
+
+mat-dialog-actions {
+  background-color: var(--mat-sys-surface);
+  position: sticky;
+  bottom: 0;
+}

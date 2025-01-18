@@ -1,0 +1,50 @@
+<div class="title">Install Angular</div>
+<mat-stepper #stepper>
+  <mat-step>
+    <div class="content">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
+      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
+      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
+      atque?
+    </div></mat-step
+  >
+  <mat-step>asd </mat-step>
+  <mat-step> asd</mat-step>
+
+  <ng-template matStepperIcon="edit" let-index="index">
+    {{ index + 1 }}
+  </ng-template>
+  <ng-template matStepperIcon="done" let-index="index">
+    {{ index + 1 }}
+  </ng-template>
+  <ng-template matStepperIcon="number" let-index="index">
+    {{ index + 1 }}
+  </ng-template>
+</mat-stepper>
+<mat-dialog-content></mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Zamknij</button>
+  <button mat-button (click)="stepper.previous()">Poprzednie</button>
+  <button mat-flat-button (click)="stepper.next()">Następne</button>
+</mat-dialog-actions>

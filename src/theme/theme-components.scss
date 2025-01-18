@@ -1,0 +1,12 @@
+:root {
+  // BUTTON FAB
+  --mdc-fab-small-container-color: white;
+  // DIALOG
+  --mat-dialog-container-small-max-width: none;
+  // STEPPER
+  // Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze
+  --mat-stepper-header-done-state-icon-background-color: var(
+    --mat-sys-on-surface-variant
+  );
+  --mat-stepper-header-done-state-icon-foreground-color: white;
+}

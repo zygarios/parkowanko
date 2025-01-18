@@ -4,8 +4,8 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./test-inline/test-inline.component').then(
-        (c) => c.TestInlineComponent
+      import('./_pages/main-page/main-page.component').then(
+        (c) => c.MainPageComponent,
       ),
   },
 ];

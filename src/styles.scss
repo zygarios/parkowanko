@@ -1,0 +1,14 @@
+@use "@angular/material" as mat;
+@use "./theme/theme";
+@use "./theme/theme-components";
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  max-width: 100dvw;
+  max-height: 100dvh;
+}
