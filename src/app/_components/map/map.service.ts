@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
+import { BehaviorSubject } from 'rxjs';
+import { Coords } from '../../_types/coords.model';
 import { ParkingPoi } from '../../_types/parking-poi.mode';
 
 const POLAND_BOUNDS = [14, 48, 24.5, 56] as any;
@@ -13,11 +15,14 @@ const CLOSE_ZOOM = 16;
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
+  private _markerMoveListener: any;
   private _markerRef: maplibregl.Marker = new maplibregl.Marker({
     draggable: true,
   });
 
   private _map!: maplibregl.Map;
+
+  selectedPoi = new BehaviorSubject<null | ParkingPoi>(null);
 
   getMap(): maplibregl.Map {
     return this._map;
@@ -43,6 +48,8 @@ export class MapService {
           fitBoundsOptions: { maxZoom: 17 },
         }),
       );
+
+    this._listenForPoiClick();
 
     return this._map;
   }
@@ -134,26 +141,42 @@ export class MapService {
     return this._map.getSource(sourceId) as maplibregl.GeoJSONSource;
   }
 
-  listenForPoiClick(poiClickHandler: (poiData: ParkingPoi) => void) {
+  private _listenForPoiClick() {
     this._map.on('click', 'unclustered-point', (e) => {
       // solution for maplibre problem with serializing nested properties
       const stringifiedData = e.features?.[0]?.properties as {
         poiData: string;
       };
-      poiClickHandler(JSON.parse(stringifiedData.poiData));
+      this.selectedPoi.next(JSON.parse(stringifiedData.poiData));
     });
   }
 
-  renderDraggableMarker(): void {
+  renderMarker(): void {
     if (!this._map.loaded()) return;
-    this._markerRef.remove();
-    // this._map.redraw();
+
+    this.removeMarker();
+
     this._markerRef.setLngLat(this._map.getCenter()).addTo(this._map);
 
-    this._map.on('move', (e) => {
-      console.log('jestem');
+    // aktualizuje na bieżąco pozycję markera gdy poruszamy mapą
+    this._markerMoveListener = (e: any) => {
       this._markerRef!.setLngLat(e.target.getCenter());
-    });
+    };
+    this._map.on('move', this._markerMoveListener);
+  }
+
+  removeMarker() {
+    // usuwa obecny marker i jego listenery
+    this._markerRef.remove();
+    this._map.off('move', this._markerMoveListener);
+  }
+
+  moveToPoi(coords: Coords) {
+    this._map.flyTo({ center: [coords.lng, coords.lat], zoom: CLOSE_ZOOM });
+  }
+
+  getMarkerLatLng(): Coords {
+    return this._markerRef.getLngLat();
   }
 
   ngOnDestroy(): void {

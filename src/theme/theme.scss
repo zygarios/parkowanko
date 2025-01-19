@@ -1,59 +1,52 @@
-/* Note: Color palettes are generated from primary: #0058c9, secondary: #0058c9 */
 html {
-  /* COLOR SYSTEM VARIABLES */
-  color-scheme: light;
-
   /* Primary palette variables */
-  --mat-sys-primary: light-dark(#0078bd, #b0c6ff);
-  --mat-sys-on-primary: light-dark(#ffffff, #002d6e);
-  --mat-sys-primary-container: light-dark(#d9e2ff, #00429a);
-  --mat-sys-on-primary-container: light-dark(#001944, #d9e2ff);
-  --mat-sys-inverse-primary: light-dark(#b0c6ff, #0158c9);
+  --mat-sys-primary: #0078bd;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #d9e2ff;
+  --mat-sys-on-primary-container: #001944;
+  --mat-sys-inverse-primary: #b0c6ff;
 
   /* Secondary palette variables */
-  --mat-sys-secondary: light-dark(#0078bd, #b0c6ff);
-  --mat-sys-on-secondary: light-dark(#ffffff, #002d6e);
-  --mat-sys-secondary-container: light-dark(#d9e2ff, #00429a);
-  --mat-sys-on-secondary-container: light-dark(#001944, #d9e2ff);
+  --mat-sys-secondary: #0078bd;
+  --mat-sys-on-secondary: #ffffff;
+  --mat-sys-secondary-container: #d9e2ff;
+  --mat-sys-on-secondary-container: #001944;
 
   /* Tertiary palette variables */
-  --mat-sys-tertiary: light-dark(#8b3aa8, #eeb0ff);
-  --mat-sys-on-tertiary: light-dark(#ffffff, #53006f);
-  --mat-sys-tertiary-container: light-dark(#fad7ff, #701d8e);
-  --mat-sys-on-tertiary-container: light-dark(#330045, #fad7ff);
+  --mat-sys-tertiary: #8b3aa8;
+  --mat-sys-on-tertiary: #ffffff;
+  --mat-sys-tertiary-container: #fad7ff;
+  --mat-sys-on-tertiary-container: #330045;
 
   /* Neutral palette variables */
-  --mat-sys-background: light-dark(#faf8ff, #11131a);
-  --mat-sys-on-background: light-dark(#191b22, #e1e2ec);
-  --mat-sys-surface: light-dark(#faf8ff, #11131a);
-  --mat-sys-surface-dim: light-dark(#d9d9e3, #11131a);
-  --mat-sys-surface-bright: light-dark(#faf8ff, #373941);
-  --mat-sys-surface-container-lowest: light-dark(#ffffff, #0c0e15);
-  --mat-sys-surface-container: light-dark(#ededf7, #1d1f27);
-  --mat-sys-surface-container-high: light-dark(#e7e7f1, #272a31);
-  --mat-sys-surface-container-highest: light-dark(#e1e2ec, #32353c);
-  --mat-sys-on-surface: light-dark(#191b22, #e1e2ec);
-  --mat-sys-shadow: light-dark(#000000, #000000);
-  --mat-sys-scrim: light-dark(#000000, #000000);
-  --mat-sys-surface-tint: light-dark(#0158c9, #b0c6ff);
-  --mat-sys-inverse-surface: light-dark(#2e3038, #e1e2ec);
-  --mat-sys-inverse-on-surface: light-dark(#eff0fa, #2e3038);
-  --mat-sys-outline: light-dark(#737785, #8c909f);
-  --mat-sys-outline-variant: light-dark(#c2c6d6, #424653);
+  --mat-sys-background: #faf8ff;
+  --mat-sys-on-background: #191b22;
+  --mat-sys-surface: #faf8ff;
+  --mat-sys-surface-dim: #d9d9e3;
+  --mat-sys-surface-bright: #faf8ff;
+  --mat-sys-surface-container-lowest: #ffffff;
+  --mat-sys-surface-container: #ededf7;
+  --mat-sys-surface-container-high: #e7e7f1;
+  --mat-sys-surface-container-highest: #e1e2ec;
+  --mat-sys-on-surface: #191b22;
+  --mat-sys-shadow: #000000;
+  --mat-sys-scrim: #000000;
+  --mat-sys-surface-tint: #0158c9;
+  --mat-sys-inverse-surface: #2e3038;
+  --mat-sys-inverse-on-surface: #eff0fa;
+  --mat-sys-outline: #737785;
+  --mat-sys-outline-variant: #c2c6d6;
 
   /* Error palette variables */
-  --mat-sys-error: light-dark(#ba1a1a, #ffb4ab);
-  --mat-sys-on-error: light-dark(#ffffff, #690005);
-  --mat-sys-error-container: light-dark(#ffdad6, #93000a);
-  --mat-sys-on-error-container: light-dark(#410002, #ffdad6);
+  --mat-sys-error: #ba1a1a;
+  --mat-sys-on-error: #ffffff;
+  --mat-sys-error-container: #ffdad6;
+  --mat-sys-on-error-container: #410002;
 
   /* Neutral variant palette variables */
-  --mat-sys-surface-variant: light-dark(#dfe2f2, #424653);
-  --mat-sys-on-surface-variant: light-dark(#424653, #c2c6d6);
-  --mat-sys-neutral-variant20: light-dark(
-    #2c303c,
-    #2c303c
-  ); /* Variable used for the sidenav scrim (container background shadow when opened) */
+  --mat-sys-surface-variant: #dfe2f2;
+  --mat-sys-on-surface-variant: #424653;
+  --mat-sys-neutral-variant20: #2c303c; /* Variable used for the sidenav scrim (container background shadow when opened) */
 
   /* TYPOGRAPHY SYSTEM VARIABLES */
 

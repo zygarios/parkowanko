@@ -2,8 +2,56 @@
   <mat-icon>question_mark</mat-icon>
 </button>
 <div class="menu-buttons-wrapper">
-  <button class="menu-button" mat-flat-button (click)="addNewParking()">
-    <mat-icon>local_parking</mat-icon>
-    Dodaj bezpłatny parking
-  </button>
+  @switch (activeMode()) {
+    @case ("default") {
+      <button class="menu-button" mat-flat-button (click)="startAddingPoi()">
+        <mat-icon>local_parking</mat-icon>
+        Dodaj bezpłatny parking
+      </button>
+    }
+    @case ("adding-poi") {
+      <button class="menu-button" mat-raised-button (click)="stopAddingPoi()">
+        Anuluj
+      </button>
+      <button class="menu-button" mat-flat-button (click)="confirmAddedPoi()">
+        <mat-icon>check</mat-icon>
+        Zatwierdź
+      </button>
+    }
+    @case ("editing-poi") {
+      <button class="menu-button" mat-raised-button (click)="stopEditingPoi()">
+        Anuluj
+      </button>
+      <button
+        class="menu-button"
+        mat-flat-button
+        (click)="startUpdatingPoiPosition()"
+      >
+        <mat-icon>edit_location_alt</mat-icon>
+        Popraw
+      </button>
+      <button class="menu-button" mat-flat-button (click)="startRemovingPoi()">
+        <mat-icon>wrong_location</mat-icon>
+        Usuń
+      </button>
+    }
+    @case ("editing-poi__update") {
+      <button class="menu-button" mat-raised-button (click)="startEditingPoi()">
+        Wróć
+      </button>
+      <button class="menu-button" mat-flat-button (click)="confirmUpdatedPoi()">
+        <mat-icon>check</mat-icon>
+        Zatwierdź
+      </button>
+    }
+    @case ("editing-poi__remove") {
+      <button class="menu-button" mat-raised-button (click)="startEditingPoi()">
+        Wróć
+      </button>
+      <button class="menu-button" mat-flat-button (click)="confirmRemovedPoi()">
+        <mat-icon>check</mat-icon>
+        Zatwierdź
+      </button>
+    }
+  }
 </div>

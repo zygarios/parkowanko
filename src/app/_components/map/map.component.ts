@@ -26,7 +26,9 @@ export class MapComponent {
   private _injector = inject(Injector);
   private _mapService = inject(MapService);
 
-  poiListCoords = input<ParkingPoi[]>([]);
+  poiListCoords = input<ParkingPoi[]>([
+    { coords: { lng: 18.537065928683887, lat: 54.499918975205986 } },
+  ]);
 
   constructor() {
     afterNextRender(() => this._initMap());
@@ -36,10 +38,6 @@ export class MapComponent {
     (await this._mapService.initialRenderMap()).on('load', () => {
       effect(() => this._mapService.renderPoiList(this.poiListCoords()), {
         injector: this._injector,
-      });
-
-      this._mapService.listenForPoiClick((poiData: ParkingPoi) => {
-        console.log(poiData);
       });
     });
   }
