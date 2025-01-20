@@ -6,6 +6,7 @@ import {
   inject,
   Injector,
   input,
+  untracked,
   ViewEncapsulation,
 } from '@angular/core';
 import { ParkingPoi } from '../../_types/parking-poi.mode';
@@ -36,9 +37,15 @@ export class MapComponent {
 
   private async _initMap() {
     (await this._mapService.initialRenderMap()).on('load', () => {
-      effect(() => this._mapService.renderPoiList(this.poiListCoords()), {
-        injector: this._injector,
-      });
+      effect(
+        () => {
+          this.poiListCoords();
+          untracked(() => this._mapService.renderPoiList(this.poiListCoords()));
+        },
+        {
+          injector: this._injector,
+        },
+      );
     });
   }
 }

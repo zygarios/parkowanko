@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
-import { BehaviorSubject } from 'rxjs';
 import { Coords } from '../../_types/coords.model';
 import { ParkingPoi } from '../../_types/parking-poi.mode';
 
@@ -22,7 +21,7 @@ export class MapService {
 
   private _map!: maplibregl.Map;
 
-  selectedPoi = new BehaviorSubject<null | ParkingPoi>(null);
+  selectedPoi = signal<null | ParkingPoi>(null);
 
   getMap(): maplibregl.Map {
     return this._map;
@@ -147,7 +146,7 @@ export class MapService {
       const stringifiedData = e.features?.[0]?.properties as {
         poiData: string;
       };
-      this.selectedPoi.next(JSON.parse(stringifiedData.poiData));
+      this.selectedPoi.set(JSON.parse(stringifiedData.poiData));
     });
   }
 

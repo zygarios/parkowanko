@@ -15,4 +15,10 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   max-width: 100dvw;
   max-height: 100dvh;
+  font-size: 14px;
+}
+
+// BUTTON
+.error-theme {
+  --mat-sys-primary: var(--mat-sys-error);
 }

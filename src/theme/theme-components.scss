@@ -4,6 +4,29 @@
 
   // DIALOG
   --mat-dialog-container-small-max-width: none;
+  --mat-dialog-headline-padding: 20px 24px 15px;
+
+  .mat-mdc-dialog-panel {
+    width: 98dvw;
+    &.dialog-fullscreen {
+      height: 98dvh;
+    }
+  }
+  .mat-mdc-dialog-title {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    &::before {
+      display: none;
+    }
+  }
+
+  mat-dialog-actions {
+    background-color: var(--mat-sys-surface);
+    position: sticky;
+    bottom: 0;
+  }
 
   // STEPPER
   // Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze

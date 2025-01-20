@@ -3,13 +3,13 @@
 </button>
 <div class="menu-buttons-wrapper">
   @switch (activeMode()) {
-    @case ("default") {
+    @case (ACTIVE_MODE_ENUM.DEFAULT) {
       <button class="menu-button" mat-flat-button (click)="startAddingPoi()">
         <mat-icon>local_parking</mat-icon>
         Dodaj bezpłatny parking
       </button>
     }
-    @case ("adding-poi") {
+    @case (ACTIVE_MODE_ENUM.ADDING_POI) {
       <button class="menu-button" mat-raised-button (click)="stopAddingPoi()">
         Anuluj
       </button>
@@ -18,7 +18,7 @@
         Zatwierdź
       </button>
     }
-    @case ("editing-poi") {
+    @case (ACTIVE_MODE_ENUM.EDITING_POI) {
       <button class="menu-button" mat-raised-button (click)="stopEditingPoi()">
         Anuluj
       </button>
@@ -30,25 +30,28 @@
         <mat-icon>edit_location_alt</mat-icon>
         Popraw
       </button>
-      <button class="menu-button" mat-flat-button (click)="startRemovingPoi()">
+      <button
+        class="menu-button error-theme"
+        mat-flat-button
+        (click)="startRemovingPoi()"
+      >
         <mat-icon>wrong_location</mat-icon>
         Usuń
       </button>
     }
-    @case ("editing-poi__update") {
-      <button class="menu-button" mat-raised-button (click)="startEditingPoi()">
+    @case (ACTIVE_MODE_ENUM.UPDATING_POI_POSITION) {
+      <button
+        class="menu-button"
+        mat-raised-button
+        (click)="stopUpdatingPoiPosition()"
+      >
         Wróć
       </button>
-      <button class="menu-button" mat-flat-button (click)="confirmUpdatedPoi()">
-        <mat-icon>check</mat-icon>
-        Zatwierdź
-      </button>
-    }
-    @case ("editing-poi__remove") {
-      <button class="menu-button" mat-raised-button (click)="startEditingPoi()">
-        Wróć
-      </button>
-      <button class="menu-button" mat-flat-button (click)="confirmRemovedPoi()">
+      <button
+        class="menu-button"
+        mat-flat-button
+        (click)="confirmUpdatedPoiPosition()"
+      >
         <mat-icon>check</mat-icon>
         Zatwierdź
       </button>
