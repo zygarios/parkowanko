@@ -141,7 +141,7 @@ export class MapService {
   }
 
   private _listenForPoiClick() {
-    this._map.on('click', 'unclustered-point', (e) => {
+    this._map.on('click', 'unclustered-point', (e: any) => {
       // solution for maplibre problem with serializing nested properties
       const stringifiedData = e.features?.[0]?.properties as {
         poiData: string;
