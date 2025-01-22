@@ -14,3 +14,11 @@
     }
   }
 }
+.marker {
+  background-image: url("./../../../../public/icons/parking-poi.svg");
+  background-size: cover;
+  width: 60px;
+  aspect-ratio: 1/1;
+  translate: 0px -50%;
+  position: relative;
+}

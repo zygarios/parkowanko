@@ -1,0 +1,14 @@
+.title {
+  padding: 20px;
+}
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}

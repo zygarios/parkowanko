@@ -1,0 +1,11 @@
+// DIALOG
+// Klasa przekazywana jako panelClass przy otwieraniu dialoga
+.dialog-fullscreen {
+  height: 98dvh;
+  width: 100dvw;
+}
+
+// BUTTON
+.error-theme {
+  --mat-sys-primary: var(--mat-sys-error);
+}

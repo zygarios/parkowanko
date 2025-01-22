@@ -18,34 +18,13 @@
         Zatwierdź
       </button>
     }
-    @case (ACTIVE_MODE_ENUM.EDITING_POI) {
-      <button class="menu-button" mat-raised-button (click)="stopEditingPoi()">
-        Anuluj
-      </button>
-      <button
-        class="menu-button"
-        mat-flat-button
-        (click)="startUpdatingPoiPosition()"
-      >
-        <mat-icon>edit_location_alt</mat-icon>
-        Popraw
-      </button>
-      <button
-        class="menu-button error-theme"
-        mat-flat-button
-        (click)="startRemovingPoi()"
-      >
-        <mat-icon>wrong_location</mat-icon>
-        Usuń
-      </button>
-    }
     @case (ACTIVE_MODE_ENUM.UPDATING_POI_POSITION) {
       <button
         class="menu-button"
         mat-raised-button
         (click)="stopUpdatingPoiPosition()"
       >
-        Wróć
+        Anuluj
       </button>
       <button
         class="menu-button"

@@ -1,0 +1,20 @@
+<div class="items-list">
+  @for (menu of sheetData.menuItems; track menu) {
+    @if (menu.isPrimary || menu.isError) {
+      <button
+        mat-flat-button
+        [class.error-theme]="menu.isError"
+        class="item"
+        (click)="choose(menu.result)"
+      >
+        <mat-icon>{{ menu.icon }}</mat-icon>
+        <div>{{ menu.label }}</div>
+      </button>
+    } @else {
+      <button mat-stroked-button class="item" (click)="choose(menu.result)">
+        <mat-icon>{{ menu.icon }}</mat-icon>
+        <div>{{ menu.label }}</div>
+      </button>
+    }
+  }
+</div>

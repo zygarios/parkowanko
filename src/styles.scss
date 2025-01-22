@@ -1,6 +1,7 @@
 @use "@angular/material" as mat;
 @use "./theme/theme";
 @use "./theme/theme-components";
+@use "./theme/theme-class.scss";
 
 * {
   box-sizing: border-box;
@@ -16,9 +17,4 @@ body {
   max-width: 100dvw;
   max-height: 100dvh;
   font-size: 14px;
-}
-
-// BUTTON
-.error-theme {
-  --mat-sys-primary: var(--mat-sys-error);
 }
