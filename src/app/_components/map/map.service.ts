@@ -1,7 +1,7 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable, signal, untracked } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
-import { Coords } from '../../_types/coords.model';
-import { ParkingPoi } from '../../_types/parking-poi.mode';
+import { LocationCoords } from '../../_types/location-coords.model';
+import { Parking } from '../../_types/parking.mode';
 import { MapRendererService } from './map-renderer.service';
 
 const POLAND_BOUNDS = [14, 48, 24.5, 56] as any;
@@ -19,11 +19,32 @@ export class MapService {
   private _markerMoveListener: any;
   private _markerRef: maplibregl.Marker =
     this._mapRendererService.prepareMarker();
-
   private _map!: maplibregl.Map;
 
-  selectedPoi = signal<null | ParkingPoi>(null);
   private _selectingMode: 'enabled' | 'disabled' = 'enabled';
+  selectedPoi = signal<null | Parking>(null);
+
+  private _isMapLoaded = signal(false);
+  isMapLoaded = this._isMapLoaded.asReadonly();
+
+  constructor() {
+    this._prepareAdditionalFeaturesOnLoadMap();
+  }
+
+  private _prepareAdditionalFeaturesOnLoadMap() {
+    effect(() => {
+      if (this.isMapLoaded()) {
+        untracked(() => {
+          this._listenForPoiClick();
+          this._mapRendererService.preparePoiLayers(this._map, 'parkings');
+        });
+      }
+    });
+  }
+
+  getMarkerLatLng(): LocationCoords {
+    return this._markerRef?.getLngLat();
+  }
 
   setSelectingMode(type: 'enabled' | 'disabled') {
     this._selectingMode = type;
@@ -33,36 +54,27 @@ export class MapService {
     return this._map;
   }
 
-  initialRenderMap(): Promise<maplibregl.Map> {
-    return new Promise(async (resolve) => {
-      if (this._map) resolve(this._map);
-      const style = await import('./osm_bright.json');
+  async initialRenderMap(): Promise<void> {
+    const style = await import('./osm_bright.json');
 
-      this._map = new maplibregl.Map({
-        container: 'map',
-        maxBounds: POLAND_MAX_BOUNDS,
-        bounds: POLAND_BOUNDS,
-        style: style as any,
-        // Additional free styles
-        // style: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
-        // style: 'https://tiles.openfreemap.org/styles/bright',
-      })
-        .addControl(new maplibregl.NavigationControl({ showCompass: false }))
-        .addControl(
-          new maplibregl.GeolocateControl({
-            positionOptions: { enableHighAccuracy: true },
-            trackUserLocation: true,
-            fitBoundsOptions: { maxZoom: 17 },
-          }),
-        );
-
-      this._listenForPoiClick();
-
-      this._map.on('load', async () => {
-        this._mapRendererService.preparePoiLayers(this._map, 'parkings');
-        resolve(this._map);
-      });
-    });
+    this._map = new maplibregl.Map({
+      container: 'map',
+      maxBounds: POLAND_MAX_BOUNDS,
+      bounds: POLAND_BOUNDS,
+      style: style as any,
+      // Additional free styles
+      // style: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
+      // style: 'https://tiles.openfreemap.org/styles/bright',
+    })
+      .addControl(new maplibregl.NavigationControl({ showCompass: false }))
+      .addControl(
+        new maplibregl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          trackUserLocation: true,
+          fitBoundsOptions: { maxZoom: 17 },
+        }),
+      )
+      .on('load', () => this._isMapLoaded.set(true));
   }
 
   private _listenForPoiClick() {
@@ -76,7 +88,7 @@ export class MapService {
     });
   }
 
-  renderPoiList(poiListCoords: ParkingPoi[]): void {
+  renderPoiList(poiListCoords: Parking[]): void {
     const sourceId = 'parkings';
     let source = this._map.getSource(sourceId) as maplibregl.GeoJSONSource;
 
@@ -87,7 +99,7 @@ export class MapService {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [poiData.coords.lng, poiData.coords.lat],
+          coordinates: [poiData.location.lng, poiData.location.lat],
         },
         properties: {
           poiData,
@@ -96,13 +108,12 @@ export class MapService {
     });
   }
 
-  renderMarkerForFocusPoi(coords: Coords) {
+  renderMarkerForFocusPoi(coords: LocationCoords) {
     this.removeMarkerForFocusPoi();
-    this._markerRef.setLngLat(coords).addTo(this._map).setDraggable(false);
+    this._markerRef.setLngLat(coords).addTo(this._map);
   }
 
   removeMarkerForFocusPoi() {
-    if (!this._map.loaded()) return;
     this._markerRef.remove();
   }
 
@@ -117,7 +128,7 @@ export class MapService {
 
       (this._map.getSource('line-source') as maplibregl.GeoJSONSource).setData(
         this._mapRendererService.getLineGeoJson(
-          this.selectedPoi()?.coords,
+          this.selectedPoi()?.location,
           this._markerRef.getLngLat(),
         ),
       );
@@ -127,20 +138,17 @@ export class MapService {
   }
 
   removeMoveableMarker() {
-    if (!this._map.loaded()) return;
     this._markerRef.remove();
-    (this._map.getSource('line-source') as maplibregl.GeoJSONSource).setData(
-      this._mapRendererService.getLineGeoJson(),
-    );
+    const lineSource = this._map.getSource(
+      'line-source',
+    ) as maplibregl.GeoJSONSource;
+
+    lineSource.setData(this._mapRendererService.getLineGeoJson());
     this._map.off('move', this._markerMoveListener);
   }
 
-  jumpToPoi(coords: Coords) {
+  jumpToPoi(coords: LocationCoords) {
     this._map.jumpTo({ center: [coords.lng, coords.lat], zoom: CLOSE_ZOOM });
-  }
-
-  getMarkerLatLng(): Coords {
-    return this._markerRef.getLngLat();
   }
 
   ngOnDestroy(): void {

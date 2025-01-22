@@ -1,0 +1,13 @@
+.menu-button {
+  position: fixed;
+  z-index: 100;
+  left: 10px;
+  top: 10px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  &:hover,
+  &:focus:active,
+  &:active,
+  &:focus {
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  }
+}

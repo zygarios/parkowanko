@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
 import { environment } from '../../../environments/environment.development';
-import { Coords } from '../../_types/coords.model';
+import { LocationCoords } from '../../_types/location-coords.model';
 
 @Injectable({
   providedIn: 'root',
@@ -112,7 +112,10 @@ export class MapRendererService {
     });
   }
 
-  getLineGeoJson(fixedPoiCoords?: Coords, markerCoords?: Coords): any {
+  getLineGeoJson(
+    fixedPoiCoords?: LocationCoords,
+    markerCoords?: LocationCoords,
+  ): any {
     let coordinates: any = [];
     if (fixedPoiCoords && markerCoords) {
       coordinates = [

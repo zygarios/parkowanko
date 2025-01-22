@@ -16,8 +16,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { ParkingPoi } from '../../_types/parking-poi.mode';
-import { HelpDialogComponent } from '../help-dialog/help-dialog.component';
+import { Parking } from '../../_types/parking.mode';
+import { GuideDialogComponent } from '../guide-dialog/guide-dialog.component';
 import {
   InfoDialogComponent,
   InfoDialogData,
@@ -52,32 +52,42 @@ export class PoiControllerComponent {
   private _snackBar = inject(MatSnackBar);
   private _sheet = inject(MatBottomSheet);
 
-  activeMode: WritableSignal<ActiveModeEnum> = signal(ActiveModeEnum.DEFAULT);
-
   ACTIVE_MODE_ENUM = ActiveModeEnum;
-
-  selectedPoi = signal<null | ParkingPoi>(null);
+  activeMode: WritableSignal<ActiveModeEnum> = signal(ActiveModeEnum.DEFAULT);
+  isMapLoaded = this._mapService.isMapLoaded;
 
   constructor() {
-    effect(() => {
-      this._mapService.selectedPoi();
-      untracked(() => this.startEditingPoi());
+    effect(() => this._listenForSelectedPoiToStartEdit());
+    effect(() => this._listenForActiveModeToSetMapState());
+  }
+
+  private _listenForSelectedPoiToStartEdit() {
+    this._mapService.selectedPoi();
+    untracked(() => this.startEditingPoi());
+  }
+  private _listenForActiveModeToSetMapState() {
+    this.activeMode();
+    untracked(() => {
+      if (this.activeMode() === ActiveModeEnum.DEFAULT) {
+        this._mapService.selectedPoi.set(null);
+        this._mapService.setSelectingMode('enabled');
+      } else {
+        this._mapService.setSelectingMode('disabled');
+      }
     });
   }
 
   openHelpDialog() {
-    this._matDialog.open(HelpDialogComponent);
+    this._matDialog.open(GuideDialogComponent);
   }
 
   startAddingPoi() {
-    this._mapService.renderMoveableMarker();
-    this._mapService.setSelectingMode('disabled');
     this.activeMode.set(ActiveModeEnum.ADDING_POI);
+    this._mapService.renderMoveableMarker();
   }
 
   stopAddingPoi() {
     this._mapService.removeMoveableMarker();
-    this._mapService.setSelectingMode('enabled');
     this.activeMode.set(ActiveModeEnum.DEFAULT);
   }
 
@@ -95,7 +105,6 @@ export class PoiControllerComponent {
 
   startEditingPoi() {
     if (!this._mapService.selectedPoi()) return;
-    this._mapService.setSelectingMode('disabled');
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
     this._sheet
       .open<MenuSheetComponent, MenuSheetData>(MenuSheetComponent, {
@@ -120,9 +129,8 @@ export class PoiControllerComponent {
         },
       })
       .afterDismissed()
-      .subscribe((result: string) => {
-        if (result === 'CANCEL') {
-          this._mapService.setSelectingMode('enabled');
+      .subscribe((result: string | undefined) => {
+        if (result === 'CANCEL' || !result) {
           this.activeMode.set(ActiveModeEnum.DEFAULT);
         }
         if (result === 'UPDATE') this.startUpdatingPoiPosition();
@@ -131,16 +139,15 @@ export class PoiControllerComponent {
   }
 
   startUpdatingPoiPosition() {
-    const selectedPoi: ParkingPoi | null = this._mapService.selectedPoi();
+    const selectedPoi: Parking | null = this._mapService.selectedPoi();
     if (!selectedPoi) return;
-    this._mapService.renderMoveableMarker();
-    this._mapService.jumpToPoi(selectedPoi?.coords);
     this.activeMode.set(ActiveModeEnum.UPDATING_POI_POSITION);
+    this._mapService.renderMoveableMarker();
+    this._mapService.jumpToPoi(selectedPoi?.location);
   }
 
   stopUpdatingPoiPosition() {
     this._mapService.removeMoveableMarker();
-    this.activeMode.set(ActiveModeEnum.DEFAULT);
     this.startEditingPoi();
   }
 
@@ -149,22 +156,21 @@ export class PoiControllerComponent {
     console.log(coords);
     // TODO spiąć z backendem
     this._snackBar.open(
-      'Gotowe!\nOznaczenie bezpłatnego parkingu zostało dodane',
+      'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
       undefined,
       { verticalPosition: 'top' },
     );
     this._mapService.removeMoveableMarker();
-    this._mapService.setSelectingMode('enabled');
     this.activeMode.set(ActiveModeEnum.DEFAULT);
   }
 
   removePoi() {
-    const selectedPoi: ParkingPoi | null = this._mapService.selectedPoi();
+    const selectedPoi: Parking | null = this._mapService.selectedPoi();
     if (!selectedPoi) return;
-    this._mapService.jumpToPoi(selectedPoi.coords);
+    this._mapService.jumpToPoi(selectedPoi.location);
     this._mapService.getMap().panBy([0, 200]);
 
-    this._mapService.renderMarkerForFocusPoi(selectedPoi.coords);
+    this._mapService.renderMarkerForFocusPoi(selectedPoi.location);
     this._matDialog
       .open<InfoDialogComponent, InfoDialogData>(InfoDialogComponent, {
         data: {
@@ -177,16 +183,14 @@ export class PoiControllerComponent {
         if (result) {
           // TODO spiac z backendem
           this._snackBar.open(
-            'Gotowe!\nUsunięto nieprawidłowy znacznik bezpłatnego parkingu',
+            'Gotowe!\nUsunięto znacznik bezpłatnego parkingu',
             undefined,
             { verticalPosition: 'top' },
           );
           this._mapService.removeMarkerForFocusPoi();
-          this._mapService.setSelectingMode('enabled');
           this.activeMode.set(ActiveModeEnum.DEFAULT);
         } else {
           this._mapService.removeMarkerForFocusPoi();
-          this._mapService.setSelectingMode('enabled');
           this.activeMode.set(ActiveModeEnum.DEFAULT);
         }
       });

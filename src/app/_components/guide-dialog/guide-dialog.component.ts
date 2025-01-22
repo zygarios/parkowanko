@@ -6,13 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
 
 @Component({
-  selector: 'app-help-dialog',
+  selector: 'app-guide-dialog',
   imports: [MatStepperModule, MatButtonModule, MatDialogModule, MatIconModule],
-  templateUrl: './help-dialog.component.html',
-  styleUrl: './help-dialog.component.scss',
+  templateUrl: './guide-dialog.component.html',
+  styleUrl: './guide-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HelpDialogComponent {
+export class GuideDialogComponent {
   private _dialogRef = inject(DialogRef);
 
   constructor() {

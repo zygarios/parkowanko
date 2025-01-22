@@ -1,15 +1,14 @@
 import {
   afterNextRender,
+  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
-  effect,
   inject,
-  Injector,
   input,
   untracked,
   ViewEncapsulation,
 } from '@angular/core';
-import { ParkingPoi } from '../../_types/parking-poi.mode';
+import { Parking } from '../../_types/parking.mode';
 import { MapService } from './map.service';
 
 @Component({
@@ -24,42 +23,34 @@ import { MapService } from './map.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent {
-  private _injector = inject(Injector);
   private _mapService = inject(MapService);
 
-  poiListCoords = input<ParkingPoi[]>([
-    { coords: { lng: 18.537065928683887, lat: 54.499918975205986 } },
-    { coords: { lng: 14.552295, lat: 53.428542 } },
-    { coords: { lng: 15.2656, lat: 54.0333 } },
-    { coords: { lng: 14.3167, lat: 53.43 } },
-    { coords: { lng: 16.172, lat: 53.763 } },
-    { coords: { lng: 15.574, lat: 53.661 } },
-    { coords: { lng: 15.28, lat: 53.348 } },
-    { coords: { lng: 15.935, lat: 53.092 } },
-    { coords: { lng: 15.75, lat: 53.915 } },
-    { coords: { lng: 14.883, lat: 53.865 } },
-    { coords: { lng: 14.771, lat: 53.15 } },
-    { coords: { lng: 15.551, lat: 54.175 } },
-    { coords: { lng: 14.425, lat: 53.55 } },
-    { coords: { lng: 15.867, lat: 53.78 } },
-    { coords: { lng: 15.025, lat: 54.078 } },
-    { coords: { lng: 15.9, lat: 53.6 } },
+  poiListCoords = input<Parking[]>([
+    { location: { lng: 18.537065928683887, lat: 54.499918975205986 } },
+    { location: { lng: 14.552295, lat: 53.428542 } },
+    { location: { lng: 15.2656, lat: 54.0333 } },
+    { location: { lng: 14.3167, lat: 53.43 } },
+    { location: { lng: 16.172, lat: 53.763 } },
+    { location: { lng: 15.574, lat: 53.661 } },
+    { location: { lng: 15.28, lat: 53.348 } },
+    { location: { lng: 15.935, lat: 53.092 } },
+    { location: { lng: 15.75, lat: 53.915 } },
+    { location: { lng: 14.883, lat: 53.865 } },
+    { location: { lng: 14.771, lat: 53.15 } },
+    { location: { lng: 15.551, lat: 54.175 } },
+    { location: { lng: 14.425, lat: 53.55 } },
+    { location: { lng: 15.867, lat: 53.78 } },
+    { location: { lng: 15.025, lat: 54.078 } },
+    { location: { lng: 15.9, lat: 53.6 } },
   ]);
 
   constructor() {
-    afterNextRender(() => this._initMap());
-  }
-
-  private async _initMap() {
-    await this._mapService.initialRenderMap();
-    effect(
-      () => {
+    afterNextRender(() => this._mapService.initialRenderMap());
+    afterRenderEffect(() => {
+      if (this._mapService.isMapLoaded()) {
         this.poiListCoords();
         untracked(() => this._mapService.renderPoiList(this.poiListCoords()));
-      },
-      {
-        injector: this._injector,
-      },
-    );
+      }
+    });
   }
 }

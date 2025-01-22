@@ -1,39 +1,38 @@
-<button class="help-button" mat-mini-fab (click)="openHelpDialog()">
-  <mat-icon>question_mark</mat-icon>
-</button>
-<div class="menu-buttons-wrapper">
-  @switch (activeMode()) {
-    @case (ACTIVE_MODE_ENUM.DEFAULT) {
-      <button class="menu-button" mat-flat-button (click)="startAddingPoi()">
-        <mat-icon>local_parking</mat-icon>
-        Dodaj bezpłatny parking
-      </button>
+@if (isMapLoaded()) {
+  <div class="menu-buttons-wrapper">
+    @switch (activeMode()) {
+      @case (ACTIVE_MODE_ENUM.DEFAULT) {
+        <button class="menu-button" mat-flat-button (click)="startAddingPoi()">
+          <mat-icon>local_parking</mat-icon>
+          Dodaj bezpłatny parking
+        </button>
+      }
+      @case (ACTIVE_MODE_ENUM.ADDING_POI) {
+        <button class="menu-button" mat-raised-button (click)="stopAddingPoi()">
+          Anuluj
+        </button>
+        <button class="menu-button" mat-flat-button (click)="confirmAddedPoi()">
+          <mat-icon>check</mat-icon>
+          Zatwierdź
+        </button>
+      }
+      @case (ACTIVE_MODE_ENUM.UPDATING_POI_POSITION) {
+        <button
+          class="menu-button"
+          mat-raised-button
+          (click)="stopUpdatingPoiPosition()"
+        >
+          Anuluj
+        </button>
+        <button
+          class="menu-button"
+          mat-flat-button
+          (click)="confirmUpdatedPoiPosition()"
+        >
+          <mat-icon>check</mat-icon>
+          Zatwierdź
+        </button>
+      }
     }
-    @case (ACTIVE_MODE_ENUM.ADDING_POI) {
-      <button class="menu-button" mat-raised-button (click)="stopAddingPoi()">
-        Anuluj
-      </button>
-      <button class="menu-button" mat-flat-button (click)="confirmAddedPoi()">
-        <mat-icon>check</mat-icon>
-        Zatwierdź
-      </button>
-    }
-    @case (ACTIVE_MODE_ENUM.UPDATING_POI_POSITION) {
-      <button
-        class="menu-button"
-        mat-raised-button
-        (click)="stopUpdatingPoiPosition()"
-      >
-        Anuluj
-      </button>
-      <button
-        class="menu-button"
-        mat-flat-button
-        (click)="confirmUpdatedPoiPosition()"
-      >
-        <mat-icon>check</mat-icon>
-        Zatwierdź
-      </button>
-    }
-  }
-</div>
+  </div>
+}

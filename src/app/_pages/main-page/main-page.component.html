@@ -1,2 +1,13 @@
+<button class="menu-button" mat-mini-fab [matMenuTriggerFor]="menu">
+  <mat-icon>menu</mat-icon>
+</button>
+
 <app-poi-controller></app-poi-controller>
 <app-map></app-map>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="openHelpDialog()">
+    <mat-icon>not_listed_location</mat-icon>
+    <span>Poradnik</span>
+  </button>
+</mat-menu>
