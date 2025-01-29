@@ -3,7 +3,7 @@
 </button>
 
 <app-poi-controller></app-poi-controller>
-<app-map></app-map>
+<app-map [parkingsList]="parkingsList.value() || []"></app-map>
 
 <mat-menu #menu="matMenu">
   <button mat-menu-item (click)="openHelpDialog()">

@@ -7,6 +7,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { GuideDialogComponent } from '../../_components/guide-dialog/guide-dialog.component';
 import { MapComponent } from '../../_components/map/map.component';
 import { PoiControllerComponent } from '../../_components/poi-controller/poi-controller.component';
+import { ParkingsService } from '../../_services/parkings-api.service';
 
 @Component({
   selector: 'app-main-page',
@@ -24,6 +25,9 @@ import { PoiControllerComponent } from '../../_components/poi-controller/poi-con
 })
 export class MainPageComponent {
   private _matDialog = inject(MatDialog);
+  private _parkingsService = inject(ParkingsService);
+
+  parkingsList = this._parkingsService.parkingsList;
 
   openHelpDialog() {
     this._matDialog.open(GuideDialogComponent);

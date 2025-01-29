@@ -22,14 +22,21 @@ export class InfoDialogComponent {
   dialogData: InfoDialogData = inject(MAT_DIALOG_DATA);
 
   constructor() {
+    this._setInitialData();
+  }
+
+  private _setInitialData() {
     this.dialogData = {
-      title: '',
-      content: '',
-      cancelButtonLabel: 'Anuluj',
-      confirmButtonLabel: 'Potwierdź',
-      hideCancelButton: false,
-      hideConfirmButton: false,
-      isConfirmErrorButton: true,
+      ...{
+        title: this.dialogData.title,
+        content: '',
+        cancelButtonLabel: 'Anuluj',
+        confirmButtonLabel: 'Potwierdź',
+        hideCancelButton: false,
+        hideConfirmButton: false,
+        isConfirmErrorButton: true,
+      },
+      ...this.dialogData,
     };
   }
 }

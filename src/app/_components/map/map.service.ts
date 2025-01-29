@@ -1,4 +1,10 @@
-import { effect, inject, Injectable, signal, untracked } from '@angular/core';
+import {
+  afterRenderEffect,
+  inject,
+  Injectable,
+  signal,
+  untracked,
+} from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../_types/location-coords.model';
 import { Parking } from '../../_types/parking.mode';
@@ -22,7 +28,7 @@ export class MapService {
   private _map!: maplibregl.Map;
 
   private _selectingMode: 'enabled' | 'disabled' = 'enabled';
-  selectedPoi = signal<null | Parking>(null);
+  selectedParking = signal<null | Parking>(null);
 
   private _isMapLoaded = signal(false);
   isMapLoaded = this._isMapLoaded.asReadonly();
@@ -32,7 +38,7 @@ export class MapService {
   }
 
   private _prepareAdditionalFeaturesOnLoadMap() {
-    effect(() => {
+    afterRenderEffect(() => {
       if (this.isMapLoaded()) {
         untracked(() => {
           this._listenForPoiClick();
@@ -55,7 +61,7 @@ export class MapService {
   }
 
   async initialRenderMap(): Promise<void> {
-    const style = await import('./osm_bright.json');
+    const style = await import('./../../../../public/osm_bright.json');
 
     this._map = new maplibregl.Map({
       container: 'map',
@@ -82,27 +88,27 @@ export class MapService {
       if (this._selectingMode === 'disabled') return;
       // solution for maplibre problem with serializing nested properties
       const stringifiedData = e.features?.[0]?.properties as {
-        poiData: string;
+        parking: string;
       };
-      this.selectedPoi.set(JSON.parse(stringifiedData.poiData));
+      this.selectedParking.set(JSON.parse(stringifiedData.parking));
     });
   }
 
-  renderPoiList(poiListCoords: Parking[]): void {
+  renderPoiList(parkingsList: Parking[]): void {
     const sourceId = 'parkings';
     let source = this._map.getSource(sourceId) as maplibregl.GeoJSONSource;
 
     // Nadpisanie danych o punktach poi na mapie
     source.setData({
       type: 'FeatureCollection',
-      features: poiListCoords.map((poiData) => ({
+      features: parkingsList.map((parking) => ({
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [poiData.location.lng, poiData.location.lat],
+          coordinates: [parking.location.lng, parking.location.lat],
         },
         properties: {
-          poiData,
+          parking,
         },
       })),
     });
@@ -128,7 +134,7 @@ export class MapService {
 
       (this._map.getSource('line-source') as maplibregl.GeoJSONSource).setData(
         this._mapRendererService.getLineGeoJson(
-          this.selectedPoi()?.location,
+          this.selectedParking()?.location,
           this._markerRef.getLngLat(),
         ),
       );
