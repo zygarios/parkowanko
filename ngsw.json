@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1738274588639,
+  "timestamp": 1738274722691,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -71,7 +71,7 @@
     "/icons/parking-poi.svg": "bdd23ed41927cb64cd22295d15936dba903edf25",
     "/icons/parking.png": "d65ed82c58842ca9580125aaf520625bcf8fbd44",
     "/icons/parking.svg": "a055965bd590ebc3bb8041b4838d4b2bdb314e11",
-    "/index.html": "fb12483d0e6a79351739ad5db8e5450b8bcfd737",
+    "/index.html": "43f5dbfba7bc4623891596e9f425a6d795a56328",
     "/main-ID6JHC6X.js": "4a1f5f5515828570a73cf1b6c7567a16dbd096f8",
     "/manifest.webmanifest": "9e82b7267d8d565645aa2920e5e017952936f853",
     "/media/parking-poi-KLDG7L2W.svg": "bdd23ed41927cb64cd22295d15936dba903edf25",
