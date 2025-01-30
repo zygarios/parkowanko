@@ -13,6 +13,7 @@ export class ParkingsService {
 
   parkingsList = rxResource({
     loader: () => this.getParkings(),
+    defaultValue: [],
   });
 
   getParkings(): Observable<Parking[]> {
