@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/_components/guide-dialog/guide-dialog.component.scss"],
+  "sourcesContent": ["::ng-deep {\n  .mat-step-label {\n    display: none !important;\n  }\n  .mat-horizontal-stepper-header-container {\n    position: sticky;\n    top: 0;\n    background-color: var(--mat-sys-surface);\n  }\n}\n\n.content {\n  overflow: hidden;\n  flex: 1;\n}\n\nmat-dialog-actions {\n  background-color: var(--mat-sys-surface);\n  position: sticky;\n  bottom: 0;\n}\n"],
+  "mappings": "AACE,UAAA,CAAA,eACE,QAAA,eAEF,UAAA,CAAA,wCACE,SAAA,OACA,IAAA,EACA,iBAAA,IAAA,mBAIJ,CAAA,QACE,SAAA,OACA,KAAA,EAGF,mBACE,iBAAA,IAAA,mBACA,SAAA,OACA,OAAA",
+  "names": []
+}

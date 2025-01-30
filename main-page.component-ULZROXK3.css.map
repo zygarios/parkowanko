@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/_pages/main-page/main-page.component.scss"],
+  "sourcesContent": [".menu-button {\n  position: fixed;\n  z-index: 100;\n  left: 10px;\n  top: 10px;\n  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);\n  &:hover,\n  &:focus:active,\n  &:active,\n  &:focus {\n    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);\n  }\n}\n"],
+  "mappings": "AAAA,CAAA,YACE,SAAA,MACA,QAAA,IACA,KAAA,KACA,IAAA,KACA,WAAA,EAAA,EAAA,IAAA,UACA,CANF,WAME,OAAA,CANF,WAME,MAAA,QAAA,CANF,WAME,QAAA,CANF,WAME,OAIE,WAAA,EAAA,EAAA,IAAA",
+  "names": []
+}

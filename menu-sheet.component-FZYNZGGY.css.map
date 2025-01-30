@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/_components/menu-sheet/menu-sheet.component.scss"],
+  "sourcesContent": [".title {\n  padding: 20px;\n}\n.items-list {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n\n  .item {\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n  }\n}\n"],
+  "mappings": "AAAA,CAAA,MAAA,QACE,KAEF,CAAA,WACE,QAAA,KACA,eAAA,OACA,IAAA,KAEA,CALF,WAKE,CAAA,KACE,QAAA,KACA,YAAA,OACA,gBAAA",
+  "names": []
+}
