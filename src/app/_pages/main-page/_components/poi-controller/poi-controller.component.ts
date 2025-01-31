@@ -3,6 +3,7 @@ import {
   Component,
   effect,
   inject,
+  linkedSignal,
   signal,
   untracked,
   WritableSignal,
@@ -13,11 +14,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { map, of, switchMap, tap } from 'rxjs';
-import { enterFadeAnimation } from '../../_others/animations/enter-fade-animation';
-import { ParkingsService } from '../../_services/parkings-api.service';
-import { SharedUtilsService } from '../../_services/shared-utils.service';
-import { Parking } from '../../_types/parking.mode';
-import { MapService } from '../map/map.service';
+import { enterFadeAnimation } from '../../../../_others/animations/enter-fade-animation';
+import { ParkingsService } from '../../../../_services/parkings-api.service';
+import { SharedUtilsService } from '../../../../_services/shared-utils.service';
+import { Parking } from '../../../../_types/parking.mode';
+import { MapService } from '../map/_services/map.service';
 
 enum ActiveModeEnum {
   DEFAULT = 'DEFAULT',
@@ -48,25 +49,39 @@ export class PoiControllerComponent {
   activeMode: WritableSignal<ActiveModeEnum> = signal(ActiveModeEnum.DEFAULT);
   isMapLoaded = this._mapService.isMapLoaded;
 
+  selectedParking = linkedSignal<Parking | null, Parking | null>({
+    source: () => this._mapService.selectedParking(),
+    computation: (value, previousValue) => {
+      if (this.activeMode() === ActiveModeEnum.DEFAULT) {
+        return value;
+      } else {
+        return previousValue?.value || null;
+      }
+    },
+  });
+
   constructor() {
     effect(() => this._listenForSelectedPoiToStartEdit());
     effect(() => this._listenForActiveModeToSetMapState());
   }
 
   private _listenForSelectedPoiToStartEdit() {
-    this._mapService.selectedParking();
+    this.selectedParking();
     untracked(() => this.startEditingPoi());
   }
+
   private _listenForActiveModeToSetMapState() {
     this.activeMode();
     untracked(() => {
       if (this.activeMode() === ActiveModeEnum.DEFAULT) {
-        this._mapService.selectedParking.set(null);
-        this._mapService.setSelectingMode('enabled');
-      } else {
-        this._mapService.setSelectingMode('disabled');
+        this.selectedParking.set(null);
       }
     });
+  }
+
+  setDefaultState() {
+    this.activeMode.set(ActiveModeEnum.DEFAULT);
+    this.selectedParking.set(null);
   }
 
   startAddingPoi() {
@@ -76,7 +91,7 @@ export class PoiControllerComponent {
 
   stopAddingPoi() {
     this._mapService.removeMoveableMarker();
-    this.activeMode.set(ActiveModeEnum.DEFAULT);
+    this.setDefaultState();
   }
 
   confirmAddedPoi() {
@@ -95,7 +110,7 @@ export class PoiControllerComponent {
   }
 
   startEditingPoi() {
-    if (!this._mapService.selectedParking()) return;
+    if (!this.selectedParking()) return;
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
     const menuSheetItems = [
       {
@@ -119,16 +134,14 @@ export class PoiControllerComponent {
       .openSheet(menuSheetItems)
       .afterDismissed()
       .subscribe((result: string | undefined) => {
-        if (result === 'CANCEL' || !result) {
-          this.activeMode.set(ActiveModeEnum.DEFAULT);
-        }
+        if (result === 'CANCEL' || !result) this.setDefaultState();
         if (result === 'UPDATE') this.startUpdatingPoiPosition();
         if (result === 'REMOVE') this.removePoi();
       });
   }
 
   startUpdatingPoiPosition() {
-    const selectedPoi: Parking | null = this._mapService.selectedParking();
+    const selectedPoi: Parking | null = this.selectedParking();
     if (!selectedPoi) return;
     this.activeMode.set(ActiveModeEnum.UPDATING_POI_POSITION);
     this._mapService.renderMoveableMarker();
@@ -141,7 +154,7 @@ export class PoiControllerComponent {
   }
 
   confirmUpdatedPoiPosition() {
-    const selectedPoi: Parking | null = this._mapService.selectedParking();
+    const selectedPoi: Parking | null = this.selectedParking();
     if (!selectedPoi) return;
     const location = this._mapService.getMarkerLatLng();
     this._parkingsService.patchParking(selectedPoi.id, { location }).subscribe({
@@ -153,19 +166,18 @@ export class PoiControllerComponent {
       },
       complete: () => {
         this._mapService.removeMoveableMarker();
-        this.activeMode.set(ActiveModeEnum.DEFAULT);
+        this.setDefaultState();
       },
     });
   }
 
   removePoi() {
-    const selectedPoi: Parking | null = this._mapService.selectedParking();
+    const selectedPoi: Parking | null = this.selectedParking();
     if (!selectedPoi) return;
     this._mapService.jumpToPoi({
-      lat: selectedPoi.location.lat - 0.001,
+      lat: selectedPoi.location.lat - 0.0015,
       lng: selectedPoi.location.lng,
     });
-
     this._mapService.renderMarkerForFocusPoi(selectedPoi.location);
 
     this._sharedUtilsService
@@ -197,7 +209,7 @@ export class PoiControllerComponent {
         next: (result) => {
           this._mapService.removeMarkerForFocusPoi();
           if (result) {
-            this.activeMode.set(ActiveModeEnum.DEFAULT);
+            this.setDefaultState();
           } else {
             this.startEditingPoi();
           }

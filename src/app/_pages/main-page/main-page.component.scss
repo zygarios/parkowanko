@@ -11,3 +11,23 @@
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
   }
 }
+
+.environment-widget {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 30px;
+  height: 20px;
+  z-index: 1000;
+  background-color: var(--mat-sys-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 10px 10px;
+  rotate: -90deg;
+  translate: -5px 0;
+  .label {
+    color: white;
+    font-size: 10px;
+  }
+}

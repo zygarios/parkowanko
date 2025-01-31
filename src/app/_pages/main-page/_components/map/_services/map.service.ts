@@ -6,8 +6,8 @@ import {
   untracked,
 } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
-import { LocationCoords } from '../../_types/location-coords.model';
-import { Parking } from '../../_types/parking.mode';
+import { LocationCoords } from '../../../../../_types/location-coords.model';
+import { Parking } from '../../../../../_types/parking.mode';
 import { MapRendererService } from './map-renderer.service';
 
 const POLAND_BOUNDS = [14, 48, 24.5, 56] as any;
@@ -26,12 +26,11 @@ export class MapService {
   private _markerRef: maplibregl.Marker =
     this._mapRendererService.prepareMarker();
   private _map!: maplibregl.Map;
-
-  private _selectingMode: 'enabled' | 'disabled' = 'enabled';
-  selectedParking = signal<null | Parking>(null);
-
   private _isMapLoaded = signal(false);
+
   isMapLoaded = this._isMapLoaded.asReadonly();
+
+  selectedParking = signal<null | Parking>(null);
 
   constructor() {
     this._prepareAdditionalFeaturesOnLoadMap();
@@ -42,6 +41,7 @@ export class MapService {
       if (this.isMapLoaded()) {
         untracked(() => {
           this._listenForPoiClick();
+          this._listenForClusterClick();
           this._mapRendererService.preparePoiLayers(this._map, 'parkings');
         });
       }
@@ -52,16 +52,12 @@ export class MapService {
     return this._markerRef?.getLngLat();
   }
 
-  setSelectingMode(type: 'enabled' | 'disabled') {
-    this._selectingMode = type;
-  }
-
   getMap(): maplibregl.Map {
     return this._map;
   }
 
   async initialRenderMap(): Promise<void> {
-    const style = await import('./../../../../public/osm_bright.json');
+    const style = await import('../../../../../../../public/osm_bright.json');
 
     this._map = new maplibregl.Map({
       container: 'map',
@@ -80,14 +76,29 @@ export class MapService {
       .on('load', () => this._isMapLoaded.set(true));
   }
 
+  // Wysyła powiadomienia o kliknięciu w poi
   private _listenForPoiClick() {
-    this._map.on('click', 'unclustered-point', (e: any) => {
-      if (this._selectingMode === 'disabled') return;
+    const mapRef = this._map;
+
+    mapRef.on('click', 'unclustered-point', (e: any) => {
       // solution for maplibre problem with serializing nested properties
       const stringifiedData = e.features?.[0]?.properties as {
         parking: string;
       };
       this.selectedParking.set(JSON.parse(stringifiedData.parking));
+    });
+
+    // Centruje i przybliża do klastra z punktami
+  }
+
+  private _listenForClusterClick() {
+    const mapRef = this._map;
+
+    mapRef.on('click', 'clusters', (e: any) => {
+      mapRef.flyTo({
+        center: [e.lngLat.lng, e.lngLat.lat],
+        zoom: mapRef.getZoom() + 3,
+      });
     });
   }
 

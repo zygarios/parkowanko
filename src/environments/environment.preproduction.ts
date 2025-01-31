@@ -2,6 +2,6 @@ import { envBase } from './env-base';
 
 export const environment = {
   ...envBase,
-  environmentLabel: 'PREP',
+  environmentType: 'PREP',
   apiUrl: 'https://parkowanko.onrender.com/api',
 };

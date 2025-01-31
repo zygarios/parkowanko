@@ -9,7 +9,7 @@ export const initSentry = () => {
     integrations: [Sentry.replayIntegration()],
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 1.0,
-    environment: environment.environmentLabel,
+    environment: environment.environmentType,
   });
 };
 

@@ -8,8 +8,8 @@ import {
   untracked,
   ViewEncapsulation,
 } from '@angular/core';
-import { Parking } from '../../_types/parking.mode';
-import { MapService } from './map.service';
+import { Parking } from '../../../../_types/parking.mode';
+import { MapService } from './_services/map.service';
 
 @Component({
   selector: 'app-map',

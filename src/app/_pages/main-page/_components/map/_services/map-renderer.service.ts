@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
-import { environment } from '../../../environments/environment.development';
-import { LocationCoords } from '../../_types/location-coords.model';
+import { environment } from '../../../../../../environments/environment.development';
+import { LocationCoords } from '../../../../../_types/location-coords.model';
 
 @Injectable({
   providedIn: 'root',
