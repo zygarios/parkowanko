@@ -85,7 +85,6 @@ export class MapRendererService {
       filter: ['has', 'point_count'],
       layout: {
         'text-field': '{point_count_abbreviated}',
-        'text-font': ['Roboto Regular'],
         'text-size': 16,
       },
       paint: {
