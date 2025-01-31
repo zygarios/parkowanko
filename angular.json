@@ -46,6 +46,7 @@
               "budgets": [],
               "outputHashing": "all",
               "serviceWorker": "ngsw-config.json",
+              "baseHref": "/parkowanko/",
               "sourceMap": true,
               "fileReplacements": [
                 {

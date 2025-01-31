@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build-prep": "ng build --configuration preproduction",
-    "deploy-prep": "ng build --configuration preproduction --base-href /parkowanko/ & ng deploy --build false",
+    "deploy-prep": "ng build --configuration preproduction & ng deploy --build false",
     "deploy-sourcemaps-to-sentry": "npx @sentry/wizard@latest -i sourcemaps"
   },
   "private": true,
