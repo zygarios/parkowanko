@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build-prep": "ng build --configuration preproduction",
     "deploy-prep": "ng build --configuration preproduction --base-href /parkowanko/ & ng deploy --build false",
     "deploy-sourcemaps-to-sentry": "npx @sentry/wizard@latest -i sourcemaps"
   },
