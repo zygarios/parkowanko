@@ -159,14 +159,13 @@ export class MapService {
   };
 
   removeMoveableMarker() {
-    this._markerRef.remove();
     const lineSource = this._map.getSource(
       'line-source',
     ) as maplibregl.GeoJSONSource;
-
     lineSource.setData(this._mapRendererService.getLineGeoJson());
-    this._map.off('move', this._markerMoveListener);
+    this._map.off('move', this._moveMarker);
     this._markerRef.off('dragend', this._drawLineBetweenFixedPointAndMarker);
+    this._markerRef.remove();
   }
 
   jumpToPoi(coords: LocationCoords) {

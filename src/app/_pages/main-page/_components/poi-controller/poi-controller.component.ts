@@ -134,7 +134,10 @@ export class PoiControllerComponent {
       .openSheet(menuSheetItems)
       .afterDismissed()
       .subscribe((result: string | undefined) => {
-        if (result === 'CANCEL' || !result) this.setDefaultState();
+        if (result === 'CANCEL' || !result) {
+          this._mapService.removeMoveableMarker();
+          this.setDefaultState();
+        }
         if (result === 'UPDATE') this.startUpdatingPoiPosition();
         if (result === 'REMOVE') this.removePoi();
       });
