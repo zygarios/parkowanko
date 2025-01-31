@@ -45,8 +45,11 @@
   .mat-bottom-sheet-container {
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-    box-shadow: var(--mat-sys-level3);
+    box-shadow: var(--mat-sys-level5);
     max-width: 100vw;
     min-width: 100vw;
+  }
+  .backdrop-invisible {
+    background-color: rgba(0, 0, 0, 0.1);
   }
 }

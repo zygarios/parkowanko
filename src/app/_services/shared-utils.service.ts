@@ -24,6 +24,7 @@ export class SharedUtilsService {
       MenuSheetComponent,
       {
         data,
+        backdropClass: 'backdrop-invisible',
       },
     );
   }

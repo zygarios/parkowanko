@@ -136,20 +136,27 @@ export class MapService {
 
     this._markerRef.setLngLat(this._map.getCenter()).addTo(this._map);
 
-    // aktualizuje na bieżąco pozycję markera gdy poruszamy mapą
-    this._markerMoveListener = (e: any) => {
-      this._markerRef!.setLngLat(e.target.getCenter());
+    // aktualizuje na bieżąco pozycję markera gdy poruszamy mapą i rysuje linie między poi a markerem
+    this._map.on('move', this._moveMarker);
 
-      (this._map.getSource('line-source') as maplibregl.GeoJSONSource).setData(
-        this._mapRendererService.getLineGeoJson(
-          this.selectedParking()?.location,
-          this._markerRef.getLngLat(),
-        ),
-      );
-    };
-
-    this._map.on('move', this._markerMoveListener);
+    // aktualizuje na bieżąco pozycję markera gdy przeciągamy markerem i rysuje linie między poi a markerem
+    this._markerRef.on('dragend', this._drawLineBetweenFixedPointAndMarker);
   }
+
+  private _moveMarker = (e: any) => {
+    this._markerRef!.setLngLat(e.target.getCenter());
+    this._drawLineBetweenFixedPointAndMarker();
+  };
+
+  private _drawLineBetweenFixedPointAndMarker = () => {
+    if (!this.selectedParking()) return;
+    (this._map.getSource('line-source') as maplibregl.GeoJSONSource).setData(
+      this._mapRendererService.getLineGeoJson(
+        this.selectedParking()?.location,
+        this._markerRef.getLngLat(),
+      ),
+    );
+  };
 
   removeMoveableMarker() {
     this._markerRef.remove();
@@ -159,6 +166,7 @@ export class MapService {
 
     lineSource.setData(this._mapRendererService.getLineGeoJson());
     this._map.off('move', this._markerMoveListener);
+    this._markerRef.off('dragend', this._drawLineBetweenFixedPointAndMarker);
   }
 
   jumpToPoi(coords: LocationCoords) {

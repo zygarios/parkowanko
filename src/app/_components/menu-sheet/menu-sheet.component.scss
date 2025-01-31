@@ -1,14 +1,15 @@
-.title {
-  padding: 20px;
-}
 .items-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 
   .item {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    padding-top: 25px;
+    padding-bottom: 25px;
   }
 }

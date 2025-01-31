@@ -14,6 +14,7 @@ export class MapRendererService {
 
     return new maplibregl.Marker({
       element: el,
+      draggable: true,
     });
   }
 
