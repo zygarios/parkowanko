@@ -6,7 +6,7 @@ export class Parking extends ApiBaseType {
   name?: string;
   description?: string;
 
-  constructor(parking: any) {
+  constructor(parking: Partial<Parking>) {
     super();
     Object.entries(parking).forEach(([key, value]: [string, any]) => {
       if (['created_at', 'updated_at'].includes(key)) {

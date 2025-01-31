@@ -19,7 +19,7 @@ export class MapRendererService {
 
   async preparePoiLayers(map: maplibregl.Map, sourceId: string): Promise<void> {
     // Ustawienie danych o punktach poi na mapie
-    map.addSource('parkings', {
+    map.addSource(sourceId, {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -35,7 +35,7 @@ export class MapRendererService {
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Cyprus_road_sign_parking.svg/212px-Cyprus_road_sign_parking.svg.png?20130416124154',
     );
 
-    map.addImage('parking', image.data);
+    map.addImage('parking-poi-icon', image.data);
     map.addSource('point', {
       type: 'geojson',
       data: {
@@ -55,10 +55,10 @@ export class MapRendererService {
     map.addLayer({
       id: 'unclustered-point',
       type: 'symbol',
-      source: 'parkings',
+      source: sourceId,
       filter: ['!', ['has', 'point_count']],
       layout: {
-        'icon-image': 'parking',
+        'icon-image': 'parking-poi-icon',
         'icon-size': 0.1,
       },
     });

@@ -68,9 +68,6 @@ export class MapService {
       maxBounds: POLAND_MAX_BOUNDS,
       bounds: POLAND_BOUNDS,
       style: style as any,
-      // Additional free styles
-      // style: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
-      // style: 'https://tiles.openfreemap.org/styles/bright',
     })
       .addControl(new maplibregl.NavigationControl({ showCompass: false }))
       .addControl(
