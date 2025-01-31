@@ -20,7 +20,7 @@ initSentry();
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideSentry(),
+    ...provideSentry(),
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withFetch(), withInterceptors([httpInterceptor])),

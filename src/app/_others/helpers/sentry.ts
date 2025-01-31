@@ -1,9 +1,10 @@
-import { ErrorHandler } from '@angular/core';
+import { ErrorHandler, isDevMode } from '@angular/core';
 import * as Sentry from '@sentry/angular';
 import { environment } from '../../../environments/environment.development';
 
 export const initSentry = () => {
-  return Sentry.init({
+  if (isDevMode()) return;
+  Sentry.init({
     dsn: environment.sentryDsn,
     integrations: [Sentry.replayIntegration()],
     replaysSessionSampleRate: 0,
@@ -12,7 +13,12 @@ export const initSentry = () => {
   });
 };
 
-export const provideSentry = () => ({
-  provide: ErrorHandler,
-  useValue: Sentry.createErrorHandler(),
-});
+export const provideSentry = () => {
+  if (isDevMode()) return [];
+  return [
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler(),
+    },
+  ];
+};
