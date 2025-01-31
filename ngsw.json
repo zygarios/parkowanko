@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1738324096050,
+  "timestamp": 1738325040948,
   "index": "/parkowanko/index.html",
   "assetGroups": [
     {
@@ -11,15 +11,15 @@
         "ignoreVary": true
       },
       "urls": [
-        "/parkowanko/chunk-LRO7VIRM.js",
-        "/parkowanko/chunk-R4VCYXKP.js",
-        "/parkowanko/chunk-S34MX2MU.js",
-        "/parkowanko/chunk-UYPQVT7B.js",
+        "/parkowanko/chunk-6VNCP4KW.js",
+        "/parkowanko/chunk-DCQ4AZKH.js",
+        "/parkowanko/chunk-EBEBPT64.js",
+        "/parkowanko/chunk-KVX4X7OF.js",
         "/parkowanko/chunk-VZBGOO6O.js",
         "/parkowanko/chunk-ZD6HRZLV.js",
         "/parkowanko/favicon.ico",
         "/parkowanko/index.html",
-        "/parkowanko/main-LO2YTCCA.js",
+        "/parkowanko/main-VXQHIRL5.js",
         "/parkowanko/manifest.webmanifest",
         "/parkowanko/styles-IATUNU63.css"
       ],
@@ -52,10 +52,10 @@
   ],
   "dataGroups": [],
   "hashTable": {
-    "/parkowanko/chunk-LRO7VIRM.js": "a29b16905b437548f8fc2cde137e94cbfddb256e",
-    "/parkowanko/chunk-R4VCYXKP.js": "d3f03a375d8918f38bce3f4498dcddf0d707013d",
-    "/parkowanko/chunk-S34MX2MU.js": "b02d484b20ed5aa9fe20cc59f9b81527b04a7396",
-    "/parkowanko/chunk-UYPQVT7B.js": "078f3508c47a6701af16f51a54a7a8c69224e6a9",
+    "/parkowanko/chunk-6VNCP4KW.js": "fb384b36104bcc537453125e7303433e7851bf17",
+    "/parkowanko/chunk-DCQ4AZKH.js": "c9bee0fcfdaf50e61f8edfb12390ed5328facf9b",
+    "/parkowanko/chunk-EBEBPT64.js": "3c252580a9c5207d7aab0358f30b28cac9c23847",
+    "/parkowanko/chunk-KVX4X7OF.js": "f420e73ff69d38ced622e3c3a6bcc700f55a83c4",
     "/parkowanko/chunk-VZBGOO6O.js": "405e64ae8f7bc31196a0d16150ebd6c6c6d22d71",
     "/parkowanko/chunk-ZD6HRZLV.js": "32b02d479b038466b67ada8398f4b117eb2e8af7",
     "/parkowanko/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
@@ -71,8 +71,8 @@
     "/parkowanko/icons/parking-poi.svg": "bdd23ed41927cb64cd22295d15936dba903edf25",
     "/parkowanko/icons/parking.png": "d65ed82c58842ca9580125aaf520625bcf8fbd44",
     "/parkowanko/icons/parking.svg": "a055965bd590ebc3bb8041b4838d4b2bdb314e11",
-    "/parkowanko/index.html": "5579b3e377d10dc6476b66ccf9f4fe2f9346d9d5",
-    "/parkowanko/main-LO2YTCCA.js": "6099cace26cf54e6ef567e63ba050624d7e0c158",
+    "/parkowanko/index.html": "95fd3878d9b759283bb839476fc8de73094a9f04",
+    "/parkowanko/main-VXQHIRL5.js": "fdc90f4581f7028a76b940068540ae29d9ec6381",
     "/parkowanko/manifest.webmanifest": "9e82b7267d8d565645aa2920e5e017952936f853",
     "/parkowanko/media/parking-poi-KLDG7L2W.svg": "bdd23ed41927cb64cd22295d15936dba903edf25",
     "/parkowanko/styles-IATUNU63.css": "aeac1157356e8633f53459d3450f82261a8dfafb"
