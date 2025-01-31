@@ -18,25 +18,46 @@ export class ParkingsService {
 
   getParkings(): Observable<Parking[]> {
     return this._httpClient
-      .get(`${environment.apiUrl}/parkings/?format=json`)
+      .get(`${environment.apiUrl}/parkings/`)
       .pipe(map((res: any) => res.map((item: any) => new Parking(item))));
   }
 
   postParking(body: ParkingSaveData): Observable<Parking> {
     return this._httpClient
-      .post<Parking>(`${environment.apiUrl}/parkings`, body)
-      .pipe(tap(() => this.parkingsList.reload()));
+      .post<Parking>(`${environment.apiUrl}/parkings/`, body)
+      .pipe(
+        tap((newParking: Parking) =>
+          this.parkingsList.update((parkings: Parking[]) => [
+            ...parkings,
+            newParking,
+          ]),
+        ),
+      );
   }
 
   patchParking(id: number, body: ParkingSaveData): Observable<Parking> {
     return this._httpClient
-      .patch<Parking>(`${environment.apiUrl}/parkings/${id}`, body)
-      .pipe(tap(() => this.parkingsList.reload()));
+      .patch<Parking>(`${environment.apiUrl}/parkings/${id}/`, body)
+      .pipe(
+        tap((updatedParking) =>
+          this.parkingsList.update((parkings: Parking[]) =>
+            parkings.map((parking) =>
+              parking.id !== id ? parking : updatedParking,
+            ),
+          ),
+        ),
+      );
   }
 
   deleteParking(id: number): Observable<void> {
     return this._httpClient
-      .delete<void>(`${environment.apiUrl}/parkings/${id}`)
-      .pipe(tap(() => this.parkingsList.reload()));
+      .delete<void>(`${environment.apiUrl}/parkings/${id}/`)
+      .pipe(
+        tap(() =>
+          this.parkingsList.update((parkings: Parking[]) =>
+            parkings.filter((parking) => parking.id !== id),
+          ),
+        ),
+      );
   }
 }

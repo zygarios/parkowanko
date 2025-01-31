@@ -1,5 +1,5 @@
 <div class="items-list">
-  @for (menu of sheetData.menuItems; track menu) {
+  @for (menu of menuSheetItems; track menu) {
     @if (menu.isPrimary || menu.isError) {
       <button
         mat-flat-button

@@ -9,3 +9,11 @@
 .error-theme {
   --mat-sys-primary: var(--mat-sys-error);
 }
+
+// SNACKBAR
+.snackbar-error {
+  --mdc-snackbar-container-color: var(--color-error);
+}
+.snackbar-success {
+  --mdc-snackbar-container-color: var(--color-success);
+}

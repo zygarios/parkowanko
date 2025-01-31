@@ -1,7 +1,12 @@
 @use "@angular/material" as mat;
-@use "./theme/theme";
+@use "./theme/theme-tokens";
 @use "./theme/theme-components";
 @use "./theme/theme-class.scss";
+
+:root {
+  --color-success: #4bab4e;
+  --color-error: var(--mat-sys-error);
+}
 
 * {
   box-sizing: border-box;

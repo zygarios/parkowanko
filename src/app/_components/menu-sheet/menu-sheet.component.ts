@@ -7,14 +7,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 
-export interface MenuSheetData {
-  menuItems: {
-    label: string;
-    icon: string;
-    result: any;
-    isPrimary?: boolean;
-    isError?: boolean;
-  }[];
+export interface MenuSheetItem {
+  label: string;
+  icon: string;
+  result: any;
+  isPrimary?: boolean;
+  isError?: boolean;
 }
 
 @Component({
@@ -25,7 +23,7 @@ export interface MenuSheetData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuSheetComponent {
-  sheetData: MenuSheetData = inject(MAT_BOTTOM_SHEET_DATA);
+  menuSheetItems: MenuSheetItem[] = inject(MAT_BOTTOM_SHEET_DATA);
   sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
 
   choose(result: any) {

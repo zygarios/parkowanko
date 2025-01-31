@@ -7,28 +7,17 @@ import {
   untracked,
   WritableSignal,
 } from '@angular/core';
-import {
-  MatBottomSheet,
-  MatBottomSheetModule,
-} from '@angular/material/bottom-sheet';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { of, switchMap, tap } from 'rxjs';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { map, of, switchMap, tap } from 'rxjs';
 import { enterFadeAnimation } from '../../_others/animations/enter-fade-animation';
 import { ParkingsService } from '../../_services/parkings-api.service';
+import { SharedUtilsService } from '../../_services/shared-utils.service';
 import { Parking } from '../../_types/parking.mode';
-import {
-  InfoDialogComponent,
-  InfoDialogData,
-} from '../info-dialog/info-dialog.component';
 import { MapService } from '../map/map.service';
-import {
-  MenuSheetComponent,
-  MenuSheetData,
-} from '../menu-sheet/menu-sheet.component';
 
 enum ActiveModeEnum {
   DEFAULT = 'DEFAULT',
@@ -52,10 +41,8 @@ enum ActiveModeEnum {
 })
 export class PoiControllerComponent {
   private _mapService = inject(MapService);
-  private _matDialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _sheet = inject(MatBottomSheet);
   private _parkingsService = inject(ParkingsService);
+  private _sharedUtilsService = inject(SharedUtilsService);
 
   ACTIVE_MODE_ENUM = ActiveModeEnum;
   activeMode: WritableSignal<ActiveModeEnum> = signal(ActiveModeEnum.DEFAULT);
@@ -96,10 +83,9 @@ export class PoiControllerComponent {
     const location = this._mapService.getMarkerLatLng();
     this._parkingsService.postParking({ location }).subscribe({
       next: () => {
-        this._snackBar.open(
+        this._sharedUtilsService.openSnackbar(
           'Gotowe!\nOznaczenie bezpłatnego parkingu zostało dodane',
-          undefined,
-          { verticalPosition: 'top' },
+          'SUCCESS',
         );
       },
       complete: () => {
@@ -111,28 +97,26 @@ export class PoiControllerComponent {
   startEditingPoi() {
     if (!this._mapService.selectedParking()) return;
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
-    this._sheet
-      .open<MenuSheetComponent, MenuSheetData>(MenuSheetComponent, {
-        data: {
-          menuItems: [
-            {
-              label: 'Popraw pozycję na mapie',
-              icon: 'edit_location_alt',
-              result: 'UPDATE',
-            },
-            {
-              label: 'Usuń znacznik',
-              icon: 'wrong_location',
-              result: 'REMOVE',
-            },
-            {
-              label: 'Anuluj',
-              icon: 'close',
-              result: 'CANCEL',
-            },
-          ],
-        },
-      })
+    const menuSheetItems = [
+      {
+        label: 'Popraw pozycję na mapie',
+        icon: 'edit_location_alt',
+        result: 'UPDATE',
+      },
+      {
+        label: 'Usuń znacznik',
+        icon: 'wrong_location',
+        result: 'REMOVE',
+      },
+      {
+        label: 'Anuluj',
+        icon: 'close',
+        result: 'CANCEL',
+      },
+    ];
+
+    this._sharedUtilsService
+      .openSheet(menuSheetItems)
       .afterDismissed()
       .subscribe((result: string | undefined) => {
         if (result === 'CANCEL' || !result) {
@@ -162,10 +146,9 @@ export class PoiControllerComponent {
     const location = this._mapService.getMarkerLatLng();
     this._parkingsService.patchParking(selectedPoi.id, { location }).subscribe({
       next: () => {
-        this._snackBar.open(
+        this._sharedUtilsService.openSnackbar(
           'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
-          undefined,
-          { verticalPosition: 'top' },
+          'SUCCESS',
         );
       },
       complete: () => {
@@ -178,39 +161,46 @@ export class PoiControllerComponent {
   removePoi() {
     const selectedPoi: Parking | null = this._mapService.selectedParking();
     if (!selectedPoi) return;
-    this._mapService.jumpToPoi(selectedPoi.location);
-    this._mapService.getMap().panBy([0, 200]);
+    this._mapService.jumpToPoi({
+      lat: selectedPoi.location.lat - 0.001,
+      lng: selectedPoi.location.lng,
+    });
 
     this._mapService.renderMarkerForFocusPoi(selectedPoi.location);
-    this._matDialog
-      .open<InfoDialogComponent, InfoDialogData>(InfoDialogComponent, {
-        data: {
-          title: 'Usuwanie punktu',
-          content: 'Czy na pewno chcesz usunąć obszar płatnego parkingu?',
-        },
+
+    this._sharedUtilsService
+      .openDialog({
+        title: 'Usuwanie punktu',
+        content: 'Czy na pewno chcesz usunąć obszar płatnego parkingu?',
       })
       .afterClosed()
       .pipe(
         switchMap((result: boolean) => {
           if (result) {
-            return this._parkingsService.deleteParking(selectedPoi.id).pipe(
-              tap(() => {
-                this._snackBar.open(
-                  'Gotowe!\nUsunięto znacznik bezpłatnego parkingu',
-                  undefined,
-                  { verticalPosition: 'top' },
-                );
-              }),
-            );
+            return this._parkingsService
+              .deleteParking(selectedPoi.id)
+              .pipe(
+                tap(() => {
+                  this._sharedUtilsService.openSnackbar(
+                    'Gotowe!\nUsunięto znacznik bezpłatnego parkingu',
+                    'SUCCESS',
+                  );
+                }),
+              )
+              .pipe(map(() => true));
           } else {
-            return of(null);
+            return of(false);
           }
         }),
       )
       .subscribe({
-        next: () => {
+        next: (result) => {
           this._mapService.removeMarkerForFocusPoi();
-          this.activeMode.set(ActiveModeEnum.DEFAULT);
+          if (result) {
+            this.activeMode.set(ActiveModeEnum.DEFAULT);
+          } else {
+            this.startEditingPoi();
+          }
         },
       });
   }

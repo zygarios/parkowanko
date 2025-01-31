@@ -1,17 +1,17 @@
 import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, Observable, throwError } from 'rxjs';
+import { SharedUtilsService } from '../../_services/shared-utils.service';
 
 export function httpInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ): Observable<HttpEvent<unknown>> {
-  const snackBar = inject(MatSnackBar);
+  const sharedUtilsService = inject(SharedUtilsService);
 
   return next(req).pipe(
     catchError((error) => {
-      snackBar.open(error, '', { verticalPosition: 'top' });
+      sharedUtilsService.openSnackbar(error, 'ERROR');
       return throwError(() => error);
     }),
   );
