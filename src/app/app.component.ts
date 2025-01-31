@@ -7,4 +7,10 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {}
+export class AppComponent {
+  constructor() {
+    setTimeout(() => {
+      throw new Error('Sentry Test Ersssror');
+    }, 5000);
+  }
+}
