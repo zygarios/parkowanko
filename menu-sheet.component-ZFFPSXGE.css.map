@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/_components/menu-sheet/menu-sheet.component.scss"],
-  "sourcesContent": [".items-list {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  padding-top: 5px;\n  padding-bottom: 5px;\n\n  .item {\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n    padding-top: 25px;\n    padding-bottom: 25px;\n  }\n}\n"],
-  "mappings": "AAAA,CAAA,WACE,QAAA,KACA,eAAA,OACA,IAAA,KACA,YAAA,IACA,eAAA,IAEA,CAPF,WAOE,CAAA,KACE,QAAA,KACA,YAAA,OACA,gBAAA,WACA,YAAA,KACA,eAAA",
-  "names": []
-}
