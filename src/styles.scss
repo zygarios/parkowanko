@@ -6,6 +6,7 @@
 :root {
   --color-success: #4bab4e;
   --color-error: var(--mat-sys-error);
+  --color-primary: #4fc4cf;
 }
 
 * {
@@ -30,5 +31,5 @@ ul {
 
 strong {
   text-transform: uppercase;
-  color: var(--mat-sys-primary);
+  color: var(--color-primary);
 }

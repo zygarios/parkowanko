@@ -1,22 +1,16 @@
 html {
   /* Primary palette variables */
-  --mat-sys-primary: #0078bd;
+  --mat-sys-primary: var(--color-primary);
   --mat-sys-on-primary: #ffffff;
   --mat-sys-primary-container: #d9e2ff;
   --mat-sys-on-primary-container: #001944;
   --mat-sys-inverse-primary: #b0c6ff;
 
   /* Secondary palette variables */
-  --mat-sys-secondary: #0078bd;
+  --mat-sys-secondary: var(--color-primary);
   --mat-sys-on-secondary: #ffffff;
   --mat-sys-secondary-container: #d9e2ff;
   --mat-sys-on-secondary-container: #001944;
-
-  /* Tertiary palette variables */
-  --mat-sys-tertiary: #8b3aa8;
-  --mat-sys-on-tertiary: #ffffff;
-  --mat-sys-tertiary-container: #fad7ff;
-  --mat-sys-on-tertiary-container: #330045;
 
   /* Neutral palette variables */
   --mat-sys-background: #faf8ff;

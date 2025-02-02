@@ -34,10 +34,13 @@ export class MapRendererService {
       );
 
     // Załadowanie ikony poi dla pojedynczego punktu
-    const image = await mapRef.loadImage(
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Cyprus_road_sign_parking.svg/212px-Cyprus_road_sign_parking.svg.png?20130416124154',
-    );
-    mapRef.addImage('parking-poi-icon', image.data);
+    const image = './../../../../../../../public/icons/parking-poi.svg';
+
+    const imageBitmap = await fetch(image)
+      .then((response) => response.blob())
+      .then((blob) => createImageBitmap(blob));
+
+    mapRef.addImage('parking-poi-icon', imageBitmap);
 
     return mapRef;
   }
