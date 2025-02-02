@@ -5,6 +5,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { booleanPointInPolygon, buffer, point } from '@turf/turf';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../../../../_types/location-coords.model';
 import { Parking } from '../../../../../_types/parking.mode';
@@ -27,9 +28,10 @@ export class MapService {
   private _map!: maplibregl.Map;
 
   private _moveMarkerFnRef: ((e: any) => void) | null = null;
-  private _drawLineBetweenPointsFnRef: (() => void) | null = null;
+  private _renderFeaturesForMarkerOnMoveFnRef: (() => void) | null = null;
 
   private _isMapLoaded = signal(false);
+  private _renderedParkingsCoordsList: LocationCoords[] = [];
 
   isMapLoaded = this._isMapLoaded.asReadonly();
 
@@ -89,6 +91,9 @@ export class MapService {
   }
 
   renderParkingsPois(parkingsList: Parking[]): void {
+    this._renderedParkingsCoordsList = parkingsList.map(
+      (parking) => parking.location,
+    );
     this._mapRendererService.renderPois(this._map, parkingsList);
   }
 
@@ -105,39 +110,65 @@ export class MapService {
     this.removeMoveableMarker();
 
     this._markerRef.setLngLat(this._map.getCenter()).addTo(this._map);
+    this._renderRadiusForMarker();
 
     // aktualizuje na bieżąco pozycję markera gdy poruszamy mapą i rysuje linie między poi a markerem
     this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
     this._map.on('move', this._moveMarkerFnRef);
 
-    // rysuje linie między poi a markerem
-    if (fixedCoords) {
-      this._drawLineBetweenPointsFnRef = () =>
-        this._drawLineBetweenPoints(fixedCoords);
+    // Dodaje dodatkowe opcje wyświetlania, które się aktualizują przy ruchu markera
+    this._renderFeaturesForMarkerOnMoveFnRef = () =>
+      this._renderFeaturesForMarkerOnMove(fixedCoords);
 
-      this._map.on('move', this._drawLineBetweenPointsFnRef);
+    this._map.on('moveend', this._renderFeaturesForMarkerOnMoveFnRef);
 
-      this._markerRef.on('dragend', this._drawLineBetweenPointsFnRef);
-    }
+    this._markerRef.on('dragend', this._renderFeaturesForMarkerOnMoveFnRef);
+  }
+
+  private _renderFeaturesForMarkerOnMove(fixedCoords?: LocationCoords) {
+    this._renderRadiusForMarker();
+    if (fixedCoords) this._renderLineBetweenPoints(fixedCoords);
   }
 
   private _moveMarker(e: any) {
     this._markerRef!.setLngLat(e.target.getCenter());
   }
 
-  private _drawLineBetweenPoints(fixedCoords: LocationCoords) {
+  private _renderLineBetweenPoints(fixedCoords: LocationCoords) {
     if (!this.selectedParking()) return;
-    this._mapRendererService.renderPoiLine(this._map, {
+    this._mapRendererService.renderLineForMarker(this._map, {
       fixedCoords: fixedCoords,
       targetCoords: this._markerRef.getLngLat(),
     });
   }
 
+  private _renderRadiusForMarker() {
+    const markerCoords = this._markerRef.getLngLat();
+    const markerPoint = point([markerCoords.lng, markerCoords.lat]);
+
+    // Definicja buforu (np. okrąg o promieniu 20 metrów)
+    const bufferPoi = buffer(markerPoint, 20, { units: 'meters' });
+    if (bufferPoi) {
+      // Sprawdzenie, czy jakikolwiek punkt poi znajduje sie w promieniu
+      const isAnyPointInRadius = this._renderedParkingsCoordsList.some(
+        (coords: LocationCoords) =>
+          booleanPointInPolygon([coords.lng, coords.lat], bufferPoi),
+      );
+
+      if (isAnyPointInRadius) {
+        this._mapRendererService.renderRadiusForMarker(this._map, markerCoords);
+      } else {
+        this._mapRendererService.renderRadiusForMarker(this._map);
+      }
+    }
+  }
+
   removeMoveableMarker() {
-    this._mapRendererService.renderPoiLine(this._map);
+    this._mapRendererService.renderLineForMarker(this._map);
+    this._mapRendererService.renderRadiusForMarker(this._map);
     this._map.off('move', this._moveMarkerFnRef!);
-    this._map.off('move', this._drawLineBetweenPointsFnRef!);
-    this._markerRef.off('dragend', this._drawLineBetweenPointsFnRef!);
+    this._map.off('moveend', this._renderFeaturesForMarkerOnMoveFnRef!);
+    this._markerRef.off('dragend', this._renderFeaturesForMarkerOnMoveFnRef!);
     this._markerRef.remove();
   }
 

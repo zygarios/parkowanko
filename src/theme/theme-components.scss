@@ -1,6 +1,17 @@
 :root {
-  // BUTTON FAB
+  // BUTTONS FAB
   --mdc-fab-small-container-color: white;
+
+  // BUTTONS
+  --mdc-filled-button-container-height: 50px;
+  --mdc-protected-button-container-height: 50px;
+  --mdc-text-button-container-height: 50px;
+  --mdc-outlined-button-container-height: 50px;
+
+  --mat-filled-button-horizontal-padding: 20px;
+  --mat-protected-button-horizontal-padding: 20px;
+  --mat-text-button-horizontal-padding: 20px;
+  --mat-outlined-button-horizontal-padding: 20px;
 
   // DIALOG
   --mat-dialog-container-small-max-width: none;

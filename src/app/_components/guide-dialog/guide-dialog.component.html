@@ -1,39 +1,41 @@
 <div mat-dialog-title>
-  <span>Install Angular</span>
+  <span>Jak zacząć?</span>
   <mat-icon mat-dialog-close>close</mat-icon>
 </div>
 <mat-stepper #stepper>
   <mat-step>
     <div class="content">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente,
-      maiores. Doloremque, eius soluta odio vero consectetur hic aspernatur sunt
-      accusantium. In, sed ut vel cumque optio distinctio libero consequuntur
-      atque?
-    </div></mat-step
-  >
-  <mat-step>asd </mat-step>
-  <mat-step> asd</mat-step>
+      To miejsce, gdzie możesz znaleźć i dodać
+      <strong>DARMOWE MIEJSCA PARKINGOWE</strong> w Twoim mieście!
+      <br />
+      <br />
+      Dzięki społeczności użytkowników łatwiej zaparkujesz
+      <strong>BEZ PŁACENIA</strong> za strefy parkingowe.
+    </div>
+  </mat-step>
+  <mat-step>
+    <div class="content">
+      <ul>
+        <li><strong>Wyszukuj</strong> darmowe miejsca parkingowe na mapie.</li>
+        <br />
+        <li><strong>Dodawaj</strong> nowe lokalizacje, które znasz.</li>
+        <br />
+        <li>
+          <strong>Edytuj</strong> i <strong>usuwaj</strong> punkty POI swoje i
+          innych.
+        </li>
+      </ul>
+    </div>
+  </mat-step>
+  <mat-step>
+    <div class="content">
+      Im więcej osób dzieli się miejscami, tym łatwiej znaleźć darmowy parking.
+      <br />
+      <br />
+      <strong>Zacznij teraz</strong> - sprawdź mapę i dodaj swoje pierwsze
+      miejsce!
+    </div>
+  </mat-step>
 
   <ng-template matStepperIcon="edit" let-index="index">
     {{ index + 1 }}
@@ -45,7 +47,6 @@
     {{ index + 1 }}
   </ng-template>
 </mat-stepper>
-<mat-dialog-content></mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="stepper.previous()">Poprzednie</button>
   <button mat-flat-button (click)="stepper.next()">Następne</button>

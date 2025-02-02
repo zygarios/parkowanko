@@ -7,7 +7,7 @@ import { Parking } from '../../../../../_types/parking.mode';
 import { POLAND_BOUNDS, POLAND_MAX_BOUNDS } from './map.service';
 
 export const PARKING_POI_SOURCE = 'parkingPoiSource';
-export const PARKING_POI_RADIUS_SOURCE = 'parkingPoiRadiusSource';
+export const PARKING_MARKER_RADIUS_SOURCE = 'parkingMarkerRadiusSource';
 const PARKING_POI_LINE_SOURCE = 'parkingPoiLineSource';
 
 @Injectable({
@@ -64,10 +64,6 @@ export class MapRendererService {
       PARKING_POI_SOURCE,
     ) as maplibregl.GeoJSONSource;
 
-    const parkingPoiRadiusSource = map.getSource(
-      PARKING_POI_RADIUS_SOURCE,
-    ) as maplibregl.GeoJSONSource;
-
     // Nadpisanie danych o punktach poi na mapie
     parkingPoiSource.setData({
       type: 'FeatureCollection',
@@ -82,20 +78,28 @@ export class MapRendererService {
         },
       })),
     });
+  }
 
-    // Nadpisanie danych o punktach poi na mapie
+  renderRadiusForMarker(map: maplibregl.Map, markerCoors?: LocationCoords) {
+    // Dodanie radiusa do markera, który okresla w jakieś minimalnie odlegości nie może się znajdować żaden inny punkt POI parkingu
+    const parkingPoiRadiusSource = map.getSource(
+      PARKING_MARKER_RADIUS_SOURCE,
+    ) as maplibregl.GeoJSONSource;
+
     parkingPoiRadiusSource.setData({
       type: 'FeatureCollection',
-      features: parkingsList.map((parking) =>
-        circle([parking.location.lng, parking.location.lat], 20, {
-          steps: 64,
-          units: 'meters',
-        }),
-      ),
+      features: markerCoors
+        ? [
+            circle([markerCoors.lng, markerCoors.lat], 20, {
+              steps: 64,
+              units: 'meters',
+            }),
+          ]
+        : [],
     });
   }
 
-  renderPoiLine(
+  renderLineForMarker(
     map: maplibregl.Map,
     locations?: {
       fixedCoords?: LocationCoords;
@@ -167,7 +171,7 @@ export class MapRendererService {
 
   private _prepareLayersForPoisRadius(map: maplibregl.Map) {
     // Dodaj nowe źródło dla okręgów
-    map.addSource(PARKING_POI_RADIUS_SOURCE, {
+    map.addSource(PARKING_MARKER_RADIUS_SOURCE, {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -180,10 +184,10 @@ export class MapRendererService {
     map.addLayer({
       id: 'location-radius',
       type: 'fill',
-      source: PARKING_POI_RADIUS_SOURCE,
+      source: PARKING_MARKER_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'fill-color': environment.primaryColor,
+        'fill-color': '#FF0000',
         'fill-opacity': 0.15,
       },
     });
@@ -191,10 +195,10 @@ export class MapRendererService {
     map.addLayer({
       id: 'location-radius-outline',
       type: 'line',
-      source: PARKING_POI_RADIUS_SOURCE,
+      source: PARKING_MARKER_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'line-color': environment.primaryColor,
+        'line-color': '#FF0000',
         'line-width': 1,
       },
     });
