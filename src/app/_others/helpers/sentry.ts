@@ -6,7 +6,13 @@ export const initSentry = () => {
   if (isDevMode()) return;
   Sentry.init({
     dsn: environment.sentryDsn,
-    integrations: [Sentry.replayIntegration()],
+    integrations: [
+      Sentry.replayIntegration({
+        maskAllInputs: false,
+        maskAllText: false,
+        maxReplayDuration: 90000,
+      }),
+    ],
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 1.0,
     environment: environment.environmentType,
