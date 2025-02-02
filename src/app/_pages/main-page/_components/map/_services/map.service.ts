@@ -10,8 +10,8 @@ import { LocationCoords } from '../../../../../_types/location-coords.model';
 import { Parking } from '../../../../../_types/parking.mode';
 import { MapRendererService } from './map-renderer.service';
 
-const POLAND_BOUNDS = [14, 48, 24.5, 56] as any;
-const POLAND_MAX_BOUNDS = [
+export const POLAND_BOUNDS = [14, 48, 24.5, 56] as any;
+export const POLAND_MAX_BOUNDS = [
   POLAND_BOUNDS[0] - 3,
   POLAND_BOUNDS[1] - 3,
   POLAND_BOUNDS[2] + 3,
@@ -22,10 +22,13 @@ const CLOSE_ZOOM = 16;
 @Injectable({ providedIn: 'root' })
 export class MapService {
   private _mapRendererService = inject(MapRendererService);
-  private _markerMoveListener: any;
   private _markerRef: maplibregl.Marker =
     this._mapRendererService.prepareMarker();
   private _map!: maplibregl.Map;
+
+  private _moveMarkerFnRef: ((e: any) => void) | null = null;
+  private _drawLineBetweenPointsFnRef: (() => void) | null = null;
+
   private _isMapLoaded = signal(false);
 
   isMapLoaded = this._isMapLoaded.asReadonly();
@@ -40,12 +43,17 @@ export class MapService {
     afterRenderEffect(() => {
       if (this.isMapLoaded()) {
         untracked(() => {
+          this._mapRendererService.preparePoiForRender(this._map);
           this._listenForPoiClick();
           this._listenForClusterClick();
-          this._mapRendererService.preparePoiLayers(this._map, 'parkings');
         });
       }
     });
+  }
+
+  async initRenderMap(): Promise<void> {
+    this._map = await this._mapRendererService.initRenderMap();
+    this._map.on('load', () => this._isMapLoaded.set(true));
   }
 
   getMarkerLatLng(): LocationCoords {
@@ -54,26 +62,6 @@ export class MapService {
 
   getMap(): maplibregl.Map {
     return this._map;
-  }
-
-  async initialRenderMap(): Promise<void> {
-    const style = await import('../../../../../../../public/osm_bright.json');
-
-    this._map = new maplibregl.Map({
-      container: 'map',
-      maxBounds: POLAND_MAX_BOUNDS,
-      bounds: POLAND_BOUNDS,
-      style: style as any,
-    })
-      .addControl(new maplibregl.NavigationControl({ showCompass: false }))
-      .addControl(
-        new maplibregl.GeolocateControl({
-          positionOptions: { enableHighAccuracy: true },
-          trackUserLocation: true,
-          fitBoundsOptions: { maxZoom: 17 },
-        }),
-      )
-      .on('load', () => this._isMapLoaded.set(true));
   }
 
   // Wysyła powiadomienia o kliknięciu w poi
@@ -87,39 +75,21 @@ export class MapService {
       };
       this.selectedParking.set(JSON.parse(stringifiedData.parking));
     });
-
-    // Centruje i przybliża do klastra z punktami
   }
 
   private _listenForClusterClick() {
     const mapRef = this._map;
-
+    // Centruje i przybliża do klastra z punktami
     mapRef.on('click', 'clusters', (e: any) => {
       mapRef.flyTo({
         center: [e.lngLat.lng, e.lngLat.lat],
-        zoom: mapRef.getZoom() + 3,
+        zoom: mapRef.getZoom() + 2.5,
       });
     });
   }
 
-  renderPoiList(parkingsList: Parking[]): void {
-    const sourceId = 'parkings';
-    let source = this._map.getSource(sourceId) as maplibregl.GeoJSONSource;
-
-    // Nadpisanie danych o punktach poi na mapie
-    source.setData({
-      type: 'FeatureCollection',
-      features: parkingsList.map((parking) => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [parking.location.lng, parking.location.lat],
-        },
-        properties: {
-          parking,
-        },
-      })),
-    });
+  renderParkingsPois(parkingsList: Parking[]): void {
+    this._mapRendererService.renderPois(this._map, parkingsList);
   }
 
   renderMarkerForFocusPoi(coords: LocationCoords) {
@@ -131,40 +101,43 @@ export class MapService {
     this._markerRef.remove();
   }
 
-  renderMoveableMarker(): void {
+  renderMoveableMarker(fixedCoords?: LocationCoords): void {
     this.removeMoveableMarker();
 
     this._markerRef.setLngLat(this._map.getCenter()).addTo(this._map);
 
     // aktualizuje na bieżąco pozycję markera gdy poruszamy mapą i rysuje linie między poi a markerem
-    this._map.on('move', this._moveMarker);
+    this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
+    this._map.on('move', this._moveMarkerFnRef);
 
-    // aktualizuje na bieżąco pozycję markera gdy przeciągamy markerem i rysuje linie między poi a markerem
-    this._markerRef.on('dragend', this._drawLineBetweenFixedPointAndMarker);
+    // rysuje linie między poi a markerem
+    if (fixedCoords) {
+      this._drawLineBetweenPointsFnRef = () =>
+        this._drawLineBetweenPoints(fixedCoords);
+
+      this._map.on('move', this._drawLineBetweenPointsFnRef);
+
+      this._markerRef.on('dragend', this._drawLineBetweenPointsFnRef);
+    }
   }
 
-  private _moveMarker = (e: any) => {
+  private _moveMarker(e: any) {
     this._markerRef!.setLngLat(e.target.getCenter());
-    this._drawLineBetweenFixedPointAndMarker();
-  };
+  }
 
-  private _drawLineBetweenFixedPointAndMarker = () => {
+  private _drawLineBetweenPoints(fixedCoords: LocationCoords) {
     if (!this.selectedParking()) return;
-    (this._map.getSource('line-source') as maplibregl.GeoJSONSource).setData(
-      this._mapRendererService.getLineGeoJson(
-        this.selectedParking()?.location,
-        this._markerRef.getLngLat(),
-      ),
-    );
-  };
+    this._mapRendererService.renderPoiLine(this._map, {
+      fixedCoords: fixedCoords,
+      targetCoords: this._markerRef.getLngLat(),
+    });
+  }
 
   removeMoveableMarker() {
-    const lineSource = this._map.getSource(
-      'line-source',
-    ) as maplibregl.GeoJSONSource;
-    lineSource.setData(this._mapRendererService.getLineGeoJson());
-    this._map.off('move', this._moveMarker);
-    this._markerRef.off('dragend', this._drawLineBetweenFixedPointAndMarker);
+    this._mapRendererService.renderPoiLine(this._map);
+    this._map.off('move', this._moveMarkerFnRef!);
+    this._map.off('move', this._drawLineBetweenPointsFnRef!);
+    this._markerRef.off('dragend', this._drawLineBetweenPointsFnRef!);
     this._markerRef.remove();
   }
 

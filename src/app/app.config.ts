@@ -2,7 +2,7 @@ import {
   ApplicationConfig,
   provideExperimentalZonelessChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions } from '@angular/router';
 
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import {
@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     ...provideSentry(),
     provideExperimentalZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(routes, withViewTransitions()),
     provideHttpClient(withFetch(), withInterceptors([httpInterceptor])),
     provideAnimationsAsync(),
     // TODO na pozniejszym etapie dodac obsluge i przetestowac

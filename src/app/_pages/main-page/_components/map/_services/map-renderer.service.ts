@@ -1,12 +1,47 @@
 import { Injectable } from '@angular/core';
+import { circle } from '@turf/turf';
 import * as maplibregl from 'maplibre-gl';
 import { environment } from '../../../../../../environments/environment.development';
 import { LocationCoords } from '../../../../../_types/location-coords.model';
+import { Parking } from '../../../../../_types/parking.mode';
+import { POLAND_BOUNDS, POLAND_MAX_BOUNDS } from './map.service';
+
+export const PARKING_POI_SOURCE = 'parkingPoiSource';
+export const PARKING_POI_RADIUS_SOURCE = 'parkingPoiRadiusSource';
+const PARKING_POI_LINE_SOURCE = 'parkingPoiLineSource';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MapRendererService {
+  async initRenderMap(): Promise<maplibregl.Map> {
+    const style = await import('../../../../../../../public/osm_bright.json');
+
+    const mapRef = new maplibregl.Map({
+      container: 'map',
+      maxBounds: POLAND_MAX_BOUNDS,
+      bounds: POLAND_BOUNDS,
+      style: style as any,
+    })
+      .addControl(new maplibregl.NavigationControl({ showCompass: false }))
+      .addControl(
+        new maplibregl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          showAccuracyCircle: false,
+          trackUserLocation: true,
+          fitBoundsOptions: { maxZoom: 17 },
+        }),
+      );
+
+    // Załadowanie ikony poi dla pojedynczego punktu
+    const image = await mapRef.loadImage(
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Cyprus_road_sign_parking.svg/212px-Cyprus_road_sign_parking.svg.png?20130416124154',
+    );
+    mapRef.addImage('parking-poi-icon', image.data);
+
+    return mapRef;
+  }
+
   prepareMarker(): maplibregl.Marker {
     // Ustawienie warstwy markera pod przyszłe wykorzystanie
     const el = document.createElement('div');
@@ -18,9 +53,66 @@ export class MapRendererService {
     });
   }
 
-  async preparePoiLayers(map: maplibregl.Map, sourceId: string): Promise<void> {
+  async preparePoiForRender(map: maplibregl.Map): Promise<void> {
+    this._prepareLayersForPoisWithClusters(map);
+    this._prepareLayersForPoisRadius(map);
+    this._prepareLayersForPoiLines(map);
+  }
+
+  renderPois(map: maplibregl.Map, parkingsList: Parking[]) {
+    const parkingPoiSource = map.getSource(
+      PARKING_POI_SOURCE,
+    ) as maplibregl.GeoJSONSource;
+
+    const parkingPoiRadiusSource = map.getSource(
+      PARKING_POI_RADIUS_SOURCE,
+    ) as maplibregl.GeoJSONSource;
+
+    // Nadpisanie danych o punktach poi na mapie
+    parkingPoiSource.setData({
+      type: 'FeatureCollection',
+      features: parkingsList.map((parking) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [parking.location.lng, parking.location.lat],
+        },
+        properties: {
+          parking,
+        },
+      })),
+    });
+
+    // Nadpisanie danych o punktach poi na mapie
+    parkingPoiRadiusSource.setData({
+      type: 'FeatureCollection',
+      features: parkingsList.map((parking) =>
+        circle([parking.location.lng, parking.location.lat], 20, {
+          steps: 64,
+          units: 'meters',
+        }),
+      ),
+    });
+  }
+
+  renderPoiLine(
+    map: maplibregl.Map,
+    locations?: {
+      fixedCoords?: LocationCoords;
+      targetCoords?: LocationCoords;
+    },
+  ) {
+    const lineSource = map.getSource(
+      PARKING_POI_LINE_SOURCE,
+    ) as maplibregl.GeoJSONSource;
+    lineSource.setData(
+      this._getLineGeoJson(locations?.fixedCoords, locations?.targetCoords),
+    );
+  }
+
+  private async _prepareLayersForPoisWithClusters(map: maplibregl.Map) {
     // Ustawienie danych o punktach poi na mapie
-    map.addSource(sourceId, {
+    map.addSource(PARKING_POI_SOURCE, {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -32,31 +124,10 @@ export class MapRendererService {
     });
 
     // Dodanie warstwy pojedynczych punktów POI
-    const image = await map.loadImage(
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Cyprus_road_sign_parking.svg/212px-Cyprus_road_sign_parking.svg.png?20130416124154',
-    );
-
-    map.addImage('parking-poi-icon', image.data);
-    map.addSource('point', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [0, 0],
-            },
-          } as any,
-        ],
-      },
-    });
-
     map.addLayer({
       id: 'unclustered-point',
       type: 'symbol',
-      source: sourceId,
+      source: PARKING_POI_SOURCE,
       filter: ['!', ['has', 'point_count']],
       layout: {
         'icon-image': 'parking-poi-icon',
@@ -68,7 +139,7 @@ export class MapRendererService {
     map.addLayer({
       id: 'clusters',
       type: 'circle',
-      source: sourceId,
+      source: PARKING_POI_SOURCE,
       filter: ['has', 'point_count'],
       paint: {
         'circle-color': environment.primaryColor,
@@ -82,7 +153,7 @@ export class MapRendererService {
     map.addLayer({
       id: 'cluster-count',
       type: 'symbol',
-      source: sourceId,
+      source: PARKING_POI_SOURCE,
       filter: ['has', 'point_count'],
       layout: {
         'text-field': '{point_count_abbreviated}',
@@ -92,18 +163,55 @@ export class MapRendererService {
         'text-color': '#FFFFFF',
       },
     });
+  }
 
-    // Dodanie danych o warstwie linii między markerem i punktem poi
-    map.addSource('line-source', {
+  private _prepareLayersForPoisRadius(map: maplibregl.Map) {
+    // Dodaj nowe źródło dla okręgów
+    map.addSource(PARKING_POI_RADIUS_SOURCE, {
       type: 'geojson',
-      data: this.getLineGeoJson(),
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    const MIN_ZOOM_TO_SHOW_RADIUS = 15;
+    // Następnie dodaj warstwy korzystające z tego źródła
+    map.addLayer({
+      id: 'location-radius',
+      type: 'fill',
+      source: PARKING_POI_RADIUS_SOURCE,
+      minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
+      paint: {
+        'fill-color': environment.primaryColor,
+        'fill-opacity': 0.15,
+      },
+    });
+
+    map.addLayer({
+      id: 'location-radius-outline',
+      type: 'line',
+      source: PARKING_POI_RADIUS_SOURCE,
+      minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
+      paint: {
+        'line-color': environment.primaryColor,
+        'line-width': 1,
+      },
+    });
+  }
+
+  private _prepareLayersForPoiLines(map: maplibregl.Map) {
+    // Dodanie danych o warstwie linii między markerem i punktem poi
+    map.addSource(PARKING_POI_LINE_SOURCE, {
+      type: 'geojson',
+      data: this._getLineGeoJson(),
     });
 
     // Dodanie warstwy linii między markerem i punktem poi
     map.addLayer({
       id: 'line-layer',
       type: 'line',
-      source: 'line-source',
+      source: PARKING_POI_LINE_SOURCE,
       paint: {
         'line-color': environment.primaryColor,
         'line-width': 3,
@@ -112,15 +220,15 @@ export class MapRendererService {
     });
   }
 
-  getLineGeoJson(
-    fixedPoiCoords?: LocationCoords,
-    markerCoords?: LocationCoords,
+  private _getLineGeoJson(
+    fixedCoords?: LocationCoords,
+    targetCoords?: LocationCoords,
   ): any {
     let coordinates: any = [];
-    if (fixedPoiCoords && markerCoords) {
+    if (fixedCoords && targetCoords) {
       coordinates = [
-        [fixedPoiCoords.lng, fixedPoiCoords.lat],
-        [markerCoords.lng, markerCoords.lat],
+        [fixedCoords.lng, fixedCoords.lat],
+        [targetCoords.lng, targetCoords.lat],
       ];
     }
     const lineGeoJson = {

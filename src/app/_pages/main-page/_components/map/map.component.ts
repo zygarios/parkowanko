@@ -28,11 +28,13 @@ export class MapComponent {
   parkingsList = input<Parking[]>([]);
 
   constructor() {
-    afterNextRender(() => this._mapService.initialRenderMap());
+    afterNextRender(() => this._mapService.initRenderMap());
     afterRenderEffect(() => {
       if (this._mapService.isMapLoaded()) {
         this.parkingsList();
-        untracked(() => this._mapService.renderPoiList(this.parkingsList()));
+        untracked(() =>
+          this._mapService.renderParkingsPois(this.parkingsList()),
+        );
       }
     });
   }

@@ -62,21 +62,11 @@ export class PoiControllerComponent {
 
   constructor() {
     effect(() => this._listenForSelectedPoiToStartEdit());
-    effect(() => this._listenForActiveModeToSetMapState());
   }
 
   private _listenForSelectedPoiToStartEdit() {
     this.selectedParking();
     untracked(() => this.startEditingPoi());
-  }
-
-  private _listenForActiveModeToSetMapState() {
-    this.activeMode();
-    untracked(() => {
-      if (this.activeMode() === ActiveModeEnum.DEFAULT) {
-        this.selectedParking.set(null);
-      }
-    });
   }
 
   setDefaultState() {
@@ -147,7 +137,7 @@ export class PoiControllerComponent {
     const selectedPoi: Parking | null = this.selectedParking();
     if (!selectedPoi) return;
     this.activeMode.set(ActiveModeEnum.UPDATING_POI_POSITION);
-    this._mapService.renderMoveableMarker();
+    this._mapService.renderMoveableMarker(this.selectedParking()?.location);
     this._mapService.jumpToPoi(selectedPoi?.location);
   }
 
