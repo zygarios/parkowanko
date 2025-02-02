@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1738509939345,
+  "timestamp": 1738510367544,
   "index": "/parkowanko/index.html",
   "assetGroups": [
     {
@@ -12,16 +12,16 @@
       },
       "urls": [
         "/parkowanko/chunk-3ULI5GND.js",
+        "/parkowanko/chunk-A7WNDHBG.js",
         "/parkowanko/chunk-JWOIYKVK.js",
-        "/parkowanko/chunk-M7RT3AAO.js",
         "/parkowanko/chunk-QRIGDONS.js",
         "/parkowanko/chunk-UGEW7JAO.js",
         "/parkowanko/chunk-VZBGOO6O.js",
         "/parkowanko/favicon.ico",
         "/parkowanko/index.html",
-        "/parkowanko/main-P5MOHBLH.js",
+        "/parkowanko/main-NB5EZZXA.js",
         "/parkowanko/manifest.webmanifest",
-        "/parkowanko/styles-2NSBXRLA.css"
+        "/parkowanko/styles-5ILFHPA7.css"
       ],
       "patterns": []
     },
@@ -50,8 +50,8 @@
   "dataGroups": [],
   "hashTable": {
     "/parkowanko/chunk-3ULI5GND.js": "fdf51110f90ad1842d01d5a07b21bda312b2ec70",
+    "/parkowanko/chunk-A7WNDHBG.js": "040093d7f7306fe9faa61d697790b311dbe9fbe0",
     "/parkowanko/chunk-JWOIYKVK.js": "0ea37deea4a71f8117a99dafa7f9b45b0252db43",
-    "/parkowanko/chunk-M7RT3AAO.js": "1a22fe01ffebf37905278dc3994dbedc78d95d1a",
     "/parkowanko/chunk-QRIGDONS.js": "733a0bbdb8ff695fb585366b07d2e548cbef4997",
     "/parkowanko/chunk-UGEW7JAO.js": "9dc89ffb69b125eb1a18631bd5882200c27d07e7",
     "/parkowanko/chunk-VZBGOO6O.js": "405e64ae8f7bc31196a0d16150ebd6c6c6d22d71",
@@ -65,11 +65,11 @@
     "/parkowanko/icons/pwa/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/parkowanko/icons/pwa/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
     "/parkowanko/icons/pwa/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
-    "/parkowanko/index.html": "f670255b672df89941ce3077d03a911335fb4d05",
-    "/parkowanko/main-P5MOHBLH.js": "d32c2c8dc17c70ca5baf1e4f3b27479c0fc942c0",
+    "/parkowanko/index.html": "ddf1468ac7a63e6b80930bded7abdb3061f6445a",
+    "/parkowanko/main-NB5EZZXA.js": "41f2bd369c4abcd3a4a40b7d7baeb0a8e01d6efe",
     "/parkowanko/manifest.webmanifest": "c81a708077905aaa90c6431e9b70859a494647e3",
     "/parkowanko/media/parking-poi-KLDG7L2W.svg": "bdd23ed41927cb64cd22295d15936dba903edf25",
-    "/parkowanko/styles-2NSBXRLA.css": "6aa49b81142104f6e2fd927e51ca7db11ed946e2"
+    "/parkowanko/styles-5ILFHPA7.css": "29852e18e0c26b7a705856e6a37064c111ebc5e8"
   },
   "navigationUrls": [
     {
