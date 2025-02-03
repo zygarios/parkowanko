@@ -1,7 +1,7 @@
 {
   "configVersion": 1,
-  "timestamp": 1738510367544,
-  "index": "/parkowanko/index.html",
+  "timestamp": 1738610431443,
+  "index": "/index.html",
   "assetGroups": [
     {
       "name": "app",
@@ -11,17 +11,17 @@
         "ignoreVary": true
       },
       "urls": [
-        "/parkowanko/chunk-3ULI5GND.js",
-        "/parkowanko/chunk-A7WNDHBG.js",
-        "/parkowanko/chunk-JWOIYKVK.js",
-        "/parkowanko/chunk-QRIGDONS.js",
-        "/parkowanko/chunk-UGEW7JAO.js",
-        "/parkowanko/chunk-VZBGOO6O.js",
-        "/parkowanko/favicon.ico",
-        "/parkowanko/index.html",
-        "/parkowanko/main-NB5EZZXA.js",
-        "/parkowanko/manifest.webmanifest",
-        "/parkowanko/styles-5ILFHPA7.css"
+        "/chunk-6AWIB7OX.js",
+        "/chunk-6VI22XDL.js",
+        "/chunk-A6RGJIC2.js",
+        "/chunk-AKWV2NOP.js",
+        "/chunk-C6Q5SG76.js",
+        "/chunk-I7S7OKR7.js",
+        "/favicon.ico",
+        "/index.html",
+        "/main-RAWH34P3.js",
+        "/manifest.webmanifest",
+        "/styles-6TXZR76S.css"
       ],
       "patterns": []
     },
@@ -33,43 +33,43 @@
         "ignoreVary": true
       },
       "urls": [
-        "/parkowanko/icons/parking-poi.svg",
-        "/parkowanko/icons/pwa/icon-128x128.png",
-        "/parkowanko/icons/pwa/icon-144x144.png",
-        "/parkowanko/icons/pwa/icon-152x152.png",
-        "/parkowanko/icons/pwa/icon-192x192.png",
-        "/parkowanko/icons/pwa/icon-384x384.png",
-        "/parkowanko/icons/pwa/icon-512x512.png",
-        "/parkowanko/icons/pwa/icon-72x72.png",
-        "/parkowanko/icons/pwa/icon-96x96.png",
-        "/parkowanko/media/parking-poi-KLDG7L2W.svg"
+        "/icons/parking-poi.svg",
+        "/icons/pwa/icon-128x128.png",
+        "/icons/pwa/icon-144x144.png",
+        "/icons/pwa/icon-152x152.png",
+        "/icons/pwa/icon-192x192.png",
+        "/icons/pwa/icon-384x384.png",
+        "/icons/pwa/icon-512x512.png",
+        "/icons/pwa/icon-72x72.png",
+        "/icons/pwa/icon-96x96.png",
+        "/media/parking-poi-MYPRM6NT.svg"
       ],
       "patterns": []
     }
   ],
   "dataGroups": [],
   "hashTable": {
-    "/parkowanko/chunk-3ULI5GND.js": "fdf51110f90ad1842d01d5a07b21bda312b2ec70",
-    "/parkowanko/chunk-A7WNDHBG.js": "040093d7f7306fe9faa61d697790b311dbe9fbe0",
-    "/parkowanko/chunk-JWOIYKVK.js": "0ea37deea4a71f8117a99dafa7f9b45b0252db43",
-    "/parkowanko/chunk-QRIGDONS.js": "733a0bbdb8ff695fb585366b07d2e548cbef4997",
-    "/parkowanko/chunk-UGEW7JAO.js": "9dc89ffb69b125eb1a18631bd5882200c27d07e7",
-    "/parkowanko/chunk-VZBGOO6O.js": "405e64ae8f7bc31196a0d16150ebd6c6c6d22d71",
-    "/parkowanko/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
-    "/parkowanko/icons/parking-poi.svg": "bdd23ed41927cb64cd22295d15936dba903edf25",
-    "/parkowanko/icons/pwa/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
-    "/parkowanko/icons/pwa/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
-    "/parkowanko/icons/pwa/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
-    "/parkowanko/icons/pwa/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
-    "/parkowanko/icons/pwa/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
-    "/parkowanko/icons/pwa/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
-    "/parkowanko/icons/pwa/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
-    "/parkowanko/icons/pwa/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
-    "/parkowanko/index.html": "ddf1468ac7a63e6b80930bded7abdb3061f6445a",
-    "/parkowanko/main-NB5EZZXA.js": "41f2bd369c4abcd3a4a40b7d7baeb0a8e01d6efe",
-    "/parkowanko/manifest.webmanifest": "c81a708077905aaa90c6431e9b70859a494647e3",
-    "/parkowanko/media/parking-poi-KLDG7L2W.svg": "bdd23ed41927cb64cd22295d15936dba903edf25",
-    "/parkowanko/styles-5ILFHPA7.css": "29852e18e0c26b7a705856e6a37064c111ebc5e8"
+    "/chunk-6AWIB7OX.js": "3b36edfcfcce4c38e9013734ede26820681da926",
+    "/chunk-6VI22XDL.js": "c3e8c0a042435b1328705adc19b78bf4da00786a",
+    "/chunk-A6RGJIC2.js": "70ba04a3b27b72ad6f95816a9107c0d01440dfd7",
+    "/chunk-AKWV2NOP.js": "bada3f74cdc22c8449dac2ae3c14cdd4b56d2d7c",
+    "/chunk-C6Q5SG76.js": "fd4fc33dfc3c6ef846db1272f907a0dbbbb1e374",
+    "/chunk-I7S7OKR7.js": "b139a0f0f565a032a301220936a905af00458e34",
+    "/favicon.ico": "d4e59cb440e0f00a4b760a8b796f68bc6bd1ac9d",
+    "/icons/parking-poi.svg": "0149c9f2a98c36861b8c0ec8456bbae699494eff",
+    "/icons/pwa/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
+    "/icons/pwa/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
+    "/icons/pwa/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
+    "/icons/pwa/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
+    "/icons/pwa/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
+    "/icons/pwa/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
+    "/icons/pwa/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
+    "/icons/pwa/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
+    "/index.html": "e0a897802e45585df58c944c332205e5761f1f52",
+    "/main-RAWH34P3.js": "6828eacbc41cddefee7d126d4588a69ccba5579d",
+    "/manifest.webmanifest": "c81a708077905aaa90c6431e9b70859a494647e3",
+    "/media/parking-poi-MYPRM6NT.svg": "0149c9f2a98c36861b8c0ec8456bbae699494eff",
+    "/styles-6TXZR76S.css": "7dae79d0a9132beee55a04f007e6aea10471580a"
   },
   "navigationUrls": [
     {

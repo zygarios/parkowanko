@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/_pages/main-page/_components/poi-controller/poi-controller.component.scss"],
-  "sourcesContent": [".menu-buttons-wrapper {\r\n  display: flex;\r\n  width: 100%;\r\n  justify-content: center;\r\n  gap: 10px;\r\n  position: fixed;\r\n  z-index: 100;\r\n  left: 0;\r\n  right: 0;\r\n  bottom: 0;\r\n  white-space: nowrap;\r\n  padding: 10px;\r\n  .menu-button {\r\n    box-shadow:\r\n      0 0 0 2px white,\r\n      0 0 2px 2px rgba(0, 0, 0, 0.5);\r\n  }\r\n}\r\n"],
-  "mappings": "AAAA,CAAA,qBACE,QAAA,KACA,MAAA,KACA,gBAAA,OACA,IAAA,KACA,SAAA,MACA,QAAA,IACA,KAAA,EACA,MAAA,EACA,OAAA,EACA,YAAA,OAVF,QAWE,KACA,CAZF,qBAYE,CAAA,YACE,WACE,EAAA,EAAA,EAAA,IAAA,IAAA,CAAA,EAAA,EAAA,IAAA,IAAA",
-  "names": []
-}
