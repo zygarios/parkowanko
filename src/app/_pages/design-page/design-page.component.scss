@@ -1,0 +1,24 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+}
+.row {
+  display: flex;
+  gap: 10px;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  > * {
+    width: fit-content;
+  }
+}
+
+.icons {
+  img {
+    width: 50px;
+  }
+}

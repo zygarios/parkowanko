@@ -1,0 +1,43 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Formularze</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="column">
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input matInput type="email" />
+        <mat-icon matSuffix> alternate_email </mat-icon>
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Przyciski</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="row">
+      <button mat-button>Przycisk</button>
+      <button mat-flat-button><mat-icon>email</mat-icon>Przycisk</button>
+      <button mat-flat-button>Przycisk</button>
+      <button mat-flat-button [class.error-theme]="true">Przycisk</button>
+      <button mat-stroked-button>
+        <div>asd</div>
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Własne ikony</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="row icons">
+      <img src="icons/parking-marker.svg" />
+      <img src="icons/parking-free-poi.png" />
+    </div>
+  </mat-card-content>
+</mat-card>

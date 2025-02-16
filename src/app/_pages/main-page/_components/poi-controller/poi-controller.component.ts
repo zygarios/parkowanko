@@ -182,17 +182,15 @@ export class PoiControllerComponent {
       .pipe(
         switchMap((result: boolean) => {
           if (result) {
-            return this._parkingsService
-              .deleteParking(selectedPoi.id)
-              .pipe(
-                tap(() => {
-                  this._sharedUtilsService.openSnackbar(
-                    'Gotowe!\nUsunięto znacznik bezpłatnego parkingu',
-                    'SUCCESS',
-                  );
-                }),
-              )
-              .pipe(map(() => true));
+            return this._parkingsService.deleteParking(selectedPoi.id).pipe(
+              tap(() => {
+                this._sharedUtilsService.openSnackbar(
+                  'Gotowe!\nUsunięto znacznik bezpłatnego parkingu',
+                  'SUCCESS',
+                );
+              }),
+              map(() => true),
+            );
           } else {
             return of(false);
           }

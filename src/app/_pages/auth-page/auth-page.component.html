@@ -1,0 +1,20 @@
+<form [formGroup]="authForm">
+  <mat-form-field>
+    <mat-label>Email</mat-label>
+    <input matInput type="email" />
+    <mat-icon matSuffix> alternate_email </mat-icon>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Hasło</mat-label>
+    <input matInput [type]="isPasswordHidden() ? 'password' : 'text'" />
+    <button
+      mat-icon-button
+      matSuffix
+      (click)="togglePasswordVisibility($event)"
+    >
+      <mat-icon>
+        {{ isPasswordHidden() ? "visibility_off" : "visibility" }}
+      </mat-icon>
+    </button>
+  </mat-form-field>
+</form>

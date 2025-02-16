@@ -1,12 +1,14 @@
+@use "tailwindcss";
 @use "@angular/material" as mat;
+@use "./theme/theme-font-tokens";
 @use "./theme/theme-tokens";
 @use "./theme/theme-components";
-@use "./theme/theme-class.scss";
+@use "./theme/theme-class";
 
 :root {
-  --color-success: #4bab4e;
-  --color-error: var(--mat-sys-error);
-  --color-primary: #4fc4cf;
+  --par-color-success: #4bab4e;
+  --par-color-error: var(--mat-sys-error);
+  --par-color-primary: #00b5c6;
 }
 
 * {
@@ -17,6 +19,7 @@ html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -25,11 +28,12 @@ body {
   font-size: 14px;
   line-height: 1.5;
 }
+
 ul {
   padding-left: 20px;
 }
 
 strong {
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--par-color-primary);
 }

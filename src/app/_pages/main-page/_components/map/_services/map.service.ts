@@ -23,8 +23,8 @@ const CLOSE_ZOOM = 16;
 @Injectable({ providedIn: 'root' })
 export class MapService {
   private _mapRendererService = inject(MapRendererService);
-  private _markerRef: maplibregl.Marker =
-    this._mapRendererService.prepareMarker();
+  private _markerRef!: maplibregl.Marker;
+
   private _map!: maplibregl.Map;
 
   private _moveMarkerFnRef: ((e: any) => void) | null = null;
@@ -41,6 +41,15 @@ export class MapService {
     this._prepareAdditionalFeaturesOnLoadMap();
   }
 
+  async initRenderMap(): Promise<void> {
+    this._map?.remove();
+    this._markerRef?.remove();
+
+    this._markerRef = this._mapRendererService.prepareMarker();
+    this._map = await this._mapRendererService.initRenderMap();
+    this._map.on('load', () => this._isMapLoaded.set(true));
+  }
+
   private _prepareAdditionalFeaturesOnLoadMap() {
     afterRenderEffect(() => {
       if (this.isMapLoaded()) {
@@ -51,11 +60,6 @@ export class MapService {
         });
       }
     });
-  }
-
-  async initRenderMap(): Promise<void> {
-    this._map = await this._mapRendererService.initRenderMap();
-    this._map.on('load', () => this._isMapLoaded.set(true));
   }
 
   getMarkerLatLng(): LocationCoords {

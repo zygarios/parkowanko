@@ -34,9 +34,9 @@ export class MapRendererService {
       );
 
     // Załadowanie ikony poi dla pojedynczego punktu
-    const image = './../../../../../../../public/icons/parking-poi.svg';
+    const imageUrl = '/icons/parking-free-poi.png';
 
-    const imageBitmap = await fetch(image)
+    const imageBitmap = await fetch(imageUrl)
       .then((response) => response.blob())
       .then((blob) => createImageBitmap(blob));
 
@@ -138,7 +138,7 @@ export class MapRendererService {
       filter: ['!', ['has', 'point_count']],
       layout: {
         'icon-image': 'parking-poi-icon',
-        'icon-size': 0.1,
+        'icon-size': 0.3,
       },
     });
 

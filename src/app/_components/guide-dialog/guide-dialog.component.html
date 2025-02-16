@@ -47,9 +47,12 @@
     {{ index + 1 }}
   </ng-template>
 </mat-stepper>
+
 <mat-dialog-actions align="end">
   <button mat-button (click)="stepper.previous()">Poprzednie</button>
-  <button mat-flat-button (click)="stepper.next()">
-    {{ stepper.selectedIndex !== 2 ? "Następne" : "Zamknij" }}
-  </button>
+  @if (stepper.selectedIndex !== 2) {
+    <button mat-flat-button (click)="stepper.next()">Następne</button>
+  } @else {
+    <button mat-flat-button mat-dialog-close>Zamknij</button>
+  }
 </mat-dialog-actions>

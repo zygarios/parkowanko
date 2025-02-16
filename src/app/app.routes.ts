@@ -1,6 +1,7 @@
+import { isDevMode } from '@angular/core';
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [
+const routesList: Routes = [
   {
     path: '',
     loadComponent: () =>
@@ -8,4 +9,28 @@ export const routes: Routes = [
         (c) => c.MainPageComponent,
       ),
   },
+  {
+    path: 'auth',
+    loadComponent: () =>
+      import('./_pages/auth-page/auth-page.component').then(
+        (c) => c.AuthPageComponent,
+      ),
+  },
+  ...(!isDevMode()
+    ? []
+    : [
+        {
+          path: 'design',
+          loadComponent: () =>
+            import('./_pages/design-page/design-page.component').then(
+              (c) => c.DesignPageComponent,
+            ),
+        },
+      ]),
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];
+
+export const routes = routesList;
