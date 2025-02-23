@@ -15,7 +15,9 @@ import { MatInputModule } from '@angular/material/input';
     MatInputModule,
   ],
   templateUrl: './design-page.component.html',
-  styleUrl: './design-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'flex flex-col p-3 gap-6',
+  },
 })
 export class DesignPageComponent {}

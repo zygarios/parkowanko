@@ -1,23 +1,26 @@
-@use "tailwindcss";
-@use "@angular/material" as mat;
-@use "./theme/theme-font-tokens";
-@use "./theme/theme-tokens";
-@use "./theme/theme-components";
-@use "./theme/theme-class";
+@import "tailwindcss";
+@import "./theme/theme-font-tokens";
+@import "./theme/theme-tokens";
+@import "./theme/theme-components";
+@import "./theme/theme-class";
 
 :root {
+  --par-color-primary: #00aab9;
+  --par-color-error: #ba1a1a;
   --par-color-success: #4bab4e;
-  --par-color-error: var(--mat-sys-error);
-  --par-color-primary: #00b5c6;
+  --par-color-black: #242424;
+  --par-container-padding: 16px;
 }
 
 * {
   box-sizing: border-box;
+  border: none;
 }
 
 html,
 body {
   height: 100%;
+  color: var(--par-color-black);
 }
 
 body {

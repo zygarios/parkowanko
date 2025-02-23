@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment.development';
 import { GuideDialogComponent } from '../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsService } from '../../_services/parkings-api.service';
+import { EnvironmentType } from '../../_types/environment-type.model';
 import { MapComponent } from './_components/map/map.component';
 import { PoiControllerComponent } from './_components/poi-controller/poi-controller.component';
 
@@ -23,13 +24,13 @@ import { PoiControllerComponent } from './_components/poi-controller/poi-control
     RouterLink,
   ],
   templateUrl: './main-page.component.html',
-  styleUrl: './main-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainPageComponent {
   private _matDialog = inject(MatDialog);
   private _parkingsService = inject(ParkingsService);
-  readonly ENVIRONMENT_TYPE = environment.environmentType;
+  readonly environmentTypeModel = EnvironmentType;
+  readonly environmentType = environment.environmentType;
 
   parkingsList = this._parkingsService.parkingsList;
 

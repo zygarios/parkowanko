@@ -3,7 +3,7 @@ import { circle } from '@turf/turf';
 import * as maplibregl from 'maplibre-gl';
 import { environment } from '../../../../../../environments/environment.development';
 import { LocationCoords } from '../../../../../_types/location-coords.model';
-import { Parking } from '../../../../../_types/parking.mode';
+import { Parking } from '../../../../../_types/parking.model';
 import { POLAND_BOUNDS, POLAND_MAX_BOUNDS } from './map.service';
 
 export const PARKING_POI_SOURCE = 'parkingPoiSource';
@@ -32,6 +32,7 @@ export class MapRendererService {
           fitBoundsOptions: { maxZoom: 17 },
         }),
       );
+    mapRef.touchZoomRotate.disableRotation();
 
     // Załadowanie ikony poi dla pojedynczego punktu
     const imageUrl = '/icons/parking-free-poi.png';

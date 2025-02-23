@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { map, Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-import { Parking, ParkingSaveData } from '../_types/parking.mode';
+import { Parking, ParkingSaveData } from '../_types/parking.model';
 
 @Injectable({
   providedIn: 'root',

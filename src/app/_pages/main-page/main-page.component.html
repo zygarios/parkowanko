@@ -1,4 +1,8 @@
-<button class="menu-button" mat-mini-fab [matMenuTriggerFor]="menu">
+<button
+  class="fixed! z-2 left-2.5 top-2.5 shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
+  mat-mini-fab
+  [matMenuTriggerFor]="menu"
+>
   <mat-icon>menu</mat-icon>
 </button>
 
@@ -16,8 +20,12 @@
   </a>
 </mat-menu>
 
-<div class="environment-widget">
-  <div class="label">
-    {{ ENVIRONMENT_TYPE }}
+@if (environmentType !== environmentTypeModel.PROD) {
+  <div
+    class="fixed top-1/2 left-0 w-8 h-5 z-50 flex items-center justify-center rounded-bl-lg rounded-br-lg bg-white border-2! border-blue-300! -rotate-90 transform -translate-x-[6px]"
+  >
+    <div class="text-xs">
+      {{ environmentType }}
+    </div>
   </div>
-</div>
+}

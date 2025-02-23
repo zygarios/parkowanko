@@ -1,25 +1,31 @@
 :root {
-  // BUTTONS FAB
+  /* BUTTONS FAB */
   --mdc-fab-small-container-color: white;
 
-  // BUTTONS
-  --mdc-filled-button-container-height: 50px;
-  --mdc-protected-button-container-height: 50px;
+  /* BUTTON-TEXT */
   --mdc-text-button-container-height: 50px;
-  --mdc-outlined-button-container-height: 50px;
-
-  --mat-filled-button-horizontal-padding: 20px;
-  --mat-protected-button-horizontal-padding: 20px;
   --mat-text-button-horizontal-padding: 20px;
+
+  /* BUTTON-FLAT */
+  --mdc-filled-button-container-height: 50px;
+  --mat-filled-button-horizontal-padding: 20px;
+
+  /* BUTTON-RAISED */
+  --mdc-protected-button-container-height: 50px;
+  --mat-protected-button-horizontal-padding: 20px;
+
+  /* BUTTON-OUTLINED */
+  --mdc-outlined-button-container-height: 50px;
   --mat-outlined-button-horizontal-padding: 20px;
 
-  // DIALOG
+  /* DIALOG */
   --mat-dialog-container-small-max-width: none;
   --mat-dialog-headline-padding: 20px 24px 15px;
 
   .mat-mdc-dialog-panel {
     width: 95dvw;
   }
+
   .mat-mdc-dialog-title {
     font-size: 20px;
     display: flex;
@@ -32,18 +38,19 @@
 
   mat-dialog-actions {
     background-color: var(--mat-sys-surface);
+    margin-top: auto;
     position: sticky;
     bottom: 0;
   }
 
-  // STEPPER
-  // Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze
+  /* STEPPER */
+  /* Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze */
   --mat-stepper-header-done-state-icon-background-color: var(
     --mat-sys-on-surface-variant
   );
   --mat-stepper-header-done-state-icon-foreground-color: white;
 
-  // SNACKBAR
+  /* SNACKBAR */
   --mdc-snackbar-container-color: var(--mat-sys-primary);
   .mat-mdc-snackbar-surface {
     box-shadow:
@@ -52,7 +59,7 @@
       var(--mat-sys-level3);
   }
 
-  // BOTTOM SHEET
+  /* BOTTOM SHEET */
   .mat-bottom-sheet-container {
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -64,13 +71,14 @@
     background-color: rgba(0, 0, 0, 0.1);
   }
 
-  // CARD
+  /* CARD */
   mat-card-header {
     padding: 16px;
   }
 
-  // FORMFIELD
+  /* FORMFIELD */
   mat-form-field {
+    margin-bottom: 20px;
     mat-icon {
       color: var(--mat-sys-primary);
     }

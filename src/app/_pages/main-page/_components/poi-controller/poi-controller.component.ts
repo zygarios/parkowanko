@@ -14,10 +14,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { map, of, switchMap, tap } from 'rxjs';
-import { enterFadeAnimation } from '../../../../_others/animations/enter-fade-animation';
 import { ParkingsService } from '../../../../_services/parkings-api.service';
 import { SharedUtilsService } from '../../../../_services/shared-utils.service';
-import { Parking } from '../../../../_types/parking.mode';
+import { Parking } from '../../../../_types/parking.model';
 import { MapService } from '../map/_services/map.service';
 
 enum ActiveModeEnum {
@@ -36,9 +35,7 @@ enum ActiveModeEnum {
     MatBottomSheetModule,
   ],
   templateUrl: './poi-controller.component.html',
-  styleUrl: './poi-controller.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [enterFadeAnimation],
 })
 export class PoiControllerComponent {
   private _mapService = inject(MapService);

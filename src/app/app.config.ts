@@ -12,7 +12,6 @@ import {
 } from '@angular/common/http';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { initSentry, provideSentry } from './_others/helpers/sentry';
 import { httpInterceptor } from './_others/interceptors/http-interceptor';
 import { routes } from './app.routes';
@@ -25,7 +24,6 @@ export const appConfig: ApplicationConfig = {
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes, withViewTransitions()),
     provideHttpClient(withFetch(), withInterceptors([httpInterceptor])),
-    provideAnimationsAsync(),
     // TODO na pozniejszym etapie dodac obsluge i przetestowac
     // provideServiceWorker('ngsw-worker.js', {
     // enabled: !isDevMode(),

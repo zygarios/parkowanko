@@ -22,6 +22,11 @@ interface AuthFormData {
 
 type AuthFormSaveData = Omit<AuthFormData, 'repeatedPassword'>;
 
+enum AuthMode {
+  LOGIN = 'LOGIN',
+  REGISTER = 'REGISTER',
+}
+
 @Component({
   selector: 'app-auth-page',
   imports: [
@@ -37,6 +42,7 @@ type AuthFormSaveData = Omit<AuthFormData, 'repeatedPassword'>;
 })
 export class AuthPageComponent {
   private _fb = inject(NonNullableFormBuilder);
+  authMode = signal<AuthMode>(AuthMode.LOGIN);
 
   authForm = this._fb.group({
     email: this._fb.control('', [Validators.required]),

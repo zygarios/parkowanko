@@ -1,10 +1,11 @@
-<form [formGroup]="authForm">
-  <mat-form-field>
+<h1>{{ authMode() ? "Logowanie" : "Rejestracja" }}</h1>
+<form [formGroup]="authForm" class="auth-form">
+  <mat-form-field subscriptSizing="dynamic">
     <mat-label>Email</mat-label>
     <input matInput type="email" />
     <mat-icon matSuffix> alternate_email </mat-icon>
   </mat-form-field>
-  <mat-form-field>
+  <mat-form-field subscriptSizing="dynamic">
     <mat-label>Hasło</mat-label>
     <input matInput [type]="isPasswordHidden() ? 'password' : 'text'" />
     <button
@@ -18,3 +19,5 @@
     </button>
   </mat-form-field>
 </form>
+
+<div class="actions"></div>

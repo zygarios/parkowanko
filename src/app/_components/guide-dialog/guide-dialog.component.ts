@@ -9,8 +9,19 @@ import { MatStepperModule } from '@angular/material/stepper';
   selector: 'app-guide-dialog',
   imports: [MatStepperModule, MatButtonModule, MatDialogModule, MatIconModule],
   templateUrl: './guide-dialog.component.html',
-  styleUrl: './guide-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    :host {
+      ::ng-deep .mat-step-label {
+        display: none !important;
+      }
+      ::ng-deep .mat-horizontal-stepper-header-container {
+        position: sticky;
+        top: 0;
+        background-color: var(--mat-sys-surface);
+      }
+    }
+  `,
 })
 export class GuideDialogComponent {
   private _dialogRef = inject(DialogRef);

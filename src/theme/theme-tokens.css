@@ -33,7 +33,7 @@ html {
   --mat-sys-outline-variant: #c2c6d6;
 
   /* Error palette variables */
-  --mat-sys-error: #ba1a1a;
+  --mat-sys-error: var(--par-colo-error);
   --mat-sys-on-error: #ffffff;
   --mat-sys-error-container: #ffdad6;
   --mat-sys-on-error-container: #410002;
@@ -63,22 +63,28 @@ html {
   );
 
   /* Elevation level system variables. These are used as the value for box-shadow CSS property. */
-  --mat-sys-level0: 0px 0px 0px 0px var(--mat-sys-umbra-color),
+  --mat-sys-level0:
+    0px 0px 0px 0px var(--mat-sys-umbra-color),
     0px 0px 0px 0px var(--mat-sys-penumbra-color),
     0px 0px 0px 0px var(--mat-sys-ambient-color);
-  --mat-sys-level1: 0px 2px 1px -1px var(--mat-sys-umbra-color),
+  --mat-sys-level1:
+    0px 2px 1px -1px var(--mat-sys-umbra-color),
     0px 1px 1px 0px var(--mat-sys-penumbra-color),
     0px 1px 3px 0px var(--mat-sys-ambient-color);
-  --mat-sys-level2: 0px 3px 3px -2px var(--mat-sys-umbra-color),
+  --mat-sys-level2:
+    0px 3px 3px -2px var(--mat-sys-umbra-color),
     0px 3px 4px 0px var(--mat-sys-penumbra-color),
     0px 1px 8px 0px var(--mat-sys-ambient-color);
-  --mat-sys-level3: 0px 3px 5px -1px var(--mat-sys-umbra-color),
+  --mat-sys-level3:
+    0px 3px 5px -1px var(--mat-sys-umbra-color),
     0px 6px 10px 0px var(--mat-sys-penumbra-color),
     0px 1px 18px 0px var(--mat-sys-ambient-color);
-  --mat-sys-level4: 0px 5px 5px -3px var(--mat-sys-umbra-color),
+  --mat-sys-level4:
+    0px 5px 5px -3px var(--mat-sys-umbra-color),
     0px 8px 10px 1px var(--mat-sys-penumbra-color),
     0px 3px 14px 2px var(--mat-sys-ambient-color);
-  --mat-sys-level5: 0px 7px 8px -4px var(--mat-sys-umbra-color),
+  --mat-sys-level5:
+    0px 7px 8px -4px var(--mat-sys-umbra-color),
     0px 12px 17px 2px var(--mat-sys-penumbra-color),
     0px 5px 22px 4px var(--mat-sys-ambient-color);
 

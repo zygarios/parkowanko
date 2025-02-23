@@ -19,7 +19,6 @@ export interface MenuSheetItem {
   selector: 'app-menu-sheet',
   imports: [MatListModule, MatIconModule, MatButtonModule],
   templateUrl: './menu-sheet.component.html',
-  styleUrl: './menu-sheet.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuSheetComponent {

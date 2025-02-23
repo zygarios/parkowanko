@@ -10,7 +10,7 @@ export const initSentry = () => {
       Sentry.replayIntegration({
         maskAllInputs: false,
         maskAllText: false,
-        maxReplayDuration: 90000,
+        maxReplayDuration: 30000,
       }),
     ],
     replaysSessionSampleRate: 0,

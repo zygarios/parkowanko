@@ -1,6 +1,8 @@
-import { envBase } from './env-base';
+import { EnvironmentType } from '../app/_types/environment-type.model';
+import { envShared } from './env-shared';
 
 export const environment = {
-  ...envBase,
-  environmentType: 'PROD',
+  ...envShared,
+  environmentType: 'PROD' as EnvironmentType,
+  apiUrl: 'https://parkowanko.onrender.com/api',
 };

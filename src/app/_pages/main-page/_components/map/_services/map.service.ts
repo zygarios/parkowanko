@@ -8,7 +8,7 @@ import {
 import { booleanPointInPolygon, buffer, point } from '@turf/turf';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../../../../_types/location-coords.model';
-import { Parking } from '../../../../../_types/parking.mode';
+import { Parking } from '../../../../../_types/parking.model';
 import { MapRendererService } from './map-renderer.service';
 
 export const POLAND_BOUNDS = [14, 48, 24.5, 56] as any;
