@@ -29,8 +29,7 @@ import { PoiControllerComponent } from './_components/poi-controller/poi-control
 export class MainPageComponent {
   private _matDialog = inject(MatDialog);
   private _parkingsService = inject(ParkingsService);
-  readonly environmentTypeModel = EnvironmentType;
-  readonly environmentType = environment.environmentType;
+  readonly environmentType: EnvironmentType = environment.environmentType;
 
   parkingsList = this._parkingsService.parkingsList;
 

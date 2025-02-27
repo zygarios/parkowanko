@@ -1,7 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClient,
+  httpResource,
+  HttpResourceRef,
+} from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { map, Observable, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { Parking, ParkingSaveData } from '../_types/parking.model';
 
@@ -11,15 +14,13 @@ import { Parking, ParkingSaveData } from '../_types/parking.model';
 export class ParkingsService {
   private _httpClient = inject(HttpClient);
 
-  parkingsList = rxResource({
-    loader: () => this.getParkings(),
-    defaultValue: [],
-  });
+  parkingsList = this._getParkings();
 
-  getParkings(): Observable<Parking[]> {
-    return this._httpClient
-      .get(`${environment.apiUrl}/parkings/`)
-      .pipe(map((res: any) => res.map((item: any) => new Parking(item))));
+  private _getParkings(): HttpResourceRef<Parking[]> {
+    return httpResource(`${environment.apiUrl}/parkings/`, {
+      parse: (res) => (res as []).map((item) => new Parking(item)),
+      defaultValue: [],
+    });
   }
 
   postParking(body: ParkingSaveData): Observable<Parking> {
@@ -29,7 +30,7 @@ export class ParkingsService {
         tap((newParking: Parking) =>
           this.parkingsList.update((parkings: Parking[]) => [
             ...parkings,
-            newParking,
+            new Parking(newParking),
           ]),
         ),
       );
@@ -39,10 +40,10 @@ export class ParkingsService {
     return this._httpClient
       .patch<Parking>(`${environment.apiUrl}/parkings/${id}/`, body)
       .pipe(
-        tap((updatedParking) =>
+        tap((updatedParking: Parking) =>
           this.parkingsList.update((parkings: Parking[]) =>
             parkings.map((parking) =>
-              parking.id !== id ? parking : updatedParking,
+              parking.id !== id ? parking : new Parking(updatedParking),
             ),
           ),
         ),

@@ -1,5 +1,1 @@
-export enum EnvironmentType {
-  PROD = 'PROD',
-  PREP = 'PREP',
-  DEV = 'DEV',
-}
+export type EnvironmentType = 'PROD' | 'PREP' | 'DEV';
