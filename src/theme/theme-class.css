@@ -13,10 +13,10 @@
 /* SNACKBAR */
 /* Klasa przekazywana jako panelClass przy otwieraniu snackbara */
 .snackbar-error {
-  --mdc-snackbar-container-color: var(--par-color-error);
+  --mat-snackbar-container-color: var(--par-color-error);
 }
 .snackbar-success {
-  --mdc-snackbar-container-color: var(--par-color-success);
+  --mat-snackbar-container-color: var(--par-color-success);
 }
 
 /* ANIMATIONS */

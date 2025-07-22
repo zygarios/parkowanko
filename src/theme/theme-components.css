@@ -1,22 +1,22 @@
 :root {
   /* BUTTONS FAB */
-  --mdc-fab-small-container-color: white;
+  --mat-fab-small-container-color: white;
 
   /* BUTTON-TEXT */
-  --mdc-text-button-container-height: 50px;
-  --mat-text-button-horizontal-padding: 20px;
+  --mat-button-text-container-height: 50px;
+  --mat-button-text-horizontal-padding: 20px;
 
   /* BUTTON-FLAT */
-  --mdc-filled-button-container-height: 50px;
-  --mat-filled-button-horizontal-padding: 20px;
+  --mat-button-filled-container-height: 50px;
+  --mat-button-filled-horizontal-padding: 20px;
 
   /* BUTTON-RAISED */
-  --mdc-protected-button-container-height: 50px;
-  --mat-protected-button-horizontal-padding: 20px;
+  --mat-button-protected-container-height: 50px;
+  --mat-button-protected-horizontal-padding: 20px;
 
   /* BUTTON-OUTLINED */
-  --mdc-outlined-button-container-height: 50px;
-  --mat-outlined-button-horizontal-padding: 20px;
+  --mat-button-outlined-container-height: 50px;
+  --mat-button-outlined-horizontal-padding: 20px;
 
   /* DIALOG */
   --mat-dialog-container-small-max-width: none;
@@ -51,7 +51,7 @@
   --mat-stepper-header-done-state-icon-foreground-color: white;
 
   /* SNACKBAR */
-  --mdc-snackbar-container-color: var(--mat-sys-primary);
+  --mat-snackbar-container-color: var(--mat-sys-primary);
   .mat-mdc-snackbar-surface {
     box-shadow:
       0 0 0 2px white,
