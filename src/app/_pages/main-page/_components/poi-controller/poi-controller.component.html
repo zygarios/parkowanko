@@ -1,0 +1,52 @@
+@if (isMapLoaded()) {
+  <div
+    class="flex justify-center gap-2 w-full fixed bottom-0 left-0 right-0 z-10 whitespace-nowrap p-3"
+  >
+    @switch (activeMode()) {
+      @case (ACTIVE_MODE_ENUM.DEFAULT) {
+        <button
+          class="shadow-[0_0_0_2px_white,0_0_2px_2px_rgba(0,0,0,0.5)] anim-fade-in"
+          mat-flat-button
+          (click)="startAddingPoi()"
+        >
+          <mat-icon>local_parking</mat-icon>
+          Dodaj bezpłatny parking
+        </button>
+      }
+      @case (ACTIVE_MODE_ENUM.ADDING_POI) {
+        <button
+          class="shadow-[0_0_0_2px_white,0_0_2px_2px_rgba(0,0,0,0.5)] anim-fade-in bg-white color"
+          mat-flat-button
+          (click)="stopAddingPoi()"
+        >
+          Anuluj
+        </button>
+        <button
+          class="shadow-[0_0_0_2px_white,0_0_2px_2px_rgba(0,0,0,0.5)] anim-fade-in"
+          mat-flat-button
+          (click)="confirmAddedPoi()"
+        >
+          <mat-icon>check</mat-icon>
+          Zatwierdź
+        </button>
+      }
+      @case (ACTIVE_MODE_ENUM.UPDATING_POI_POSITION) {
+        <button
+          class="shadow-[0_0_0_2px_white,0_0_2px_2px_rgba(0,0,0,0.5)] anim-fade-in"
+          mat-flat-button
+          (click)="stopUpdatingPoiPosition()"
+        >
+          Anuluj
+        </button>
+        <button
+          class="shadow-[0_0_0_2px_white,0_0_2px_2px_rgba(0,0,0,0.5)] anim-fade-in"
+          mat-flat-button
+          (click)="confirmUpdatedPoiPosition()"
+        >
+          <mat-icon>check</mat-icon>
+          Zatwierdź
+        </button>
+      }
+    }
+  </div>
+}

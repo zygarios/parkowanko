@@ -1,0 +1,31 @@
+<button
+  class="fixed! z-2 left-2.5 top-2.5 shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
+  mat-mini-fab
+  [matMenuTriggerFor]="menu"
+>
+  <mat-icon>menu</mat-icon>
+</button>
+
+<app-poi-controller></app-poi-controller>
+<app-map [parkingsList]="parkingsList()"></app-map>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="openHelpDialog()">
+    <mat-icon>not_listed_location</mat-icon>
+    <span>Poradnik</span>
+  </button>
+  <a mat-menu-item routerLink="auth">
+    <mat-icon>login</mat-icon>
+    <span>Zaloguj się</span>
+  </a>
+</mat-menu>
+
+@if (environmentType !== 'PROD') {
+  <div
+    class="fixed top-1/2 left-0 w-8 h-5 z-50 flex items-center justify-center rounded-bl-lg rounded-br-lg bg-white border-2! border-blue-300! -rotate-90 transform -translate-x-6px"
+  >
+    <div class="text-xs">
+      {{ environmentType }}
+    </div>
+  </div>
+}

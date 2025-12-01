@@ -1,0 +1,43 @@
+<h1>{{ authMode() === authModeType.LOGIN ? 'Logowanie' : 'Rejestracja' }}</h1>
+<form class="auth-form flex-1" (submit)="$event.preventDefault()">
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Email</mat-label>
+    <input [field]="authForm.email" matInput type="email" />
+    <mat-icon matSuffix> alternate_email </mat-icon>
+  </mat-form-field>
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Hasło</mat-label>
+    <input matInput [field]="authForm.password" [type]="isPasswordHidden() ? 'password' : 'text'" />
+    <button mat-icon-button matSuffix (click)="togglePasswordVisibility('password')">
+      <mat-icon>
+        {{ isPasswordHidden() ? 'visibility_off' : 'visibility' }}
+      </mat-icon>
+    </button>
+  </mat-form-field>
+  @if (!authForm.repeatedPassword().hidden()) {
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-label>Powtórz hasło</mat-label>
+      <input
+        [field]="authForm.repeatedPassword"
+        matInput
+        [type]="isRepeatedPasswordHidden() ? 'password' : 'text'"
+      />
+      <button mat-icon-button matSuffix (click)="togglePasswordVisibility('repeatedPassword')">
+        <mat-icon>
+          {{ isRepeatedPasswordHidden() ? 'visibility_off' : 'visibility' }}
+        </mat-icon>
+      </button>
+    </mat-form-field>
+  }
+  <div class="flex flex-col gap-4">
+    <button mat-flat-button (click)="submit()">
+      {{ authMode() === authModeType.LOGIN ? 'Zaloguj' : 'Zarejestruj' }}
+    </button>
+    <div class="flex gap-5 items-center justify-between">
+      {{ authMode() === authModeType.LOGIN ? 'Nie masz jeszcze konta?' : 'Masz już konto?' }}
+      <button mat-button (click)="changeAuthMode()">
+        {{ authMode() === authModeType.LOGIN ? 'Zarejestruj się' : 'Zaloguj się' }}
+      </button>
+    </div>
+  </div>
+</form>

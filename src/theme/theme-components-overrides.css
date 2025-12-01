@@ -1,0 +1,84 @@
+:root {
+  /* BUTTON-FAB */
+  --mat-fab-small-container-color: white;
+
+  /* BUTTON-TEXT */
+  --mat-button-text-container-height: 50px;
+  --mat-button-text-horizontal-padding: 20px;
+
+  /* BUTTON-FLAT */
+  --mat-button-filled-container-height: 50px;
+  --mat-button-filled-horizontal-padding: 20px;
+
+  /* BUTTON-RAISED */
+  --mat-button-protected-container-height: 50px;
+  --mat-button-protected-horizontal-padding: 20px;
+
+  /* BUTTON-OUTLINED */
+  --mat-button-outlined-container-height: 50px;
+  --mat-button-outlined-horizontal-padding: 20px;
+
+  /* DIALOG */
+  --mat-dialog-container-small-max-width: none;
+  --mat-dialog-headline-padding: 20px 24px 15px;
+
+  .mat-mdc-dialog-panel {
+    width: 95dvw;
+  }
+
+  .mat-mdc-dialog-title {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    &::before {
+      display: none;
+    }
+  }
+
+  mat-dialog-actions {
+    background-color: var(--mat-sys-surface);
+    margin-top: auto;
+    position: sticky;
+    bottom: 0;
+  }
+
+  /* STEPPER */
+  /* Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze */
+  --mat-stepper-header-done-state-icon-background-color: var(--mat-sys-on-surface-variant);
+  --mat-stepper-header-done-state-icon-foreground-color: white;
+
+  /* SNACKBAR */
+  --mat-snackbar-container-color: var(--mat-sys-primary);
+  .mat-mdc-snackbar-surface {
+    box-shadow:
+      0 0 0 2px white,
+      0 0 0 3px var(--mat-sys-primary),
+      var(--mat-sys-level3);
+  }
+
+  /* BOTTOM SHEET */
+  .mat-bottom-sheet-container {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: var(--mat-sys-level5);
+    max-width: 100vw;
+    min-width: 100vw;
+  }
+
+  .backdrop-invisible {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  /* CARD */
+  mat-card-header {
+    padding: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* FORMFIELD */
+  mat-form-field {
+    margin-bottom: 20px;
+  }
+}

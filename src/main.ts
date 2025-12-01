@@ -1,6 +1,8 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { initSentry } from './app/_others/helpers/sentry';
+import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
-import { App } from './app/app';
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+initSentry();
+
+bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
