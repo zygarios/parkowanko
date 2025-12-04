@@ -1,49 +1,12 @@
 @if (isMapLoaded()) {
   <div
-    class="flex justify-center gap-2 w-full fixed bottom-0 left-0 right-0 z-10 whitespace-nowrap p-3"
+    class="flex justify-between gap-2 w-full fixed bottom-0 left-0 right-0 z-10 whitespace-nowrap p-3"
   >
-    @switch (activeMode()) {
-      @case (ACTIVE_MODE_ENUM.DEFAULT) {
-        <mat-form-field subscriptSizing="dynamic" class="anim-fade-in">
-          <input
-            type="text"
-            placeholder="Wyszukaj adres"
-            matInput
-            [matAutocomplete]="auto"
-            (input)="filterAdresses($event.target.value)"
-            (focus)="filterAdresses($event.target.value)"
-          />
-          <mat-icon matSuffix>search</mat-icon>
-          <mat-autocomplete
-            requireSelection
-            #auto="matAutocomplete"
-            (optionSelected)="selectAddress($event.option.value)"
-          >
-            @for (adress of adressesList(); track adress) {
-              <mat-option [value]="adress">{{ adress }}</mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
-        <button class="anim-fade-in" matFab (click)="startAddingPoi()">
-          <mat-icon>add_location_alt</mat-icon>
-        </button>
-      }
-      @case (ACTIVE_MODE_ENUM.ADDING_POI) {
-        <button class="anim-fade-in" mat-flat-button (click)="stopAddingPoi()">Anuluj</button>
-        <button class="anim-fade-in" mat-flat-button (click)="confirmAddedPoi()">
-          <mat-icon>check</mat-icon>
-          Zatwierdź
-        </button>
-      }
-      @case (ACTIVE_MODE_ENUM.UPDATING_POI_POSITION) {
-        <button class="anim-fade-in" mat-flat-button (click)="stopUpdatingPoiPosition()">
-          Anuluj
-        </button>
-        <button class="anim-fade-in" mat-flat-button (click)="confirmUpdatedPoiPosition()">
-          <mat-icon>check</mat-icon>
-          Zatwierdź
-        </button>
-      }
+    @if (activeMode() === ACTIVE_MODE_ENUM.DEFAULT) {
+      <app-address-search-box />
+      <button class="anim-fade-in" matFab (click)="startAddingPoi()">
+        <mat-icon>add_location_alt</mat-icon>
+      </button>
     }
   </div>
 }

@@ -19,6 +19,7 @@
   /* BUTTON-OUTLINED */
   --mat-button-outlined-container-height: 50px;
   --mat-button-outlined-horizontal-padding: 20px;
+  --mat-button-outlined-outline-color: var(--mat-sys-primary);
 
   /* DIALOG */
   --mat-dialog-container-small-max-width: none;
@@ -70,7 +71,8 @@
   .mat-bottom-sheet-container {
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-    box-shadow: var(--mat-sys-level5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    border-top: 5px solid var(--mat-sys-primary);
     max-width: 100vw;
     min-width: 100vw;
   }

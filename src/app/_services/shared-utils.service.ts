@@ -6,10 +6,7 @@ import {
   InfoDialogComponent,
   InfoDialogData,
 } from '../_components/info-dialog/info-dialog.component';
-import {
-  MenuSheetComponent,
-  MenuSheetItem,
-} from '../_components/menu-sheet/menu-sheet.component';
+import { MenuSheetComponent, MenuSheetData } from '../_components/menu-sheet/menu-sheet.component';
 
 @Injectable({
   providedIn: 'root',
@@ -19,14 +16,15 @@ export class SharedUtilsService {
   private _snackBar = inject(MatSnackBar);
   private _sheet = inject(MatBottomSheet);
 
-  openSheet(data: MenuSheetItem[]) {
-    return this._sheet.open<MenuSheetComponent, MenuSheetItem[]>(
-      MenuSheetComponent,
-      {
-        data,
-        backdropClass: 'backdrop-invisible',
-      },
-    );
+  openSheet(data: MenuSheetData, config?: { disableClose?: boolean; hasBackdrop?: boolean }) {
+    const sheetRef = this._sheet.open<MenuSheetComponent, MenuSheetData>(MenuSheetComponent, {
+      data,
+      autoFocus: false,
+      backdropClass: 'backdrop-invisible',
+      disableClose: config?.disableClose ?? false,
+      hasBackdrop: config?.hasBackdrop ?? false,
+    });
+    return sheetRef;
   }
 
   openSnackbar(title: string, type?: 'ERROR' | 'SUCCESS') {
@@ -41,11 +39,8 @@ export class SharedUtilsService {
   }
 
   openDialog(data: InfoDialogData) {
-    return this._matDialog.open<InfoDialogComponent, InfoDialogData>(
-      InfoDialogComponent,
-      {
-        data,
-      },
-    );
+    return this._matDialog.open<InfoDialogComponent, InfoDialogData>(InfoDialogComponent, {
+      data,
+    });
   }
 }

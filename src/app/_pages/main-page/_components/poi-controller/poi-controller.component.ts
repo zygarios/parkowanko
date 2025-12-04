@@ -8,22 +8,19 @@ import {
   untracked,
   WritableSignal,
 } from '@angular/core';
-import { Field } from '@angular/forms/signals';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormField } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BehaviorSubject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
-import { GeocodeApiService } from '../../../../_services/geocode-api.service';
+import { MenuSheetItem } from '../../../../_components/menu-sheet/menu-sheet.component';
 import { ParkingsService } from '../../../../_services/parkings-api.service';
 import { SharedUtilsService } from '../../../../_services/shared-utils.service';
-import { GeocodeAddress } from '../../../../_types/geocode-api.model';
 import { Parking } from '../../../../_types/parking.model';
 import { MapService } from '../map/_services/map.service';
+import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';
 
 enum ActiveModeEnum {
   DEFAULT = 'DEFAULT',
@@ -39,10 +36,9 @@ enum ActiveModeEnum {
     MatButtonModule,
     MatSnackBarModule,
     MatBottomSheetModule,
-    MatFormField,
     MatInputModule,
     MatAutocompleteModule,
-    Field,
+    AddressSearchBoxComponent,
   ],
   styles: `
     :host {
@@ -66,17 +62,12 @@ enum ActiveModeEnum {
 })
 export class PoiControllerComponent {
   private mapService = inject(MapService);
-  private geocodeApiService = inject(GeocodeApiService);
   private parkingsService = inject(ParkingsService);
   private sharedUtilsService = inject(SharedUtilsService);
 
   ACTIVE_MODE_ENUM = ActiveModeEnum;
   activeMode: WritableSignal<ActiveModeEnum> = signal(ActiveModeEnum.DEFAULT);
   isMapLoaded = this.mapService.getIsMapLoaded;
-
-  addressSearch = new BehaviorSubject('');
-  adressesList = signal<GeocodeAddress[]>([]);
-  selectedAddress = signal<GeocodeAddress | null>(null);
 
   selectedParking = linkedSignal<Parking | null, Parking | null>({
     source: () => this.mapService.selectedParking(),
@@ -91,25 +82,6 @@ export class PoiControllerComponent {
 
   constructor() {
     effect(() => this._listenForSelectedPoiToStartEdit());
-    this.loadAddressesWhenSearchInputChange();
-  }
-
-  private loadAddressesWhenSearchInputChange() {
-    this.addressSearch
-      .pipe(
-        distinctUntilChanged(),
-        debounceTime(300),
-        switchMap((searchTerm) => this.geocodeApiService.getAddresses(searchTerm)),
-      )
-      .subscribe((addresses) => this.adressesList.set(addresses));
-  }
-
-  filterAdresses(searchTerm: string): void {
-    this.addressSearch.next(searchTerm);
-  }
-
-  selectAddress(adress: GeocodeAddress) {
-    this.selectedAddress.set(adress);
   }
 
   private _listenForSelectedPoiToStartEdit() {
@@ -125,6 +97,32 @@ export class PoiControllerComponent {
   startAddingPoi() {
     this.activeMode.set(ActiveModeEnum.ADDING_POI);
     this.mapService.renderMoveableMarker();
+
+    const sheetRef = this.sharedUtilsService.openSheet(
+      {
+        menuItems: [
+          {
+            label: 'Anuluj',
+            icon: 'close',
+            result: 'CANCEL',
+          },
+          {
+            label: 'Potwierdź',
+            icon: 'edit_location_alt',
+            result: 'CONFIRM',
+            isPrimary: true,
+            isSuccess: true,
+          },
+        ],
+        isMenuHorizontal: true,
+      },
+      { disableClose: true },
+    );
+
+    sheetRef.afterDismissed().subscribe((result: string | undefined) => {
+      if (result === 'CANCEL' || !result) this.stopAddingPoi();
+      else if (result === 'CONFIRM') this.confirmAddedPoi();
+    });
   }
 
   stopAddingPoi() {
@@ -150,28 +148,32 @@ export class PoiControllerComponent {
   startEditingPoi() {
     if (!this.selectedParking()) return;
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
-    const menuSheetItems = [
+    const menuSheetItems: MenuSheetItem[] = [
       {
-        label: 'Popraw pozycję na mapie',
+        label: 'Zasugeruj zmianę położenia parkingu',
         icon: 'edit_location_alt',
         result: 'UPDATE',
+        isPrimary: true,
       },
       {
-        label: 'Anuluj',
-        icon: 'close',
-        result: 'CANCEL',
+        label: 'Zamknij',
+        icon: 'keyboard_arrow_down',
+        result: 'CLOSE',
       },
     ];
 
     this.sharedUtilsService
-      .openSheet(menuSheetItems)
+      .openSheet({ menuItems: menuSheetItems })
       .afterDismissed()
       .subscribe((result: string | undefined) => {
-        if (result === 'CANCEL' || !result) {
+        if (result === 'CLOSE' || !result) {
           this.mapService.removeMoveableMarker();
           this.setDefaultState();
         }
-        if (result === 'UPDATE') this.startUpdatingPoiPosition();
+        if (result === 'UPDATE') {
+          this.startUpdatingPoiPosition();
+          this.handleUpdateUserChoice();
+        }
       });
   }
 
@@ -181,6 +183,34 @@ export class PoiControllerComponent {
     this.activeMode.set(ActiveModeEnum.UPDATING_POI_POSITION);
     this.mapService.renderMoveableMarker(this.selectedParking()?.location);
     this.mapService.jumpToPoi(selectedPoi?.location);
+  }
+
+  handleUpdateUserChoice() {
+    const sheetRef = this.sharedUtilsService.openSheet(
+      {
+        menuItems: [
+          {
+            label: 'Anuluj',
+            icon: 'close',
+            result: 'CANCEL',
+          },
+          {
+            label: 'Potwierdź',
+            icon: 'edit_location_alt',
+            result: 'CONFIRM',
+            isPrimary: true,
+            isSuccess: true,
+          },
+        ],
+        isMenuHorizontal: true,
+      },
+      { disableClose: true },
+    );
+
+    sheetRef.afterDismissed().subscribe((result: string | undefined) => {
+      if (result === 'CANCEL' || !result) this.stopUpdatingPoiPosition();
+      else if (result === 'CONFIRM') this.confirmUpdatedPoiPosition();
+    });
   }
 
   stopUpdatingPoiPosition() {
@@ -198,8 +228,10 @@ export class PoiControllerComponent {
           'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
           'SUCCESS',
         );
+        this.mapService.removeMoveableMarker();
+        this.setDefaultState();
       },
-      complete: () => {
+      error: () => {
         this.mapService.removeMoveableMarker();
         this.setDefaultState();
       },

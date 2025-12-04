@@ -1,0 +1,26 @@
+<mat-form-field subscriptSizing="dynamic" class="w-full anim-fade-in">
+  <input
+    #searchInputRef
+    type="text"
+    placeholder="Miasto, ulica numer"
+    matInput
+    [matAutocomplete]="auto"
+    [field]="$any(selectedAddressForm)"
+    (input)="addressSearchTerm.set($event.target.value)"
+    (focus)="addressSearchTerm.set($event.target.value)"
+    (blur)="addressSearchTerm.set($event.target.value)"
+  />
+  @if (!addressSearchTerm()) {
+    <mat-icon matPrefix>search</mat-icon>
+  }
+  @if (selectedAddress()) {
+    <button matSuffix matIconButton (click)="resetInput()">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+  <mat-autocomplete requireSelection #auto="matAutocomplete" [displayWith]="parseAddressToString">
+    @for (address of addressesList(); track address) {
+      <mat-option [value]="address">{{ parseAddressToString | computedFunc: address }}</mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>

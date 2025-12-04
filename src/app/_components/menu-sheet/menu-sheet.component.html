@@ -1,20 +1,36 @@
-<div class="flex flex-col gap-2 py-3">
-  @for (menu of menuSheetItems; track menu) {
-    @if (menu.isPrimary || menu.isError) {
-      <button
-        mat-flat-button
-        [class.button-error]="menu.isError"
-        class="flex justify-start!"
-        (click)="choose(menu.result)"
-      >
-        <mat-icon>{{ menu.icon }}</mat-icon>
-        <div>{{ menu.label }}</div>
-      </button>
-    } @else {
-      <button mat-stroked-button class="flex justify-start!" (click)="choose(menu.result)">
-        <mat-icon>{{ menu.icon }}</mat-icon>
-        <div>{{ menu.label }}</div>
-      </button>
-    }
+<div class="flex flex-col py-3">
+  @if (data.title) {
+    <div class="font-big">{{ data.title }}</div>
+    <hr class="my-3" />
   }
+  @if (data.description) {
+    <div class="font-small mb-3">{{ data.description }}</div>
+  }
+  <div class="flex flex-col gap-2" [class]="data.isMenuHorizontal ? ['flex-row'] : ''">
+    @for (menu of data.menuItems; track menu) {
+      @if (menu.isPrimary) {
+        <button
+          mat-flat-button
+          [class.button-error]="menu.isError"
+          [class.button-success]="menu.isSuccess"
+          [class]="data.isMenuHorizontal ? ['justify-center!', 'w-1/2'] : ['justify-start!']"
+          class="flex"
+          (click)="choose(menu.result)"
+        >
+          <mat-icon>{{ menu.icon }}</mat-icon>
+          <div>{{ menu.label }}</div>
+        </button>
+      } @else {
+        <button
+          mat-stroked-button
+          [class]="data.isMenuHorizontal ? ['justify-center!', 'w-1/2'] : ['justify-start!']"
+          class="flex"
+          (click)="choose(menu.result)"
+        >
+          <mat-icon>{{ menu.icon }}</mat-icon>
+          <div>{{ menu.label }}</div>
+        </button>
+      }
+    }
+  </div>
 </div>
