@@ -1,0 +1,42 @@
+<div class="p-6">
+  <div class="mb-5">Przekaż dodatkowe informacje innym kierowcom:</div>
+  <mat-form-field class="w-full" subscriptSizing="dynamic">
+    <mat-label>Obłożenie miejsc</mat-label>
+    @if (reviewForm().occupancy().errors()[0]; as error) {
+      <mat-error>{{ error.message }}</mat-error>
+    }
+    <mat-select name="label" [field]="reviewForm().occupancy">
+      @for (occupancy of occupancyOptions; track $index) {
+        @if ($last) {
+          <hr />
+        }
+        <mat-option [value]="occupancy.value">
+          @if (occupancy.icon) {
+            <mat-icon>{{ occupancy.icon }}</mat-icon>
+          }
+          {{ occupancy.label }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="w-full" subscriptSizing="dynamic">
+    <mat-label>Cechy szczególne</mat-label>
+    <mat-select multiple [field]="reviewForm().attributes">
+      <mat-select-trigger> {{ attributeFormFieldLabel() }} </mat-select-trigger>
+      @for (attribute of attributesOptions; track $index) {
+        <mat-option [value]="attribute.value">{{ attribute.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="w-full" subscriptSizing="dynamic">
+    <mat-label>Dodatkowy opis</mat-label>
+    <textarea
+      rows="3"
+      class="resize-none"
+      matInput
+      placeholder="Komentarz lub opis dodatkowych informacji, którymi warto się podzielić z innymi kierowcami."
+    ></textarea>
+  </mat-form-field>
+</div>

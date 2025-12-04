@@ -10,7 +10,8 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "css",
+          "style": "none",
+          "inlineStyle": true,
           "changeDetection": "OnPush",
           "skipTests": true,
           "type": "component"
@@ -30,7 +31,7 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "inlineStyleLanguage": "css",
+            "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",

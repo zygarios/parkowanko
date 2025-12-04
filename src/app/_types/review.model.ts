@@ -1,17 +1,21 @@
 import { ApiBaseType } from './api-base-type.model';
-import { LocationCoords } from './location-coords.model';
-export interface ParkingSaveData {
-  location: LocationCoords;
+
+export interface ReviewSaveData {
+  parkingId: number;
+  description: string;
+  attributes: string[];
+  occupancy: string;
+  isLiked: boolean;
 }
 
-export class Parking extends ApiBaseType {
-  location!: LocationCoords;
-  likesCount!: number;
-  dislikesCount!: number;
-  isEditPositionPendingRequest!: boolean;
-  isVerified!: boolean;
+export class Review extends ApiBaseType {
+  parkingId!: number;
+  description!: string;
+  attributes!: string[];
+  occupancy!: string;
+  isLiked!: boolean;
 
-  constructor(props: Partial<Parking>) {
+  constructor(props: Partial<Review>) {
     super();
 
     Object.assign(this, props);

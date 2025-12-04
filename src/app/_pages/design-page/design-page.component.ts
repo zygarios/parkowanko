@@ -7,17 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-design-page',
-  imports: [
-    MatFormFieldModule,
-    MatIconModule,
-    MatButtonModule,
-    MatCardModule,
-    MatInputModule,
-  ],
+  imports: [MatFormFieldModule, MatIconModule, MatButtonModule, MatCardModule, MatInputModule],
   templateUrl: './design-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    class: 'flex flex-col p-3 gap-6',
-  },
 })
 export class DesignPageComponent {}

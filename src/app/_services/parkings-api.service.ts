@@ -8,9 +8,9 @@ import { Parking, ParkingSaveData } from '../_types/parking.model';
   providedIn: 'root',
 })
 export class ParkingsService {
-  private readonly _httpClient = inject(HttpClient);
+  private _httpClient = inject(HttpClient);
 
-  private readonly parkingsList = signal<Parking[]>([]);
+  private parkingsList = signal<Parking[]>([]);
 
   getParkings(force = false): Signal<Parking[]> {
     if (!this.parkingsList.length || force) {

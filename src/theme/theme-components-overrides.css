@@ -1,6 +1,8 @@
 :root {
   /* BUTTON-FAB */
   --mat-fab-small-container-color: white;
+  --mat-fab-container-color: var(--mat-sys-primary);
+  --mat-fab-foreground-color: white;
 
   /* BUTTON-TEXT */
   --mat-button-text-container-height: 50px;
@@ -22,6 +24,12 @@
   --mat-dialog-container-small-max-width: none;
   --mat-dialog-headline-padding: 20px 24px 15px;
 
+  /* BUTTONS-ALL */
+
+  .mdc-button {
+    min-width: 100px;
+  }
+
   .mat-mdc-dialog-panel {
     width: 95dvw;
   }
@@ -31,6 +39,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: var(--par-border-line);
     &::before {
       display: none;
     }
@@ -74,11 +83,15 @@
   mat-card-header {
     padding: 16px;
     margin-bottom: 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: var(--par-border-line);
   }
 
   /* FORMFIELD */
   mat-form-field {
     margin-bottom: 20px;
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--mat-sys-surface);
+      border-radius: var(--mat-sys-corner-extra-small);
+    }
   }
 }

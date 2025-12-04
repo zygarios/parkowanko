@@ -15,14 +15,14 @@ html {
   --mat-sys-on-primary-fixed-variant: light-dark(#004f56, #004f56);
 
   /* Secondary palette variables */
-  --mat-sys-secondary: light-dark(var(--par-color-primary), #57d8e7);
-  --mat-sys-on-secondary: light-dark(#ffffff, #00363c);
-  --mat-sys-secondary-container: light-dark(#8ef2ff, #004f56);
-  --mat-sys-on-secondary-container: light-dark(#001f23, #8ef2ff);
-  --mat-sys-secondary-fixed: light-dark(#8ef2ff, #8ef2ff);
-  --mat-sys-secondary-fixed-dim: light-dark(#57d8e7, #57d8e7);
-  --mat-sys-on-secondary-fixed: light-dark(#001f23, #001f23);
-  --mat-sys-on-secondary-fixed-variant: light-dark(#004f56, #004f56);
+  --mat-sys-secondary: var(--mat-sys-primary);
+  --mat-sys-on-secondary: var(--mat-sys-on-primary);
+  --mat-sys-secondary-container: var(--par-color-primary-light);
+  --mat-sys-on-secondary-container: var(--mat-sys-on-primary-container);
+  --mat-sys-secondary-fixed: var(--mat-sys-primary-fixed);
+  --mat-sys-secondary-fixed-dim: var(--mat-sys-primary-fixed-dim);
+  --mat-sys-on-secondary-fixed: var(--mat-sys-on-primary-fixed);
+  --mat-sys-on-secondary-fixed-variant: var(--mat-sys-on-primary-fixed-variant);
 
   /* Tertiary palette variables */
   --mat-sys-tertiary: light-dark(#794a96, #e5b5ff);

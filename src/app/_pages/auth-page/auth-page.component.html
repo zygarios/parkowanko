@@ -1,43 +1,68 @@
-<h1>{{ authMode() === authModeType.LOGIN ? 'Logowanie' : 'Rejestracja' }}</h1>
-<form class="auth-form flex-1" (submit)="$event.preventDefault()">
-  <mat-form-field subscriptSizing="dynamic">
-    <mat-label>Email</mat-label>
-    <input [field]="authForm.email" matInput type="email" />
-    <mat-icon matSuffix> alternate_email </mat-icon>
-  </mat-form-field>
-  <mat-form-field subscriptSizing="dynamic">
-    <mat-label>Hasło</mat-label>
-    <input matInput [field]="authForm.password" [type]="isPasswordHidden() ? 'password' : 'text'" />
-    <button mat-icon-button matSuffix (click)="togglePasswordVisibility('password')">
-      <mat-icon>
-        {{ isPasswordHidden() ? 'visibility_off' : 'visibility' }}
-      </mat-icon>
-    </button>
-  </mat-form-field>
-  @if (!authForm.repeatedPassword().hidden()) {
+<div class="auth-container flex flex-col text-center">
+  <img
+    class="w-40 ml-auto mr-auto mb-5"
+    priority
+    ngSrc="/images/banner-logo.png"
+    width="376"
+    height="216"
+  />
+  <h1 class="font-large">{{ authMode() === authModeType.LOGIN ? 'Logowanie' : 'Rejestracja' }}</h1>
+  <form class="flex-1 flex flex-col pt-5 pb-5" (submit)="$event.preventDefault()">
     <mat-form-field subscriptSizing="dynamic">
-      <mat-label>Powtórz hasło</mat-label>
+      <mat-label>Email</mat-label>
+      <input [field]="authForm.email" matInput type="email" />
+      <mat-icon matSuffix> alternate_email </mat-icon>
+      @if (authForm.email().errors()[0]; as error) {
+        <mat-error>{{ error.message }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-label>Hasło</mat-label>
       <input
-        [field]="authForm.repeatedPassword"
         matInput
-        [type]="isRepeatedPasswordHidden() ? 'password' : 'text'"
+        [field]="authForm.password"
+        [type]="isPasswordHidden() ? 'password' : 'text'"
       />
-      <button mat-icon-button matSuffix (click)="togglePasswordVisibility('repeatedPassword')">
+      @if (authForm.password().errors()[0]; as error) {
+        <mat-error>{{ error.message }}</mat-error>
+      }
+      <button mat-icon-button matSuffix (click)="togglePasswordVisibility('password')">
         <mat-icon>
-          {{ isRepeatedPasswordHidden() ? 'visibility_off' : 'visibility' }}
+          {{ isPasswordHidden() ? 'visibility_off' : 'visibility' }}
         </mat-icon>
       </button>
     </mat-form-field>
-  }
-  <div class="flex flex-col gap-4">
+    @if (!authForm.repeatedPassword().hidden()) {
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Powtórz hasło</mat-label>
+        <input
+          [field]="authForm.repeatedPassword"
+          matInput
+          [type]="isRepeatedPasswordHidden() ? 'password' : 'text'"
+        />
+        @if (authForm.repeatedPassword().errors()[0]; as error) {
+          <mat-error>{{ error.message }}</mat-error>
+        }
+        <button mat-icon-button matSuffix (click)="togglePasswordVisibility('repeatedPassword')">
+          <mat-icon>
+            {{ isRepeatedPasswordHidden() ? 'visibility_off' : 'visibility' }}
+          </mat-icon>
+        </button>
+      </mat-form-field>
+    }
+  </form>
+
+  <hr />
+
+  <div class="flex flex-col gap-4 mt-10">
     <button mat-flat-button (click)="submit()">
       {{ authMode() === authModeType.LOGIN ? 'Zaloguj' : 'Zarejestruj' }}
     </button>
-    <div class="flex gap-5 items-center justify-between">
+    <div class="flex gap-5 items-center justify-between font-small">
       {{ authMode() === authModeType.LOGIN ? 'Nie masz jeszcze konta?' : 'Masz już konto?' }}
       <button mat-button (click)="changeAuthMode()">
         {{ authMode() === authModeType.LOGIN ? 'Zarejestruj się' : 'Zaloguj się' }}
       </button>
     </div>
   </div>
-</form>
+</div>

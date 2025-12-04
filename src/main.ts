@@ -1,5 +1,5 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { initSentry } from './app/_others/helpers/sentry';
+import { initSentry } from './app/_others/_helpers/sentry';
 import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
 

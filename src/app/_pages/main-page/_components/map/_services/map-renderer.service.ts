@@ -64,23 +64,24 @@ export class MapRendererService {
   }
 
   renderPois(map: maplibregl.Map, parkingsList: Parking[]) {
-    const parkingPoiSource = map.getSource(
-      PARKING_POI_SOURCE,
-    ) as maplibregl.GeoJSONSource;
+    const parkingPoiSource = map.getSource(PARKING_POI_SOURCE) as maplibregl.GeoJSONSource;
 
     // Nadpisanie danych o punktach poi na mapie
     parkingPoiSource.setData({
       type: 'FeatureCollection',
-      features: parkingsList.map((parking) => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [parking.location.lng, parking.location.lat],
-        },
-        properties: {
-          parking,
-        },
-      })),
+      features: parkingsList.map((parking) => {
+        const copiedParking = structuredClone(parking);
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [parking.location.lng, parking.location.lat],
+          },
+          properties: {
+            parking: copiedParking,
+          },
+        };
+      }),
     });
   }
 
@@ -110,12 +111,8 @@ export class MapRendererService {
       targetCoords?: LocationCoords;
     },
   ) {
-    const lineSource = map.getSource(
-      PARKING_POI_LINE_SOURCE,
-    ) as maplibregl.GeoJSONSource;
-    lineSource.setData(
-      this._getLineGeoJson(locations?.fixedCoords, locations?.targetCoords),
-    );
+    const lineSource = map.getSource(PARKING_POI_LINE_SOURCE) as maplibregl.GeoJSONSource;
+    lineSource.setData(this._getLineGeoJson(locations?.fixedCoords, locations?.targetCoords));
   }
 
   private async _prepareLayersForPoisWithClusters(map: maplibregl.Map) {
@@ -228,10 +225,7 @@ export class MapRendererService {
     });
   }
 
-  private _getLineGeoJson(
-    fixedCoords?: LocationCoords,
-    targetCoords?: LocationCoords,
-  ): any {
+  private _getLineGeoJson(fixedCoords?: LocationCoords, targetCoords?: LocationCoords): any {
     let coordinates: any = [];
     if (fixedCoords && targetCoords) {
       coordinates = [

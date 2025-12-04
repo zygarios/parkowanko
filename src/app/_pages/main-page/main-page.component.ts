@@ -24,13 +24,13 @@ import { PoiControllerComponent } from './_components/poi-controller/poi-control
     RouterLink,
   ],
   templateUrl: './main-page.component.html',
-  styleUrl: './main-page.component.css',
+  styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainPageComponent {
-  private readonly matDialog = inject(MatDialog);
-  private readonly parkingsService = inject(ParkingsService);
-  readonly environmentType: EnvironmentType = environment.environmentType;
+  private matDialog = inject(MatDialog);
+  private parkingsService = inject(ParkingsService);
+  environmentType: EnvironmentType = environment.environmentType;
 
   parkingsList = this.parkingsService.getParkings();
 

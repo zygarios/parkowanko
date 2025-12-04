@@ -13,10 +13,10 @@ import {
   providedIn: 'root',
 })
 export class GeocodeApiService {
-  private readonly GEOCODE_API = `${environment.geocodeApi}/?request=GetAddress&srid=4326&address=`;
-  private readonly GEOCODE_REVERSE_API = `${environment.geocodeApi}/?request=GetAddressReverse&srid=4326&location=`;
+  private GEOCODE_API = `${environment.geocodeApi}/?request=GetAddress&srid=4326&address=`;
+  private GEOCODE_REVERSE_API = `${environment.geocodeApi}/?request=GetAddressReverse&srid=4326&location=`;
 
-  private readonly httpClient = inject(HttpClient);
+  private httpClient = inject(HttpClient);
 
   getCities(city: string): Observable<GeocodeCity[]> {
     return this.httpClient.get<GeocodeResponse<GeocodeCity>>(this.GEOCODE_API + city.trim()).pipe(
@@ -48,8 +48,8 @@ export class GeocodeApiService {
     );
   }
 
-  getAddresses(city: string, street: string, buildingNumber: string): Observable<GeocodeAddress[]> {
-    const address = `${city.trim()}, ${street} ${buildingNumber}`;
+  getAddresses(address: string): Observable<GeocodeAddress[]> {
+    // const address = `${city.trim()}, ${street} ${buildingNumber}`;
     const url = this.GEOCODE_API + address;
     return this.httpClient.get<GeocodeResponse<GeocodeAddress>>(url).pipe(
       map((res): GeocodeAddress[] => (res.results ? Object.values(res.results) : [])),

@@ -1,0 +1,55 @@
+<div mat-dialog-title>
+  @if (isFirstStep()) {
+    <div class="flex ml-auto mr-auto gap-2 relative">Udało się zaparkować?</div>
+  } @else {
+    <div class="flex ml-auto mr-auto gap-2 relative">
+      <mat-icon
+        style="color: gold"
+        class="text-[30px]! w-[30px]! h-[30px]! absolute left-0 -translate-x-full -ml-2"
+      >
+        star
+      </mat-icon>
+      {{ isLastStep() ? 'Dziękujemy!' : 'Zostaw opinię' }}
+    </div>
+  }
+</div>
+
+<mat-tab-group [selectedIndex]="activeStep()" dynamicHeight>
+  <mat-tab>
+    <div class="p-6">
+      <div class="flex gap-2 justify-center">
+        <button mat-flat-button class="button-error w-1/2!" (click)="addVote(false)">
+          <mat-icon>thumb_down</mat-icon>Nie...
+        </button>
+        <button mat-flat-button class="button-success w-1/2!" (click)="addVote(true)">
+          <mat-icon>thumb_up</mat-icon>Udało się!
+        </button>
+      </div>
+    </div>
+  </mat-tab>
+  <mat-tab>
+    <app-review-form [reviewForm]="reviewForm" />
+  </mat-tab>
+  <mat-tab>
+    <div class="px-6 py-10 flex flex-col items-center gap-5">
+      <mat-icon class="text-[100px]! w-[100px]! h-[100px]! success-icon">task_alt</mat-icon>
+      <div class="text-center">
+        Twoje zgłoszenie pomaga innym kierowcom znaleźć bezpieczne i pewne miejsca do parkowania.
+        <br />
+        Im więcej takich ocen, tym łatwiej unikać pułapek i szybciej trafić na sensowne, darmowe
+        spoty.
+      </div>
+    </div>
+  </mat-tab>
+</mat-tab-group>
+
+@if (!isFirstStep()) {
+  <mat-dialog-actions align="end">
+    @if (!isLastStep()) {
+      <button mat-button (click)="previousStep()">Wróć</button>
+      <button mat-flat-button (click)="submitReview()">Wyślij</button>
+    } @else {
+      <button mat-flat-button mat-dialog-close>Zamknij</button>
+    }
+  </mat-dialog-actions>
+}
