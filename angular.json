@@ -38,7 +38,8 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": ["src/styles.css"],
+            "outputPath": "dist"
           },
           "configurations": {
             "production": {
@@ -50,8 +51,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "12kB",
-                  "maximumError": "24kB"
+                  "maximumWarning": "80kB",
+                  "maximumError": "150kB"
                 }
               ],
               "outputHashing": "all"

@@ -15,12 +15,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MenuSheetItem } from '../../../../_components/menu-sheet/menu-sheet.component';
+import { EMPTY, of, switchMap } from 'rxjs';
 import { ParkingsService } from '../../../../_services/parkings-api.service';
 import { SharedUtilsService } from '../../../../_services/shared-utils.service';
 import { Parking } from '../../../../_types/parking.model';
 import { MapService } from '../map/_services/map.service';
 import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';
+import {
+  addingPoiConfirmSheetConfig,
+  changingPoiPositionOptionsSheetConfig,
+  selectedPoiOptionsSheetConfig,
+} from './_data/poi-controller-sheet-configs.data';
 
 enum ActiveModeEnum {
   DEFAULT = 'DEFAULT',
@@ -61,15 +66,15 @@ enum ActiveModeEnum {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PoiControllerComponent {
-  private mapService = inject(MapService);
-  private parkingsService = inject(ParkingsService);
-  private sharedUtilsService = inject(SharedUtilsService);
+  private readonly mapService = inject(MapService);
+  private readonly parkingsService = inject(ParkingsService);
+  private readonly sharedUtilsService = inject(SharedUtilsService);
 
   ACTIVE_MODE_ENUM = ActiveModeEnum;
   activeMode: WritableSignal<ActiveModeEnum> = signal(ActiveModeEnum.DEFAULT);
   isMapLoaded = this.mapService.getIsMapLoaded;
 
-  selectedParking = linkedSignal<Parking | null, Parking | null>({
+  readonly selectedParking = linkedSignal<Parking | null, Parking | null>({
     source: () => this.mapService.selectedParking(),
     computation: (value, previousValue) => {
       if (this.activeMode() === ActiveModeEnum.DEFAULT) {
@@ -81,10 +86,10 @@ export class PoiControllerComponent {
   });
 
   constructor() {
-    effect(() => this._listenForSelectedPoiToStartEdit());
+    effect(() => this.listenForSelectedPoiToStartEdit());
   }
 
-  private _listenForSelectedPoiToStartEdit() {
+  private listenForSelectedPoiToStartEdit() {
     this.selectedParking();
     untracked(() => this.startEditingPoi());
   }
@@ -94,76 +99,51 @@ export class PoiControllerComponent {
     this.selectedParking.set(null);
   }
 
-  startAddingPoi() {
-    this.activeMode.set(ActiveModeEnum.ADDING_POI);
-    this.mapService.renderMoveableMarker();
-
-    const sheetRef = this.sharedUtilsService.openSheet(
-      {
-        menuItems: [
-          {
-            label: 'Anuluj',
-            icon: 'close',
-            result: 'CANCEL',
-          },
-          {
-            label: 'Potwierdź',
-            icon: 'edit_location_alt',
-            result: 'CONFIRM',
-            isPrimary: true,
-            isSuccess: true,
-          },
-        ],
-        isMenuHorizontal: true,
-      },
-      { disableClose: true },
-    );
-
-    sheetRef.afterDismissed().subscribe((result: string | undefined) => {
-      if (result === 'CANCEL' || !result) this.stopAddingPoi();
-      else if (result === 'CONFIRM') this.confirmAddedPoi();
-    });
-  }
-
   stopAddingPoi() {
     this.mapService.removeMoveableMarker();
     this.setDefaultState();
   }
 
-  confirmAddedPoi() {
-    const location = this.mapService.getMarkerLatLng();
-    this.parkingsService.postParking({ location }).subscribe({
-      next: () => {
-        this.sharedUtilsService.openSnackbar(
-          'Gotowe!\nOznaczenie bezpłatnego parkingu zostało dodane',
-          'SUCCESS',
-        );
-      },
-      complete: () => {
-        this.stopAddingPoi();
-      },
-    });
+  startAddingPoi() {
+    this.activeMode.set(ActiveModeEnum.ADDING_POI);
+    this.mapService.renderMoveableMarker();
+
+    this.sharedUtilsService
+      .openSheet(addingPoiConfirmSheetConfig, {
+        disableClose: true,
+      })
+      .afterDismissed()
+      .pipe(
+        switchMap((result: string | undefined) => {
+          if (result === 'CONFIRM') {
+            const location = this.mapService.getMarkerLatLng();
+            return this.parkingsService.postParking({ location });
+          } else {
+            this.stopAddingPoi();
+            return of(EMPTY);
+          }
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.sharedUtilsService.openSnackbar(
+            'Gotowe!\nOznaczenie bezpłatnego parkingu zostało dodane',
+            'SUCCESS',
+          );
+          this.stopAddingPoi();
+        },
+        error: () => {
+          this.stopAddingPoi();
+        },
+      });
   }
 
   startEditingPoi() {
     if (!this.selectedParking()) return;
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
-    const menuSheetItems: MenuSheetItem[] = [
-      {
-        label: 'Zasugeruj zmianę położenia parkingu',
-        icon: 'edit_location_alt',
-        result: 'UPDATE',
-        isPrimary: true,
-      },
-      {
-        label: 'Zamknij',
-        icon: 'keyboard_arrow_down',
-        result: 'CLOSE',
-      },
-    ];
 
     this.sharedUtilsService
-      .openSheet({ menuItems: menuSheetItems })
+      .openSheet(selectedPoiOptionsSheetConfig)
       .afterDismissed()
       .subscribe((result: string | undefined) => {
         if (result === 'CLOSE' || !result) {
@@ -186,26 +166,9 @@ export class PoiControllerComponent {
   }
 
   handleUpdateUserChoice() {
-    const sheetRef = this.sharedUtilsService.openSheet(
-      {
-        menuItems: [
-          {
-            label: 'Anuluj',
-            icon: 'close',
-            result: 'CANCEL',
-          },
-          {
-            label: 'Potwierdź',
-            icon: 'edit_location_alt',
-            result: 'CONFIRM',
-            isPrimary: true,
-            isSuccess: true,
-          },
-        ],
-        isMenuHorizontal: true,
-      },
-      { disableClose: true },
-    );
+    const sheetRef = this.sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig, {
+      disableClose: true,
+    });
 
     sheetRef.afterDismissed().subscribe((result: string | undefined) => {
       if (result === 'CANCEL' || !result) this.stopUpdatingPoiPosition();

@@ -75,10 +75,18 @@
     border-top: 5px solid var(--mat-sys-primary);
     max-width: 100vw;
     min-width: 100vw;
-  }
 
-  .backdrop-invisible {
-    background-color: rgba(0, 0, 0, 0.1);
+    &.mat-bottom-sheet-container-animations-enabled {
+      &.mat-bottom-sheet-container-enter {
+        animation-duration: 300ms;
+        animation-timing-function: ease;
+      }
+
+      &.mat-bottom-sheet-container-exit {
+        animation-duration: 300ms;
+        animation-timing-function: ease;
+      }
+    }
   }
 
   /* CARD */
