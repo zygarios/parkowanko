@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { environment } from '../../environments/environment.development';
-import { Parking, ParkingSaveData } from '../_types/parking.model';
+import { environment } from '../../../environments/environment.development';
+import { Parking, ParkingSaveData } from '../../_types/parking.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ParkingsService {
+export class ParkingsApiService {
   private _httpClient = inject(HttpClient);
 
   private parkingsList = signal<Parking[]>([]);

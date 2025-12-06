@@ -5,8 +5,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   InfoDialogComponent,
   InfoDialogData,
-} from '../_components/info-dialog/info-dialog.component';
-import { MenuSheetComponent, MenuSheetData } from '../_components/menu-sheet/menu-sheet.component';
+} from '../../_components/info-dialog/info-dialog.component';
+import { MenuSheetComponent, MenuSheetData } from '../../_components/menu-sheet/menu-sheet.component';
 
 @Injectable({
   providedIn: 'root',
@@ -38,9 +38,11 @@ export class SharedUtilsService {
     });
   }
 
-  openDialog(data: InfoDialogData) {
+  openInfoDialog(data: InfoDialogData, config?: { disableClose?: boolean }) {
     return this._matDialog.open<InfoDialogComponent, InfoDialogData>(InfoDialogComponent, {
       data,
+      autoFocus: false,
+      disableClose: config?.disableClose ?? false,
     });
   }
 }

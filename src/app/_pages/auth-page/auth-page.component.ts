@@ -1,5 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   email,
@@ -16,6 +17,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { validationMessages } from '../../_others/_helpers/validation-messages';
+import { AuthService } from '../../_services/_core/auth.service';
 
 interface AuthData {
   email: string;
@@ -52,6 +54,9 @@ export class AuthPageComponent {
   isRepeatedPasswordHidden = signal(true);
   authMode = signal<AuthModeType>(AuthModeType.LOGIN);
   authModeType = AuthModeType;
+
+  private _authService = inject(AuthService);
+  private _router = inject(Router);
 
   private authData = signal<AuthData>({ email: '', password: '', repeatedPassword: '' });
 
@@ -92,6 +97,28 @@ export class AuthPageComponent {
 
   submit() {
     submit(this.authForm, async (form) => {
+      const { email, password, repeatedPassword } = form;
+
+      if (this.authMode() === AuthModeType.LOGIN) {
+        this._authService.login({ email, password }).subscribe({
+          next: () => {
+            this._router.navigate(['/']);
+          },
+          error: (err) => {
+            console.error(err);
+
+          }
+        });
+      } else {
+        this._authService.register({ email, password, repeatedPassword }).subscribe({
+          next: () => {
+            this._router.navigate(['/']);
+          },
+          error: (err) => {
+            console.error(err);
+          }
+        });
+      }
       return null;
     });
   }

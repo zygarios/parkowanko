@@ -5,14 +5,15 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { provideSentry } from './_others/_helpers/sentry';
-import { httpInterceptor } from './_others/_interceptors/http-interceptor';
+import { httpInterceptor } from './_others/_interceptors/http.interceptor';
+import { authInterceptor } from './_others/_interceptors/auth.interceptor';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withViewTransitions()),
-    provideHttpClient(withInterceptors([httpInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, httpInterceptor])),
     ...provideSentry(),
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,

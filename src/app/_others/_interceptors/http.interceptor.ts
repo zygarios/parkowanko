@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { SharedUtilsService } from '../../_services/shared-utils.service';
+import { SharedUtilsService } from '../../_services/_core/shared-utils.service';
 
 export function httpInterceptor(
   req: HttpRequest<unknown>,

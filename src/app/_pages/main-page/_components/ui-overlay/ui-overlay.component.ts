@@ -6,18 +6,20 @@ import {
   linkedSignal,
   signal,
   untracked,
-  WritableSignal,
 } from '@angular/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { EMPTY, of, switchMap } from 'rxjs';
-import { ParkingsService } from '../../../../_services/parkings-api.service';
-import { SharedUtilsService } from '../../../../_services/shared-utils.service';
+import { environment } from '../../../../../environments/environment.development';
+import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
+import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
+import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { Parking } from '../../../../_types/parking.model';
 import { MapService } from '../map/_services/map.service';
 import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';
@@ -34,7 +36,7 @@ enum ActiveModeEnum {
   UPDATING_POI_POSITION = 'UPDATE_POI_POSITION',
 }
 @Component({
-  selector: 'app-poi-controller',
+  selector: 'app-ui-overlay',
   imports: [
     MatMenuModule,
     MatIconModule,
@@ -62,20 +64,23 @@ enum ActiveModeEnum {
       }
     }
   `,
-  templateUrl: './poi-controller.component.html',
+  templateUrl: './ui-overlay.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PoiControllerComponent {
-  private readonly mapService = inject(MapService);
-  private readonly parkingsService = inject(ParkingsService);
-  private readonly sharedUtilsService = inject(SharedUtilsService);
+export class UiOverlayComponent {
+  private readonly _mapService = inject(MapService);
+  private readonly _parkingsApiService = inject(ParkingsApiService);
+  private readonly _sharedUtilsService = inject(SharedUtilsService);
+  private readonly _matDialog = inject(MatDialog);
+
+  environmentType = environment.environmentType;
 
   ACTIVE_MODE_ENUM = ActiveModeEnum;
-  activeMode: WritableSignal<ActiveModeEnum> = signal(ActiveModeEnum.DEFAULT);
-  isMapLoaded = this.mapService.getIsMapLoaded;
+  activeMode = signal(ActiveModeEnum.DEFAULT);
+  isMapLoaded = this._mapService.getIsMapLoaded;
 
   readonly selectedParking = linkedSignal<Parking | null, Parking | null>({
-    source: () => this.mapService.selectedParking(),
+    source: () => this._mapService.selectedParking(),
     computation: (value, previousValue) => {
       if (this.activeMode() === ActiveModeEnum.DEFAULT) {
         return value;
@@ -84,6 +89,12 @@ export class PoiControllerComponent {
       }
     },
   });
+
+  openHelpDialog() {
+    this._matDialog.open(GuideDialogComponent, {
+      autoFocus: false,
+    });
+  }
 
   constructor() {
     effect(() => this.listenForSelectedPoiToStartEdit());
@@ -100,15 +111,15 @@ export class PoiControllerComponent {
   }
 
   stopAddingPoi() {
-    this.mapService.removeMoveableMarker();
+    this._mapService.removeMoveableMarker();
     this.setDefaultState();
   }
 
   startAddingPoi() {
     this.activeMode.set(ActiveModeEnum.ADDING_POI);
-    this.mapService.renderMoveableMarker();
+    this._mapService.renderMoveableMarker();
 
-    this.sharedUtilsService
+    this._sharedUtilsService
       .openSheet(addingPoiConfirmSheetConfig, {
         disableClose: true,
       })
@@ -116,8 +127,8 @@ export class PoiControllerComponent {
       .pipe(
         switchMap((result: string | undefined) => {
           if (result === 'CONFIRM') {
-            const location = this.mapService.getMarkerLatLng();
-            return this.parkingsService.postParking({ location });
+            const location = this._mapService.getMarkerLatLng();
+            return this._parkingsApiService.postParking({ location });
           } else {
             this.stopAddingPoi();
             return of(EMPTY);
@@ -126,7 +137,7 @@ export class PoiControllerComponent {
       )
       .subscribe({
         next: () => {
-          this.sharedUtilsService.openSnackbar(
+          this._sharedUtilsService.openSnackbar(
             'Gotowe!\nOznaczenie bezpłatnego parkingu zostało dodane',
             'SUCCESS',
           );
@@ -142,12 +153,12 @@ export class PoiControllerComponent {
     if (!this.selectedParking()) return;
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
 
-    this.sharedUtilsService
+    this._sharedUtilsService
       .openSheet(selectedPoiOptionsSheetConfig)
       .afterDismissed()
       .subscribe((result: string | undefined) => {
         if (result === 'CLOSE' || !result) {
-          this.mapService.removeMoveableMarker();
+          this._mapService.removeMoveableMarker();
           this.setDefaultState();
         }
         if (result === 'UPDATE') {
@@ -161,12 +172,12 @@ export class PoiControllerComponent {
     const selectedPoi: Parking | null = this.selectedParking();
     if (!selectedPoi) return;
     this.activeMode.set(ActiveModeEnum.UPDATING_POI_POSITION);
-    this.mapService.renderMoveableMarker(this.selectedParking()?.location);
-    this.mapService.jumpToPoi(selectedPoi?.location);
+    this._mapService.renderMoveableMarker(this.selectedParking()?.location);
+    this._mapService.jumpToPoi(selectedPoi?.location);
   }
 
   handleUpdateUserChoice() {
-    const sheetRef = this.sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig, {
+    const sheetRef = this._sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig, {
       disableClose: true,
     });
 
@@ -177,25 +188,25 @@ export class PoiControllerComponent {
   }
 
   stopUpdatingPoiPosition() {
-    this.mapService.removeMoveableMarker();
+    this._mapService.removeMoveableMarker();
     this.startEditingPoi();
   }
 
   confirmUpdatedPoiPosition() {
     const selectedPoi: Parking | null = this.selectedParking();
     if (!selectedPoi) return;
-    const location = this.mapService.getMarkerLatLng();
-    this.parkingsService.patchParking(selectedPoi.id, { location }).subscribe({
+    const location = this._mapService.getMarkerLatLng();
+    this._parkingsApiService.patchParking(selectedPoi.id, { location }).subscribe({
       next: () => {
-        this.sharedUtilsService.openSnackbar(
+        this._sharedUtilsService.openSnackbar(
           'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
           'SUCCESS',
         );
-        this.mapService.removeMoveableMarker();
+        this._mapService.removeMoveableMarker();
         this.setDefaultState();
       },
       error: () => {
-        this.mapService.removeMoveableMarker();
+        this._mapService.removeMoveableMarker();
         this.setDefaultState();
       },
     });
