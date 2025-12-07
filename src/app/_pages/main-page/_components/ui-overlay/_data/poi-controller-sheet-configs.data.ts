@@ -1,14 +1,16 @@
+import { PoiActionsEnum } from '../_types/poi-actions.model';
+
 export const addingPoiConfirmSheetConfig = {
   menuItems: [
     {
       label: 'Anuluj',
       icon: 'close',
-      result: 'CANCEL',
+      result: PoiActionsEnum.CANCEL,
     },
     {
       label: 'Potwierdź',
       icon: 'edit_location_alt',
-      result: 'CONFIRM',
+      result: PoiActionsEnum.CONFIRM,
       isPrimary: true,
       isSuccess: true,
     },
@@ -21,13 +23,13 @@ export const selectedPoiOptionsSheetConfig = {
     {
       label: 'Zasugeruj zmianę położenia parkingu',
       icon: 'edit_location_alt',
-      result: 'UPDATE',
+      result: PoiActionsEnum.UPDATE,
       isPrimary: true,
     },
     {
       label: 'Zamknij',
       icon: 'keyboard_arrow_down',
-      result: 'CLOSE',
+      result: PoiActionsEnum.CLOSE,
     },
   ],
 };
@@ -35,15 +37,17 @@ export const selectedPoiOptionsSheetConfig = {
 export const changingPoiPositionOptionsSheetConfig = {
   menuItems: [
     {
-      label: 'Zasugeruj zmianę położenia parkingu',
-      icon: 'edit_location_alt',
-      result: 'UPDATE',
-      isPrimary: true,
+      label: 'Anuluj',
+      icon: 'close',
+      result: PoiActionsEnum.CANCEL,
     },
     {
-      label: 'Zamknij',
-      icon: 'keyboard_arrow_down',
-      result: 'CLOSE',
+      label: 'Potwierdź',
+      icon: 'edit_location_alt',
+      result: PoiActionsEnum.CONFIRM,
+      isPrimary: true,
+      isSuccess: true,
     },
   ],
+  isMenuHorizontal: true,
 };

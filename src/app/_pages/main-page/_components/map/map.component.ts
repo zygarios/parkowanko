@@ -4,11 +4,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  input,
   untracked,
   ViewEncapsulation,
 } from '@angular/core';
-import { Parking } from '../../../../_types/parking.model';
+import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { MapService } from './_services/map.service';
 
 @Component({
@@ -41,7 +40,6 @@ import { MapService } from './_services/map.service';
     }
   `,
   selector: 'app-map',
-  imports: [],
   host: {
     id: 'map',
   },
@@ -50,17 +48,22 @@ import { MapService } from './_services/map.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent {
-  private mapService = inject(MapService);
+  private _mapService = inject(MapService);
+  private _parkingsApiService = inject(ParkingsApiService);
 
-  parkingsList = input<Parking[]>([]);
+  parkingsList = this._parkingsApiService.getParkings();
 
   constructor() {
-    afterNextRender(() => this.mapService.initRenderMap());
+    afterNextRender(() => this._mapService.initRenderMap());
     afterRenderEffect(() => {
-      if (this.mapService.getIsMapLoaded()) {
+      if (this._mapService.getIsMapLoaded()) {
         this.parkingsList();
-        untracked(() => this.mapService.renderParkingsPois(this.parkingsList()));
+        untracked(() => this._mapService.renderParkingsPois(this.parkingsList()));
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this._mapService.cleanUp();
   }
 }

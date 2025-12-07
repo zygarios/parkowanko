@@ -78,12 +78,12 @@
 
     &.mat-bottom-sheet-container-animations-enabled {
       &.mat-bottom-sheet-container-enter {
-        animation-duration: 300ms;
+        animation-duration: 200ms;
         animation-timing-function: ease;
       }
 
       &.mat-bottom-sheet-container-exit {
-        animation-duration: 300ms;
+        animation-duration: 200ms;
         animation-timing-function: ease;
       }
     }

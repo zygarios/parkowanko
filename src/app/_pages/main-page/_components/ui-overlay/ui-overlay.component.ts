@@ -3,7 +3,6 @@ import {
   Component,
   effect,
   inject,
-  linkedSignal,
   signal,
   untracked,
 } from '@angular/core';
@@ -15,7 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { EMPTY, of, switchMap } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { EMPTY, switchMap } from 'rxjs';
 import { environment } from '../../../../../environments/environment.development';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
@@ -28,6 +28,7 @@ import {
   changingPoiPositionOptionsSheetConfig,
   selectedPoiOptionsSheetConfig,
 } from './_data/poi-controller-sheet-configs.data';
+import { PoiActionsEnum } from './_types/poi-actions.model';
 
 enum ActiveModeEnum {
   DEFAULT = 'DEFAULT',
@@ -46,6 +47,7 @@ enum ActiveModeEnum {
     MatInputModule,
     MatAutocompleteModule,
     AddressSearchBoxComponent,
+    RouterLink,
   ],
   styles: `
     :host {
@@ -79,16 +81,7 @@ export class UiOverlayComponent {
   activeMode = signal(ActiveModeEnum.DEFAULT);
   isMapLoaded = this._mapService.getIsMapLoaded;
 
-  readonly selectedParking = linkedSignal<Parking | null, Parking | null>({
-    source: () => this._mapService.selectedParking(),
-    computation: (value, previousValue) => {
-      if (this.activeMode() === ActiveModeEnum.DEFAULT) {
-        return value;
-      } else {
-        return previousValue?.value || null;
-      }
-    },
-  });
+  readonly selectedParking = this._mapService.selectedParking;
 
   openHelpDialog() {
     this._matDialog.open(GuideDialogComponent, {
@@ -126,12 +119,12 @@ export class UiOverlayComponent {
       .afterDismissed()
       .pipe(
         switchMap((result: string | undefined) => {
-          if (result === 'CONFIRM') {
+          if (result === PoiActionsEnum.CONFIRM) {
             const location = this._mapService.getMarkerLatLng();
             return this._parkingsApiService.postParking({ location });
           } else {
             this.stopAddingPoi();
-            return of(EMPTY);
+            return EMPTY;
           }
         }),
       )
@@ -157,13 +150,12 @@ export class UiOverlayComponent {
       .openSheet(selectedPoiOptionsSheetConfig)
       .afterDismissed()
       .subscribe((result: string | undefined) => {
-        if (result === 'CLOSE' || !result) {
+        if (result === PoiActionsEnum.CLOSE || !result) {
           this._mapService.removeMoveableMarker();
           this.setDefaultState();
         }
-        if (result === 'UPDATE') {
+        if (result === PoiActionsEnum.UPDATE) {
           this.startUpdatingPoiPosition();
-          this.handleUpdateUserChoice();
         }
       });
   }
@@ -174,17 +166,39 @@ export class UiOverlayComponent {
     this.activeMode.set(ActiveModeEnum.UPDATING_POI_POSITION);
     this._mapService.renderMoveableMarker(this.selectedParking()?.location);
     this._mapService.jumpToPoi(selectedPoi?.location);
+    this.handleUpdateUserChoice();
   }
 
   handleUpdateUserChoice() {
     const sheetRef = this._sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig, {
       disableClose: true,
     });
-
-    sheetRef.afterDismissed().subscribe((result: string | undefined) => {
-      if (result === 'CANCEL' || !result) this.stopUpdatingPoiPosition();
-      else if (result === 'CONFIRM') this.confirmUpdatedPoiPosition();
-    });
+    sheetRef
+      .afterDismissed()
+      .pipe(
+        switchMap((result: string | undefined) => {
+          if (result === PoiActionsEnum.CONFIRM) {
+            return this.confirmUpdatedPoiPosition();
+          } else {
+            this.stopUpdatingPoiPosition();
+            return EMPTY;
+          }
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this._sharedUtilsService.openSnackbar(
+            'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
+            'SUCCESS',
+          );
+          this._mapService.removeMoveableMarker();
+          this.setDefaultState();
+        },
+        error: () => {
+          this._mapService.removeMoveableMarker();
+          this.setDefaultState();
+        },
+      });
   }
 
   stopUpdatingPoiPosition() {
@@ -194,21 +208,7 @@ export class UiOverlayComponent {
 
   confirmUpdatedPoiPosition() {
     const selectedPoi: Parking | null = this.selectedParking();
-    if (!selectedPoi) return;
     const location = this._mapService.getMarkerLatLng();
-    this._parkingsApiService.patchParking(selectedPoi.id, { location }).subscribe({
-      next: () => {
-        this._sharedUtilsService.openSnackbar(
-          'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
-          'SUCCESS',
-        );
-        this._mapService.removeMoveableMarker();
-        this.setDefaultState();
-      },
-      error: () => {
-        this._mapService.removeMoveableMarker();
-        this.setDefaultState();
-      },
-    });
+    return this._parkingsApiService.patchParking(selectedPoi!.id, { location });
   }
 }

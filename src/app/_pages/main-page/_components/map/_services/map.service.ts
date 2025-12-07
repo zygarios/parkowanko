@@ -1,4 +1,4 @@
-import { afterRenderEffect, inject, Injectable, signal, untracked } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { booleanPointInPolygon, buffer, point } from '@turf/turf';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../../../../_types/location-coords.model';
@@ -12,64 +12,53 @@ export const POLAND_MAX_BOUNDS = [
   POLAND_BOUNDS[2] + 3,
   POLAND_BOUNDS[3] + 3,
 ] as maplibregl.LngLatBoundsLike;
+const PARKING_POI_RADIUS_BOUND = 20;
 const CLOSE_ZOOM = 16;
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
-  private mapRendererService = inject(MapRendererService);
-  private markerRef!: maplibregl.Marker;
+  private _mapRendererService = inject(MapRendererService);
 
-  private map!: maplibregl.Map;
+  private _map!: maplibregl.Map;
+  private _markerRef!: maplibregl.Marker;
 
-  private moveMarkerFnRef: ((e: any) => void) | null = null;
-  private renderFeaturesForMarkerOnMoveFnRef: (() => void) | null = null;
+  private _moveMarkerFnRef: ((e: any) => void) | null = null;
+  private _renderFeaturesForMarkerOnMoveFnRef: (() => void) | null = null;
 
-  private isMapLoaded = signal(false);
-  private renderedParkingsCoordsList: LocationCoords[] = [];
+  private _renderedParkingsCoordsList: LocationCoords[] = [];
 
-  getIsMapLoaded = this.isMapLoaded.asReadonly();
+  private _isMapLoaded = signal(false);
+  getIsMapLoaded = this._isMapLoaded.asReadonly();
 
   selectedParking = signal<null | Parking>(null);
 
-  constructor() {
-    this.prepareAdditionalFeaturesOnLoadMap();
-  }
-
   async initRenderMap(): Promise<void> {
-    this.map?.remove();
-    this.markerRef?.remove();
+    this._map?.remove();
+    this._markerRef?.remove();
 
-    this.markerRef = this.mapRendererService.prepareMarker();
-    this.map = await this.mapRendererService.initRenderMap();
-    this.map.on('load', () => this.isMapLoaded.set(true));
-  }
+    this._map = await this._mapRendererService.initRenderMap();
 
-  private prepareAdditionalFeaturesOnLoadMap() {
-    afterRenderEffect(() => {
-      if (this.isMapLoaded()) {
-        untracked(() => {
-          this.mapRendererService.preparePoiForRender(this.map);
-          this.listenForPoiClick();
-          this.listenForClusterClick();
-        });
-      }
+    this._map.on('load', () => {
+      this._isMapLoaded.set(true);
+      this._markerRef = this._mapRendererService.prepareMarker();
+      this._mapRendererService.prepareLayersForRender(this._map);
+      this.listenForPoiClick();
+      this.listenForClusterClick();
     });
   }
 
   getMarkerLatLng(): LocationCoords {
-    return this.markerRef?.getLngLat();
+    return this._markerRef?.getLngLat();
   }
 
   getMap(): maplibregl.Map {
-    return this.map;
+    return this._map;
   }
 
-  // Wysyła powiadomienia o kliknięciu w poi
   private listenForPoiClick() {
-    const mapRef = this.map;
+    const mapRef = this._map;
 
     mapRef.on('click', 'unclustered-point', (e: any) => {
-      // solution for maplibre problem with serializing nested properties
       const stringifiedData = e.features?.[0]?.properties as {
         parking: string;
       };
@@ -78,8 +67,7 @@ export class MapService {
   }
 
   private listenForClusterClick() {
-    const mapRef = this.map;
-    // Centruje i przybliża do klastra z punktami
+    const mapRef = this._map;
     mapRef.on('click', 'clusters', (e: any) => {
       mapRef.flyTo({
         center: [e.lngLat.lng, e.lngLat.lat],
@@ -89,88 +77,90 @@ export class MapService {
   }
 
   renderParkingsPois(parkingsList: Parking[]): void {
-    this.renderedParkingsCoordsList = parkingsList.map((parking) => parking.location);
-    this.mapRendererService.renderPois(this.map, parkingsList);
+    this._renderedParkingsCoordsList = parkingsList.map((parking) => parking.location);
+    this._mapRendererService.renderPois(this._map, parkingsList);
   }
 
   renderMarkerForFocusPoi(coords: LocationCoords) {
     this.removeMarkerForFocusPoi();
-    this.markerRef.setLngLat(coords).addTo(this.map);
+    this._markerRef.setLngLat(coords).addTo(this._map);
   }
 
   removeMarkerForFocusPoi() {
-    this.markerRef.remove();
+    this._markerRef.remove();
   }
 
   renderMoveableMarker(fixedCoords?: LocationCoords): void {
     this.removeMoveableMarker();
 
-    this.markerRef.setLngLat(this.map.getCenter()).addTo(this.map);
-    this.renderRadiusForMarker();
+    this._markerRef.setLngLat(this._map.getCenter()).addTo(this._map);
+    this._renderRadiusForParkingPoi();
 
-    // aktualizuje na bieżąco pozycję markera gdy poruszamy mapą i rysuje linie między poi a markerem
-    this.moveMarkerFnRef = (e: any) => this.moveMarker(e);
-    this.map.on('move', this.moveMarkerFnRef);
+    this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
+    this._map.on('move', this._moveMarkerFnRef);
 
-    // Dodaje dodatkowe opcje wyświetlania, które się aktualizują przy ruchu markera
-    this.renderFeaturesForMarkerOnMoveFnRef = () => this.renderFeaturesForMarkerOnMove(fixedCoords);
+    this._renderFeaturesForMarkerOnMoveFnRef = () =>
+      this._renderFeaturesForMarkerOnMove(fixedCoords);
 
-    this.map.on('moveend', this.renderFeaturesForMarkerOnMoveFnRef);
+    this._map.on('moveend', this._renderFeaturesForMarkerOnMoveFnRef);
 
-    this.markerRef.on('dragend', this.renderFeaturesForMarkerOnMoveFnRef);
+    this._markerRef.on('dragend', this._renderFeaturesForMarkerOnMoveFnRef);
   }
 
-  private renderFeaturesForMarkerOnMove(fixedCoords?: LocationCoords) {
-    this.renderRadiusForMarker();
-    if (fixedCoords) this.renderLineBetweenPoints(fixedCoords);
+  private _renderFeaturesForMarkerOnMove(fixedCoords?: LocationCoords) {
+    this._renderRadiusForParkingPoi();
+    if (fixedCoords) this._renderLineBetweenPoints(fixedCoords);
   }
 
-  private moveMarker(e: any) {
-    this.markerRef!.setLngLat(e.target.getCenter());
-  }
+  private _moveMarker = (e: any) => {
+    this._markerRef!.setLngLat(e.target.getCenter());
+  };
 
-  private renderLineBetweenPoints(fixedCoords: LocationCoords) {
+  private _renderLineBetweenPoints(fixedCoords: LocationCoords) {
     if (!this.selectedParking()) return;
-    this.mapRendererService.renderLineForMarker(this.map, {
+    this._mapRendererService.renderLineForMarker(this._map, {
       fixedCoords: fixedCoords,
-      targetCoords: this.markerRef.getLngLat(),
+      targetCoords: this._markerRef.getLngLat(),
     });
   }
 
-  private renderRadiusForMarker() {
-    const markerCoords = this.markerRef.getLngLat();
+  private _renderRadiusForParkingPoi() {
+    const markerCoords = this._markerRef.getLngLat();
     const markerPoint = point([markerCoords.lng, markerCoords.lat]);
 
-    // Definicja buforu (np. okrąg o promieniu 20 metrów)
-    const bufferPoi = buffer(markerPoint, 20, { units: 'meters' });
+    const bufferPoi = buffer(markerPoint, PARKING_POI_RADIUS_BOUND, { units: 'meters' });
     if (bufferPoi) {
-      // Sprawdzenie, czy jakikolwiek punkt poi znajduje sie w promieniu
-      const isAnyPointInRadius = this.renderedParkingsCoordsList.some((coords: LocationCoords) =>
+      const parkingPoiInRadius = this._renderedParkingsCoordsList.find((coords: LocationCoords) =>
         booleanPointInPolygon([coords.lng, coords.lat], bufferPoi),
       );
 
-      if (isAnyPointInRadius) {
-        this.mapRendererService.renderRadiusForMarker(this.map, markerCoords);
+      if (parkingPoiInRadius) {
+        this._mapRendererService.renderRadiusForParkingPoi(this._map, parkingPoiInRadius);
       } else {
-        this.mapRendererService.renderRadiusForMarker(this.map);
+        this._mapRendererService.renderRadiusForParkingPoi(this._map);
       }
     }
   }
 
   removeMoveableMarker() {
-    this.mapRendererService.renderLineForMarker(this.map);
-    this.mapRendererService.renderRadiusForMarker(this.map);
-    this.map.off('move', this.moveMarkerFnRef!);
-    this.map.off('moveend', this.renderFeaturesForMarkerOnMoveFnRef!);
-    this.markerRef.off('dragend', this.renderFeaturesForMarkerOnMoveFnRef!);
-    this.markerRef.remove();
+    this._mapRendererService.renderLineForMarker(this._map);
+    this._mapRendererService.renderRadiusForParkingPoi(this._map);
+    this._map.off('move', this._moveMarkerFnRef!);
+    this._map.off('moveend', this._renderFeaturesForMarkerOnMoveFnRef!);
+    this._markerRef.off('dragend', this._renderFeaturesForMarkerOnMoveFnRef!);
+    this._markerRef.remove();
   }
 
   jumpToPoi(coords: LocationCoords) {
-    this.map.jumpTo({ center: [coords.lng, coords.lat], zoom: CLOSE_ZOOM });
+    this._map.jumpTo({ center: [coords.lng, coords.lat], zoom: CLOSE_ZOOM });
+  }
+
+  cleanUp() {
+    this._map?.remove();
+    this._markerRef?.remove();
   }
 
   ngOnDestroy(): void {
-    this.map?.remove();
+    this.cleanUp();
   }
 }
