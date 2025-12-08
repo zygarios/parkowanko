@@ -83,14 +83,14 @@ export class UiOverlayComponent {
 
   readonly selectedParking = this._mapService.selectedParking;
 
+  constructor() {
+    effect(() => this.listenForSelectedPoiToStartEdit());
+  }
+
   openHelpDialog() {
     this._matDialog.open(GuideDialogComponent, {
       autoFocus: false,
     });
-  }
-
-  constructor() {
-    effect(() => this.listenForSelectedPoiToStartEdit());
   }
 
   private listenForSelectedPoiToStartEdit() {

@@ -1,11 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { booleanPointInPolygon, buffer, point } from '@turf/turf';
+import type { MapLayerMouseEvent } from 'maplibre-gl';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../../../../_types/location-coords.model';
 import { Parking } from '../../../../../_types/parking.model';
 import { MapRendererService } from './map-renderer.service';
 
-export const POLAND_BOUNDS = [14, 48, 24.5, 56] as any;
+export const POLAND_BOUNDS: [number, number, number, number] = [14, 48, 24.5, 56];
 export const POLAND_MAX_BOUNDS = [
   POLAND_BOUNDS[0] - 3,
   POLAND_BOUNDS[1] - 3,
@@ -19,11 +20,13 @@ const CLOSE_ZOOM = 16;
 export class MapService {
   private _mapRendererService = inject(MapRendererService);
 
-  private _map!: maplibregl.Map;
-  private _markerRef!: maplibregl.Marker;
+  private _map: maplibregl.Map | null = null;
+  private _markerRef: maplibregl.Marker | null = null;
 
   private _moveMarkerFnRef: ((e: any) => void) | null = null;
   private _renderFeaturesForMarkerOnMoveFnRef: (() => void) | null = null;
+  private _poiClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
+  private _clusterClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
 
   private _renderedParkingsCoordsList: LocationCoords[] = [];
 
@@ -32,135 +35,230 @@ export class MapService {
 
   selectedParking = signal<null | Parking>(null);
 
+  /**
+   * Inicjalizuje mapę MapLibre i przygotowuje wszystkie warstwy
+   * Czyści poprzednią instancję jeśli istnieje (zapobiega wyciekom pamięci)
+   */
   async initRenderMap(): Promise<void> {
-    this._map?.remove();
-    this._markerRef?.remove();
+    this.cleanUp();
 
     this._map = await this._mapRendererService.initRenderMap();
 
     this._map.on('load', () => {
       this._isMapLoaded.set(true);
       this._markerRef = this._mapRendererService.prepareMarker();
-      this._mapRendererService.prepareLayersForRender(this._map);
+      this._mapRendererService.prepareLayersForRender(this._map!);
       this.listenForPoiClick();
       this.listenForClusterClick();
     });
   }
 
+  /**
+   * Pobiera aktualne współrzędne markera
+   * @returns Współrzędne lng/lat markera
+   */
   getMarkerLatLng(): LocationCoords {
-    return this._markerRef?.getLngLat();
+    return this._markerRef!.getLngLat();
   }
 
-  getMap(): maplibregl.Map {
-    return this._map;
-  }
-
+  /**
+   * Nasłuchuje kliknięć na pojedyncze POI parkingów (nieugrupowane)
+   * Aktualizuje selectedParking przy kliknięciu użytkownika
+   */
   private listenForPoiClick() {
-    const mapRef = this._map;
-
-    mapRef.on('click', 'unclustered-point', (e: any) => {
+    this._poiClickFnRef = (e: MapLayerMouseEvent) => {
       const stringifiedData = e.features?.[0]?.properties as {
         parking: string;
       };
       this.selectedParking.set(JSON.parse(stringifiedData.parking));
-    });
+    };
+    this._map!.on('click', 'unclustered-point', this._poiClickFnRef);
   }
 
+  /**
+   * Nasłuchuje kliknięć na klastry parkingów
+   * Przybliża widok mapy do klikniętego klastra z animacją flyTo
+   */
   private listenForClusterClick() {
-    const mapRef = this._map;
-    mapRef.on('click', 'clusters', (e: any) => {
-      mapRef.flyTo({
+    this._clusterClickFnRef = (e: MapLayerMouseEvent) => {
+      this._map!.flyTo({
         center: [e.lngLat.lng, e.lngLat.lat],
-        zoom: mapRef.getZoom() + 2.5,
+        zoom: this._map!.getZoom() + 2.5,
       });
-    });
+    };
+    this._map!.on('click', 'clusters', this._clusterClickFnRef);
   }
 
+  /**
+   * Renderuje POI parkingów na mapie z obsługą klastrowania
+   * Przechowuje listę współrzędnych dla późniejszego wykrywania bliskości
+   * @param parkingsList - Lista parkingów do wyświetlenia na mapie
+   */
   renderParkingsPois(parkingsList: Parking[]): void {
     this._renderedParkingsCoordsList = parkingsList.map((parking) => parking.location);
-    this._mapRendererService.renderPois(this._map, parkingsList);
+    this._mapRendererService.renderPois(this._map!, parkingsList);
   }
 
+  /**
+   * Renderuje marker w określonym punkcie (fokus na wybrany parking)
+   * @param coords - Współrzędne gdzie umieścić marker
+   */
   renderMarkerForFocusPoi(coords: LocationCoords) {
     this.removeMarkerForFocusPoi();
-    this._markerRef.setLngLat(coords).addTo(this._map);
+    this._markerRef!.setLngLat(coords).addTo(this._map!);
   }
 
+  /**
+   * Usuwa marker fokusu z mapy
+   */
   removeMarkerForFocusPoi() {
-    this._markerRef.remove();
+    this._markerRef?.remove();
   }
 
+  /**
+   * Renderuje ruchomy marker który podąża za centrum mapy
+   * Opcjonalnie rysuje linię do punktu stałego
+   * Używane przy dodawaniu nowego parkingu
+   * @param fixedCoords - Opcjonalne współrzędne punktu stałego dla rysowania linii dystansu
+   */
   renderMoveableMarker(fixedCoords?: LocationCoords): void {
     this.removeMoveableMarker();
 
-    this._markerRef.setLngLat(this._map.getCenter()).addTo(this._map);
+    // Ustaw marker w centrum mapy i dodaj do widoku
+    this._markerRef!.setLngLat(this._map!.getCenter()).addTo(this._map!);
     this._renderRadiusForParkingPoi();
 
+    // Podłącz marker do ruchu mapy (marker podąża za centrum)
     this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
-    this._map.on('move', this._moveMarkerFnRef);
+    this._map!.on('move', this._moveMarkerFnRef);
 
+    // Renderuj dodatkowe features po zakończeniu ruchu mapy lub przeciągnięcia markera
     this._renderFeaturesForMarkerOnMoveFnRef = () =>
       this._renderFeaturesForMarkerOnMove(fixedCoords);
 
-    this._map.on('moveend', this._renderFeaturesForMarkerOnMoveFnRef);
-
-    this._markerRef.on('dragend', this._renderFeaturesForMarkerOnMoveFnRef);
+    this._map!.on('move', this._renderFeaturesForMarkerOnMoveFnRef);
+    this._markerRef!.on('move', this._renderFeaturesForMarkerOnMoveFnRef);
   }
 
+  /**
+   * Renderuje features mapy po zakończeniu ruchu: promień i opcjonalnie linię
+   */
   private _renderFeaturesForMarkerOnMove(fixedCoords?: LocationCoords) {
     this._renderRadiusForParkingPoi();
     if (fixedCoords) this._renderLineBetweenPoints(fixedCoords);
   }
 
+  /**
+   * Przesuwa marker do centrum mapy podczas ruchu
+   */
   private _moveMarker = (e: any) => {
     this._markerRef!.setLngLat(e.target.getCenter());
   };
 
+  /**
+   * Renderuje przerywaną linię między punktem stałym a markerem
+   * Używane do pokazania dystansu
+   */
   private _renderLineBetweenPoints(fixedCoords: LocationCoords) {
     if (!this.selectedParking()) return;
-    this._mapRendererService.renderLineForMarker(this._map, {
+    this._mapRendererService.renderLineForMarker(this._map!, {
       fixedCoords: fixedCoords,
-      targetCoords: this._markerRef.getLngLat(),
+      targetCoords: this._markerRef!.getLngLat(),
     });
   }
 
+  /**
+   * Renderuje promień 20m wokół markera i sprawdza czy jest w nim parking
+   * Wyświetla czerwony okrąg jeśli w promieniu znajdzie się jakikolwiek parking
+   * Wykorzystuje bibliotekę Turf.js do obliczeń geometrycznych
+   */
   private _renderRadiusForParkingPoi() {
-    const markerCoords = this._markerRef.getLngLat();
+    const markerCoords = this._markerRef!.getLngLat();
     const markerPoint = point([markerCoords.lng, markerCoords.lat]);
 
+    // Utwórz bufor 20m wokół markera używając Turf.js
     const bufferPoi = buffer(markerPoint, PARKING_POI_RADIUS_BOUND, { units: 'meters' });
     if (bufferPoi) {
+      // Sprawdź czy którykolwiek z wyrenderowanych parkingów jest w promieniu
       const parkingPoiInRadius = this._renderedParkingsCoordsList.find((coords: LocationCoords) =>
         booleanPointInPolygon([coords.lng, coords.lat], bufferPoi),
       );
 
+      // Renderuj promień tylko jeśli parking jest w zasięgu
       if (parkingPoiInRadius) {
-        this._mapRendererService.renderRadiusForParkingPoi(this._map, parkingPoiInRadius);
+        this._mapRendererService.renderRadiusForParkingPoi(this._map!, parkingPoiInRadius);
       } else {
-        this._mapRendererService.renderRadiusForParkingPoi(this._map);
+        this._mapRendererService.renderRadiusForParkingPoi(this._map!);
       }
     }
   }
 
+  /**
+   * Usuwa ruchomy marker i czyści związane z nim renderowane features
+   * Usuwa event listenery ruchu mapy
+   */
   removeMoveableMarker() {
+    // Guard clause - sprawdź czy mapa jeszcze istnieje
+    if (!this._map) return;
+
     this._mapRendererService.renderLineForMarker(this._map);
     this._mapRendererService.renderRadiusForParkingPoi(this._map);
     this._map.off('move', this._moveMarkerFnRef!);
-    this._map.off('moveend', this._renderFeaturesForMarkerOnMoveFnRef!);
-    this._markerRef.off('dragend', this._renderFeaturesForMarkerOnMoveFnRef!);
-    this._markerRef.remove();
-  }
-
-  jumpToPoi(coords: LocationCoords) {
-    this._map.jumpTo({ center: [coords.lng, coords.lat], zoom: CLOSE_ZOOM });
-  }
-
-  cleanUp() {
-    this._map?.remove();
+    this._map.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);
+    this._markerRef?.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);
     this._markerRef?.remove();
   }
 
-  ngOnDestroy(): void {
-    this.cleanUp();
+  /**
+   * Przeskakuje do określonego punktu na mapie z przybliżeniem
+   * @param coords - Współrzędne docelowego punktu
+   */
+  jumpToPoi(coords: LocationCoords) {
+    this._map!.jumpTo({ center: [coords.lng, coords.lat], zoom: CLOSE_ZOOM });
+  }
+
+  /**
+   * Czyści wszystkie zasoby mapy, event listenery i referencje
+   * KRYTYCZNE: Zapobiega wyciekom pamięci przy nawigacji między widokami
+   * Wywołuje się automatycznie przez DestroyRef w komponencie
+   */
+  cleanUp() {
+    this._cleanUpListeners();
+    this._cleanUpMapCore();
+  }
+
+  private _cleanUpListeners() {
+    // Usuń event listenery POI i klastrów
+    if (this._poiClickFnRef) {
+      this._map?.off('click', 'unclustered-point', this._poiClickFnRef);
+      this._poiClickFnRef = null;
+    }
+    if (this._clusterClickFnRef) {
+      this._map?.off('click', 'clusters', this._clusterClickFnRef);
+      this._clusterClickFnRef = null;
+    }
+
+    // Usuń listenery ruchomego markera jeśli istnieją
+    if (this._moveMarkerFnRef) {
+      this._map?.off('move', this._moveMarkerFnRef);
+      this._moveMarkerFnRef = null;
+    }
+    if (this._renderFeaturesForMarkerOnMoveFnRef) {
+      this._map?.off('move', this._renderFeaturesForMarkerOnMoveFnRef);
+      this._markerRef?.off('move', this._renderFeaturesForMarkerOnMoveFnRef);
+      this._renderFeaturesForMarkerOnMoveFnRef = null;
+    }
+  }
+
+  private _cleanUpMapCore() {
+    // Usuń instancje mapy i markera z DOM
+    this._markerRef?.remove();
+    this._map?.remove();
+
+    // Wyzeruj referencje (zapobiega wyciekowi pamięci)
+    this._map = null;
+    this._markerRef = null;
+    this._renderedParkingsCoordsList = [];
+    this._isMapLoaded.set(false);
   }
 }

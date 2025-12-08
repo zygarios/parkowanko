@@ -14,11 +14,9 @@ export class AddressSearchBoxService {
     return toSignal<GeocodeAddress[]>(
       toObservable(searchTerm).pipe(
         distinctUntilChanged(),
-        debounce((searchTerm) =>
-          !searchTerm || !searchTerm.includes(',') ? interval() : interval(300),
-        ),
+        debounce((searchTerm) => (!searchTerm ? interval() : interval(300))),
         switchMap((searchTerm) => {
-          if (!searchTerm || !searchTerm.includes(',')) return of([]);
+          if (!searchTerm) return of([]);
           return of(searchTerm).pipe(
             switchMap((searchTerm) => this.geocodeApiService.getAddresses(searchTerm)),
           );
