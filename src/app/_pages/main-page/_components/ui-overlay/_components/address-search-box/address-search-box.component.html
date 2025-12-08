@@ -20,7 +20,9 @@
   }
   <mat-autocomplete requireSelection #auto="matAutocomplete" [displayWith]="parseAddressToString">
     @for (address of addressesList(); track address) {
-      <mat-option [value]="address">{{ parseAddressToString | computedFunc: address }}</mat-option>
+      <mat-option [value]="address">{{
+        parseAddressToString | computedFunc: address : true
+      }}</mat-option>
     }
   </mat-autocomplete>
 </mat-form-field>

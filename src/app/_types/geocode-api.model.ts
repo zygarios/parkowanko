@@ -1,12 +1,16 @@
-export interface GeocodeResponse<
-  T extends GeocodeCity | GeocodeStreet | GeocodeAddress,
-> {
+export interface GeocodeResponse {
   type: string;
   foundObjects: number;
-  results: Record<string, T>;
+  results: Record<string, Localization>;
 }
 
-export interface GeocodeCity {
+export type Localization = GeocodeCity | GeocodeAddress;
+
+export enum LocalizationType {
+  CITY = 'CITY',
+  ADDRESS = 'ADDRESS',
+}
+interface GeocodeCity {
   city: string;
   voivodeship: string;
   // powiat
@@ -20,19 +24,9 @@ export interface GeocodeCity {
   // lng
   x: string;
   teryt: string;
+  type: LocalizationType;
 }
-export interface GeocodeStreet {
-  city: string;
-  street: string;
-  // pełna lokalizacja "{Państwo, województwo, powiat, gmina}"
-  jednostka: string;
-  // lat
-  y: string;
-  // lng
-  x: string;
-  teryt: string;
-}
-export interface GeocodeAddress {
+interface GeocodeAddress {
   city: string;
   street: string;
   // numer budynku
@@ -47,4 +41,5 @@ export interface GeocodeAddress {
   // pełna lokalizacja "{Państwo, województwo, powiat, gmina}"
   jednostka: string;
   teryt: string;
+  type: LocalizationType;
 }

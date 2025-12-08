@@ -14,7 +14,8 @@ export const POLAND_MAX_BOUNDS = [
   POLAND_BOUNDS[3] + 3,
 ] as maplibregl.LngLatBoundsLike;
 const PARKING_POI_RADIUS_BOUND = 20;
-const CLOSE_ZOOM = 16;
+const CLOSE_ZOOM = 17;
+const FAR_ZOOM = 11;
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
@@ -137,7 +138,7 @@ export class MapService {
       this._renderFeaturesForMarkerOnMove(fixedCoords);
 
     this._map!.on('move', this._renderFeaturesForMarkerOnMoveFnRef);
-    this._markerRef!.on('move', this._renderFeaturesForMarkerOnMoveFnRef);
+    this._markerRef!.on('drag', this._renderFeaturesForMarkerOnMoveFnRef);
   }
 
   /**
@@ -205,7 +206,7 @@ export class MapService {
     this._mapRendererService.renderRadiusForParkingPoi(this._map);
     this._map.off('move', this._moveMarkerFnRef!);
     this._map.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);
-    this._markerRef?.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);
+    this._markerRef?.off('drag', this._renderFeaturesForMarkerOnMoveFnRef!);
     this._markerRef?.remove();
   }
 
@@ -213,8 +214,8 @@ export class MapService {
    * Przeskakuje do określonego punktu na mapie z przybliżeniem
    * @param coords - Współrzędne docelowego punktu
    */
-  jumpToPoi(coords: LocationCoords) {
-    this._map!.jumpTo({ center: [coords.lng, coords.lat], zoom: CLOSE_ZOOM });
+  jumpToPoi(coords: LocationCoords, zoomFar?: boolean) {
+    this._map!.jumpTo({ center: [coords.lng, coords.lat], zoom: zoomFar ? FAR_ZOOM : CLOSE_ZOOM });
   }
 
   /**
@@ -245,7 +246,7 @@ export class MapService {
     }
     if (this._renderFeaturesForMarkerOnMoveFnRef) {
       this._map?.off('move', this._renderFeaturesForMarkerOnMoveFnRef);
-      this._markerRef?.off('move', this._renderFeaturesForMarkerOnMoveFnRef);
+      this._markerRef?.off('drag', this._renderFeaturesForMarkerOnMoveFnRef);
       this._renderFeaturesForMarkerOnMoveFnRef = null;
     }
   }

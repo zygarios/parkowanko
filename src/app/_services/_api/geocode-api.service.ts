@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { GeocodeAddress, GeocodeResponse } from '../../_types/geocode-api.model';
+import { GeocodeResponse, Localization, LocalizationType } from '../../_types/geocode-api.model';
 
 @Injectable({
   providedIn: 'root',
@@ -13,19 +13,38 @@ export class GeocodeApiService {
 
   private httpClient = inject(HttpClient);
 
-  getAddresses(address: string): Observable<GeocodeAddress[]> {
+  getAddresses(address: string): Observable<Localization[]> {
     const url = this.GEOCODE_API + address;
-    return this.httpClient.get<GeocodeResponse<GeocodeAddress>>(url).pipe(
-      map((res): GeocodeAddress[] => (res.results ? Object.values(res.results) : [])),
+    let localizationType = LocalizationType.ADDRESS;
+
+    return this.httpClient.get<GeocodeResponse>(url).pipe(
+      tap((res) => {
+        if (res.type === 'city') {
+          localizationType = LocalizationType.CITY;
+        }
+      }),
+      map((res): Localization[] => (res.results ? Object.values(res.results) : [])),
+      map((addresses) => this._filterDuplicatedCities(addresses)),
       catchError(() => of([])),
     );
   }
 
-  getAddressReverse(lat: string, lng: string): Observable<GeocodeAddress[]> {
+  getAddressReverse(lat: string, lng: string): Observable<Localization[]> {
     const url = `${this.GEOCODE_REVERSE_API}POINT(${lng} ${lat})`;
-    return this.httpClient.get<GeocodeResponse<GeocodeAddress>>(url).pipe(
+    return this.httpClient.get<GeocodeResponse>(url).pipe(
       map((res) => (res.results ? Object.values(res.results) : [])),
       catchError(() => of([])),
     );
+  }
+
+  private _filterDuplicatedCities(results: Localization[]) {
+    const uniqueSet = new Set();
+    return results.filter((item) => {
+      if (!uniqueSet.has(item.teryt)) {
+        uniqueSet.add(item.teryt);
+        return true;
+      }
+      return false;
+    });
   }
 }

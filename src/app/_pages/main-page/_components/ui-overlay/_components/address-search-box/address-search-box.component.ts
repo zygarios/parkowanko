@@ -14,7 +14,7 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ComputedFuncPipe } from '../../../../../../_others/_helpers/computed-func.pipe';
-import { GeocodeAddress } from '../../../../../../_types/geocode-api.model';
+import { Localization, LocalizationType } from '../../../../../../_types/geocode-api.model';
 import { MapService } from './../../../map/_services/map.service';
 import { AddressSearchBoxService } from './address-search-box.service';
 
@@ -44,7 +44,7 @@ export class AddressSearchBoxComponent {
   private readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('searchInputRef');
 
   addressSearchTerm = signal('');
-  selectedAddress = signal<GeocodeAddress | null>(null);
+  selectedAddress = signal<Localization | null>(null);
   selectedAddressForm = form(this.selectedAddress);
 
   addressesList = this.addressSearchBoxService.getAddressesBySearchTerm(this.addressSearchTerm);
@@ -52,30 +52,37 @@ export class AddressSearchBoxComponent {
   constructor() {
     effect(() => {
       if (this.selectedAddress()) {
-        this.mapService.jumpToPoi({
-          lng: Number(this.selectedAddress()!.x),
-          lat: Number(this.selectedAddress()!.y),
-        });
+        this.mapService.jumpToPoi(
+          {
+            lng: Number(this.selectedAddress()!.x),
+            lat: Number(this.selectedAddress()!.y),
+          },
+          this.selectedAddress()!.type === LocalizationType.CITY,
+        );
       }
     });
   }
-
   resetInput() {
     this.addressSearchTerm.set('');
     this.selectedAddress.set(null);
     this.searchInputRef()!.nativeElement.value = '';
   }
 
-  parseAddressToString(address: GeocodeAddress | null) {
+  parseAddressToString(address: Localization | null, isOptionLabel: boolean = false) {
     if (!address) return '';
 
     let addressSuggestion = address.city;
-    if (address.street) {
+
+    if ('street' in address && address.street) {
       addressSuggestion = addressSuggestion + `, ${address.street}`;
+
+      if ('number' in address && address.number) {
+        addressSuggestion = addressSuggestion + ` ${address.number}`;
+      }
+    } else if (isOptionLabel && 'voivodeship' in address && address.voivodeship) {
+      addressSuggestion = addressSuggestion + ` (${address.voivodeship})`;
     }
-    if (address.number) {
-      addressSuggestion = addressSuggestion + ` ${address.number}`;
-    }
+
     return addressSuggestion;
   }
 }
