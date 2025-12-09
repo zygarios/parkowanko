@@ -84,7 +84,7 @@ export class MapService {
     this._clusterClickFnRef = (e: MapLayerMouseEvent) => {
       this._map!.flyTo({
         center: [e.lngLat.lng, e.lngLat.lat],
-        zoom: this._map!.getZoom() + 2.5,
+        zoom: this._map!.getZoom() + 3,
       });
     };
     this._map!.on('click', 'clusters', this._clusterClickFnRef);
@@ -171,6 +171,7 @@ export class MapService {
   /**
    * Renderuje promień 20m wokół markera i sprawdza czy jest w nim parking
    * Wyświetla czerwony okrąg jeśli w promieniu znajdzie się jakikolwiek parking
+   * Dodatkowo dodaje klasę 'disabled' na markerze aby wizualnie pokazać że nie można tam umieścić parkingu
    * Wykorzystuje bibliotekę Turf.js do obliczeń geometrycznych
    */
   private _renderRadiusForParkingPoi() {
@@ -188,8 +189,18 @@ export class MapService {
       // Renderuj promień tylko jeśli parking jest w zasięgu
       if (parkingPoiInRadius) {
         this._mapRendererService.renderRadiusForParkingPoi(this._map!, parkingPoiInRadius);
+        // Dodaj klasę 'disabled' do markera aby pokazać że nie można tu umieścić parkingu
+        const markerElement = this._markerRef?.getElement();
+        if (markerElement) {
+          markerElement.classList.add('disabled');
+        }
       } else {
         this._mapRendererService.renderRadiusForParkingPoi(this._map!);
+        // Usuń klasę 'disabled' z markera
+        const markerElement = this._markerRef?.getElement();
+        if (markerElement) {
+          markerElement.classList.remove('disabled');
+        }
       }
     }
   }

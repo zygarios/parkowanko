@@ -59,11 +59,11 @@
   --mat-stepper-header-done-state-icon-foreground-color: white;
 
   /* SNACKBAR */
-  --mat-snackbar-container-color: var(--mat-sys-primary);
+  --mat-snack-bar-container-color: var(--mat-sys-primary);
   .mat-mdc-snackbar-surface {
     box-shadow:
       0 0 0 2px white,
-      0 0 0 3px var(--mat-sys-primary),
+      0 0 0 3px var(--mat-snack-bar-container-color),
       var(--mat-sys-level3);
   }
 

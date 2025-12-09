@@ -39,6 +39,10 @@ import { MapService } from './_services/map.service';
       position: relative;
       animation: fadeIn 0.3s;
     }
+
+    .marker.disabled {
+      opacity: 0.5 !important;
+    }
   `,
   selector: 'app-map',
   host: {

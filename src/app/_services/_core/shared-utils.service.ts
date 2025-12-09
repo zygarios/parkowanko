@@ -6,7 +6,10 @@ import {
   InfoDialogComponent,
   InfoDialogData,
 } from '../../_components/info-dialog/info-dialog.component';
-import { MenuSheetComponent, MenuSheetData } from '../../_components/menu-sheet/menu-sheet.component';
+import {
+  MenuSheetComponent,
+  MenuSheetData,
+} from '../../_components/menu-sheet/menu-sheet.component';
 
 @Injectable({
   providedIn: 'root',

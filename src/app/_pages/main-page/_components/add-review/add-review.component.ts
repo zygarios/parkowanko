@@ -13,7 +13,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTab, MatTabsModule } from '@angular/material/tabs';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { validationMessages } from '../../../../_others/_helpers/validation-messages';
+import { ReviewsApiService } from '../../../../_services/_api/reviews-api.service';
+import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { ReviewSaveData } from '../../../../_types/review.model';
 import { ReviewFormComponent } from './_components/review-form/review-form.component';
 
@@ -40,15 +43,19 @@ import { ReviewFormComponent } from './_components/review-form/review-form.compo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddReviewComponent {
-  private stepsRef = viewChildren(MatTab);
-  private dialogRef = inject(MatDialogRef);
-  private dialogData = inject<{ parkingId: number }>(MAT_DIALOG_DATA);
+  private _dialogRef = inject(MatDialogRef);
+  private _reviewsApiService = inject(ReviewsApiService);
+  private _sharedUtilsService = inject(SharedUtilsService);
+  private _dialogData = inject<{ parkingId: number; skipLikeStep?: boolean }>(MAT_DIALOG_DATA);
+  private _stepsRef = viewChildren(MatTab);
+
+  skipLikeStep = this._dialogData.skipLikeStep;
   activeStep = signal(0);
   isFirstStep = computed(() => this.activeStep() === 0);
-  isLastStep = computed(() => this.activeStep() === this.stepsRef().length - 1);
+  isLastStep = computed(() => this.activeStep() === this._stepsRef().length - 1);
 
   review = signal<ReviewSaveData>({
-    parkingId: this.dialogData.parkingId,
+    parkingId: this._dialogData.parkingId,
     description: '',
     attributes: [],
     occupancy: '',
@@ -62,10 +69,11 @@ export class AddReviewComponent {
   });
 
   constructor() {
-    this.dialogRef.disableClose = true;
-    if (!this.dialogData.parkingId) {
+    this._dialogRef.disableClose = true;
+    if (!this._dialogData.parkingId && this._dialogData.parkingId !== 0) {
       throw new Error('Formularz dodawania opinii wymaga przekazanie parkingId w dialogData');
     }
+    if (this._dialogData.skipLikeStep) this.nextStep();
   }
 
   addVote(isLiked: boolean) {
@@ -75,22 +83,35 @@ export class AddReviewComponent {
 
   nextStep() {
     this.activeStep.update((step) => {
-      if (this.isLastStep()) return 0;
+      if (this.isLastStep()) return step;
       return ++step;
     });
   }
 
   previousStep() {
     this.activeStep.update((step) => {
-      if (step === 0) return this.stepsRef.length - 1;
+      if (this.skipLikeStep && step === 1) return step;
+      if (step === 0) return step;
       return --step;
     });
   }
 
   submitReview() {
-    submit(this.reviewForm, async (form) => {
-      this.nextStep();
-      return null;
+    submit(this.reviewForm, async () => {
+      // request
+      try {
+        await firstValueFrom(
+          this._reviewsApiService
+            .postReview(this._dialogData.parkingId, this.review())
+            // TODO: usunac catcherror
+            .pipe(catchError(() => of(null))),
+        );
+      } catch (_) {
+        this._sharedUtilsService.openSnackbar('Wystąpił błąd podczas dodawania oceny', 'ERROR');
+      } finally {
+        this.nextStep();
+        return null;
+      }
     });
   }
 }

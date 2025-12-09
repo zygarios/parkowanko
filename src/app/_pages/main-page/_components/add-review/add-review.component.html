@@ -46,7 +46,11 @@
 @if (!isFirstStep()) {
   <mat-dialog-actions align="end">
     @if (!isLastStep()) {
-      <button mat-button (click)="previousStep()">Wróć</button>
+      @if (skipLikeStep) {
+        <button mat-button mat-dialog-close>Zamknij</button>
+      } @else {
+        <button mat-button (click)="previousStep()">Wróć</button>
+      }
       <button mat-flat-button (click)="submitReview()">Wyślij</button>
     } @else {
       <button mat-flat-button mat-dialog-close>Zamknij</button>

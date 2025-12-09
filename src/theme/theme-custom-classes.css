@@ -24,11 +24,11 @@
 /* SNACKBAR */
 /* Klasa przekazywana jako panelClass przy otwieraniu snackbara */
 .snackbar-error {
-  --mat-snackbar-container-color: var(--par-color-error);
+  --mat-snack-bar-container-color: var(--par-color-error);
 }
 
 .snackbar-success {
-  --mat-snackbar-container-color: var(--par-color-success);
+  --mat-snack-bar-container-color: var(--par-color-success);
 }
 
 /* ANIMATIONS */
