@@ -17,12 +17,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
-import { catchError, EMPTY, switchMap } from 'rxjs';
+import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 import { environment } from '../../../../../environments/environment.development';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { Parking } from '../../../../_types/parking.model';
+import { AddReviewComponent } from '../add-review/add-review.component';
 import { MapService, PARKING_POI_RADIUS_BOUND } from '../map/_services/map.service';
 import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';
 import {
@@ -132,7 +133,15 @@ export class UiOverlayComponent {
             } else {
               const location = this._mapService.getMarkerLatLng();
               return this._parkingsApiService.postParking({ location }).pipe(
+                tap((newParking) =>
+                  this._matDialog.open(AddReviewComponent, {
+                    data: { parkingId: newParking.id, skipVoteStep: true },
+                  }),
+                ),
                 catchError(() => {
+                  this._matDialog.open(AddReviewComponent, {
+                    data: { parkingId: 1, skipVoteStep: true },
+                  });
                   this._sharedUtilsService.openSnackbar(
                     'Wystąpił błąd podczas dodawania parkingu',
                     'ERROR',
@@ -175,6 +184,25 @@ export class UiOverlayComponent {
           if (menu.result === PoiActionsEnum.UPDATE) {
             this.startUpdatingPoiPosition();
             return this.handleUpdateUserChoice();
+          } else if (menu.result === PoiActionsEnum.NAVIGATE) {
+            sheetRef.dismiss();
+            const location = this.selectedParking()?.location;
+            if (location) {
+              const userAgent = navigator.userAgent;
+              const isIOS =
+                /iPad|iPhone|iPod/.test(userAgent) ||
+                (/Macintosh/i.test(userAgent) && navigator.maxTouchPoints > 0);
+
+              if (isIOS) {
+                window.location.href = `maps:?daddr=${location.lat},${location.lng}&dirflg=d`;
+              } else {
+                window.open(
+                  `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`,
+                  '_blank',
+                );
+              }
+            }
+            return EMPTY;
           } else {
             sheetRef.dismiss();
             this._mapService.removeMoveableMarker();

@@ -1,18 +1,20 @@
-<div mat-dialog-title>
-  @if (isFirstStep()) {
-    <div class="flex ml-auto mr-auto gap-2 relative">Udało się zaparkować?</div>
-  } @else {
-    <div class="flex ml-auto mr-auto gap-2 relative">
-      <mat-icon
-        style="color: gold"
-        class="text-[30px]! w-[30px]! h-[30px]! absolute left-0 -translate-x-full -ml-2"
-      >
-        star
-      </mat-icon>
-      {{ isLastStep() ? 'Dziękujemy!' : 'Zostaw opinię' }}
-    </div>
-  }
-</div>
+@if (!skipVoteStep) {
+  <div mat-dialog-title>
+    @if (isFirstStep()) {
+      <div class="flex ml-auto mr-auto gap-2 relative">Udało się zaparkować?</div>
+    } @else {
+      <div class="flex ml-auto mr-auto gap-2 relative">
+        <mat-icon
+          style="color: gold"
+          class="text-[30px]! w-[30px]! h-[30px]! absolute left-0 -translate-x-full -ml-2"
+        >
+          star
+        </mat-icon>
+        {{ isLastStep() ? 'Dziękujemy!' : 'Zostaw opinię' }}
+      </div>
+    }
+  </div>
+}
 
 <mat-tab-group [selectedIndex]="activeStep()" dynamicHeight>
   <mat-tab>
@@ -46,14 +48,14 @@
 @if (!isFirstStep()) {
   <mat-dialog-actions align="end">
     @if (!isLastStep()) {
-      @if (skipLikeStep) {
-        <button mat-button mat-dialog-close>Zamknij</button>
+      @if (skipVoteStep) {
+        <button mat-button mat-dialog-close>Pomiń</button>
       } @else {
         <button mat-button (click)="previousStep()">Wróć</button>
       }
       <button mat-flat-button (click)="submitReview()">Wyślij</button>
     } @else {
-      <button mat-flat-button mat-dialog-close>Zamknij</button>
+      <button mat-flat-button mat-dialog-close>Pomiń</button>
     }
   </mat-dialog-actions>
 }

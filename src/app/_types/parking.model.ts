@@ -8,24 +8,10 @@ export class Parking extends ApiBaseType {
   location!: LocationCoords;
   likesCount!: number;
   dislikesCount!: number;
-  isEditPositionPendingRequest!: boolean;
+  hasEditLocationProposal!: boolean;
   isVerified!: boolean;
 
   constructor(props: Partial<Parking>) {
-    super();
-
-    Object.assign(this, props);
-
-    // Dodatkowe transformacje
-    Object.entries(props).forEach(([key, value]: [string, any]) => {
-      switch (key) {
-        case 'created_at':
-          return (this.created_at = new Date(value));
-        case 'updated_at':
-          return (this.updated_at = new Date(value));
-        default:
-          return;
-      }
-    });
+    super(props);
   }
 }

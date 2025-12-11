@@ -1,6 +1,7 @@
+import { MenuSheetData } from '../../../../../_components/menu-sheet/menu-sheet.model';
 import { PoiActionsEnum } from '../_types/poi-actions.model';
 
-export const addingPoiConfirmSheetConfig = {
+export const addingPoiConfirmSheetConfig: MenuSheetData = {
   menuItems: [
     {
       label: 'Anuluj',
@@ -18,13 +19,18 @@ export const addingPoiConfirmSheetConfig = {
   isMenuHorizontal: true,
 };
 
-export const selectedPoiOptionsSheetConfig = {
+export const selectedPoiOptionsSheetConfig: MenuSheetData = {
   menuItems: [
     {
-      label: 'Zasugeruj zmianę położenia parkingu',
+      label: 'Nawiguj',
+      icon: 'navigation',
+      result: PoiActionsEnum.NAVIGATE,
+      isPrimary: true,
+    },
+    {
+      label: 'Zaproponuj zmianę lokalizacji',
       icon: 'edit_location_alt',
       result: PoiActionsEnum.UPDATE,
-      isPrimary: true,
     },
     {
       label: 'Zamknij',
@@ -34,7 +40,7 @@ export const selectedPoiOptionsSheetConfig = {
   ],
 };
 
-export const changingPoiPositionOptionsSheetConfig = {
+export const changingPoiPositionOptionsSheetConfig: MenuSheetData = {
   menuItems: [
     {
       label: 'Anuluj',

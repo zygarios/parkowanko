@@ -46,10 +46,10 @@ export class AddReviewComponent {
   private _dialogRef = inject(MatDialogRef);
   private _reviewsApiService = inject(ReviewsApiService);
   private _sharedUtilsService = inject(SharedUtilsService);
-  private _dialogData = inject<{ parkingId: number; skipLikeStep?: boolean }>(MAT_DIALOG_DATA);
+  private _dialogData = inject<{ parkingId: number; skipVoteStep?: boolean }>(MAT_DIALOG_DATA);
   private _stepsRef = viewChildren(MatTab);
 
-  skipLikeStep = this._dialogData.skipLikeStep;
+  skipVoteStep = this._dialogData.skipVoteStep;
   activeStep = signal(0);
   isFirstStep = computed(() => this.activeStep() === 0);
   isLastStep = computed(() => this.activeStep() === this._stepsRef().length - 1);
@@ -73,7 +73,7 @@ export class AddReviewComponent {
     if (!this._dialogData.parkingId && this._dialogData.parkingId !== 0) {
       throw new Error('Formularz dodawania opinii wymaga przekazanie parkingId w dialogData');
     }
-    if (this._dialogData.skipLikeStep) this.nextStep();
+    if (this._dialogData.skipVoteStep) this.nextStep();
   }
 
   addVote(isLiked: boolean) {
@@ -90,7 +90,7 @@ export class AddReviewComponent {
 
   previousStep() {
     this.activeStep.update((step) => {
-      if (this.skipLikeStep && step === 1) return step;
+      if (this.skipVoteStep && step === 1) return step;
       if (step === 0) return step;
       return --step;
     });

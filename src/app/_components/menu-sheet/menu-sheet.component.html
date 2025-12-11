@@ -8,7 +8,7 @@
   }
   <div class="flex flex-col gap-2" [class]="data.isMenuHorizontal ? ['flex-row'] : ''">
     @for (menu of data.menuItems; track menu) {
-      @if (menu.isPrimary) {
+      @if (menu.isPrimary || menu.isSuccess || menu.isError) {
         <button
           mat-flat-button
           [class.button-error]="menu.isError"
