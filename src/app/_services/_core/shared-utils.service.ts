@@ -27,7 +27,8 @@ export class SharedUtilsService {
       disableClose: config?.disableClose ?? false,
       hasBackdrop: config?.hasBackdrop ?? false,
     });
-    return sheetRef;
+
+    return sheetRef.instance.menuSheetRef;
   }
 
   openSnackbar(title: string, type?: 'ERROR' | 'SUCCESS') {

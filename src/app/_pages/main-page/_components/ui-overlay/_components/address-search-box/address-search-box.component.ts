@@ -50,6 +50,10 @@ export class AddressSearchBoxComponent {
   addressesList = this.addressSearchBoxService.getAddressesBySearchTerm(this.addressSearchTerm);
 
   constructor() {
+    this.listenForAddressChange();
+  }
+
+  listenForAddressChange() {
     effect(() => {
       if (this.selectedAddress()) {
         this.mapService.jumpToPoi(
@@ -57,11 +61,12 @@ export class AddressSearchBoxComponent {
             lng: Number(this.selectedAddress()!.x),
             lat: Number(this.selectedAddress()!.y),
           },
-          this.selectedAddress()!.type === LocalizationType.CITY,
+          this.selectedAddress()!.type === LocalizationType.CITY ? 'FAR_ZOOM' : 'CLOSE_ZOOM',
         );
       }
     });
   }
+
   resetInput() {
     this.addressSearchTerm.set('');
     this.selectedAddress.set(null);

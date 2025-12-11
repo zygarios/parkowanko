@@ -158,10 +158,9 @@ export class MapLayersService {
       paint: {
         'text-color': '#FFFFFF',
         'text-halo-color': environment.primaryColor,
-        // Szerokość konturu dla czytelności
         'text-halo-width': 1,
-        'text-opacity-transition': { duration: 0 }, // Wyłącz fade-in animation
-        'text-translate-transition': { duration: 0 }, // Wyłącz animację przesunięcia
+        'text-opacity-transition': { duration: 0 },
+        'text-translate-transition': { duration: 0 },
       },
     });
   }

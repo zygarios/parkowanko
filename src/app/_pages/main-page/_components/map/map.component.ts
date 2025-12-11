@@ -37,7 +37,7 @@ import { MapService } from './_services/map.service';
       aspect-ratio: 1/1.2;
       translate: 0px -50%;
       position: relative;
-      animation: fadeIn 0.3s;
+      animation: fadeIn 0.2s;
     }
 
     .marker.disabled {

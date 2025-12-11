@@ -3,11 +3,12 @@ import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bott
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { Subject } from 'rxjs';
 
-export interface MenuSheetItem {
+export interface MenuSheetItem<T = any> {
   label: string;
   icon: string;
-  result: any;
+  result: T;
   isPrimary?: boolean;
   isSuccess?: boolean;
   isError?: boolean;
@@ -19,6 +20,11 @@ export interface MenuSheetData {
   isMenuHorizontal?: boolean;
 }
 
+export interface MenuSheetRef {
+  dismiss: () => void;
+  onClick: Subject<MenuSheetItem>;
+}
+
 @Component({
   selector: 'app-menu-sheet',
   imports: [MatListModule, MatIconModule, MatButtonModule],
@@ -26,10 +32,20 @@ export interface MenuSheetData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuSheetComponent {
-  data: MenuSheetData = inject(MAT_BOTTOM_SHEET_DATA);
-  sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
+  private sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
 
-  choose(result: any) {
-    this.sheetRef.dismiss(result);
+  menuSheetRef = {
+    dismiss: () => this.sheetRef.dismiss(),
+    onClick: new Subject<MenuSheetItem>(),
+  };
+
+  data: MenuSheetData = inject(MAT_BOTTOM_SHEET_DATA);
+
+  choose(menu: MenuSheetItem): void {
+    this.menuSheetRef.onClick.next(menu);
+  }
+
+  ngOnDestroy(): void {
+    this.menuSheetRef.onClick.complete();
   }
 }

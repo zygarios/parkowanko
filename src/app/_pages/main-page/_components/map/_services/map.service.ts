@@ -13,7 +13,7 @@ export const POLAND_MAX_BOUNDS = [
   POLAND_BOUNDS[2] + 3,
   POLAND_BOUNDS[3] + 3,
 ] as maplibregl.LngLatBoundsLike;
-const PARKING_POI_RADIUS_BOUND = 20;
+export const PARKING_POI_RADIUS_BOUND = 20;
 const CLOSE_ZOOM = 17;
 const FAR_ZOOM = 11;
 
@@ -35,6 +35,7 @@ export class MapService {
   getIsMapLoaded = this._isMapLoaded.asReadonly();
 
   selectedParking = signal<null | Parking>(null);
+  isAbleToAddOrEditParking = signal(true);
 
   /**
    * Inicjalizuje mapę MapLibre i przygotowuje wszystkie warstwy
@@ -191,6 +192,7 @@ export class MapService {
         this._mapRendererService.renderRadiusForParkingPoi(this._map!, parkingPoiInRadius);
         // Dodaj klasę 'disabled' do markera aby pokazać że nie można tu umieścić parkingu
         const markerElement = this._markerRef?.getElement();
+        this.isAbleToAddOrEditParking.set(false);
         if (markerElement) {
           markerElement.classList.add('disabled');
         }
@@ -198,9 +200,9 @@ export class MapService {
         this._mapRendererService.renderRadiusForParkingPoi(this._map!);
         // Usuń klasę 'disabled' z markera
         const markerElement = this._markerRef?.getElement();
-        if (markerElement) {
-          markerElement.classList.remove('disabled');
-        }
+        markerElement!.classList.remove('disabled');
+
+        this.isAbleToAddOrEditParking.set(true);
       }
     }
   }
@@ -225,8 +227,11 @@ export class MapService {
    * Przeskakuje do określonego punktu na mapie z przybliżeniem
    * @param coords - Współrzędne docelowego punktu
    */
-  jumpToPoi(coords: LocationCoords, zoomFar?: boolean) {
-    this._map!.jumpTo({ center: [coords.lng, coords.lat], zoom: zoomFar ? FAR_ZOOM : CLOSE_ZOOM });
+  jumpToPoi(coords: LocationCoords, zoom?: 'CLOSE_ZOOM' | 'FAR_ZOOM') {
+    let zoomValue: number | undefined;
+    if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
+    if (zoom === 'FAR_ZOOM') zoomValue = FAR_ZOOM;
+    this._map!.jumpTo({ center: [coords.lng, coords.lat], zoom: zoomValue });
   }
 
   /**
