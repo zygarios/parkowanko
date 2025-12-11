@@ -56,7 +56,7 @@ export class AddressSearchBoxComponent {
   listenForAddressChange() {
     effect(() => {
       if (this.selectedAddress()) {
-        this.mapService.jumpToPoi(
+        this.mapService.flyToPoi(
           {
             lng: Number(this.selectedAddress()!.x),
             lat: Number(this.selectedAddress()!.y),

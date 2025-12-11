@@ -123,7 +123,7 @@ export class UiOverlayComponent {
       .pipe(
         switchMap((menu) => {
           if (menu.result === PoiActionsEnum.CONFIRM) {
-            if (!this._mapService.isAbleToAddOrEditParking()) {
+            if (this._mapService.isMarkerInsideDisabledZone()) {
               this._sharedUtilsService.openSnackbar(
                 `Znacznik musi być oddalony co najmniej o ${PARKING_POI_RADIUS_BOUND} metrów od innych znaczników.`,
                 'ERROR',
@@ -165,19 +165,35 @@ export class UiOverlayComponent {
     if (!this.selectedParking() || this.activeMode() === ActiveModeEnum.ADDING_POI) return;
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
     this._mapService.jumpToPoi(this.selectedParking()!.location);
+
     const sheetRef = this._sharedUtilsService.openSheet(selectedPoiOptionsSheetConfig);
 
-    sheetRef.onClick.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((menu) => {
-      if (menu.result === PoiActionsEnum.CLOSE || !menu) {
-        sheetRef.dismiss();
-        this._mapService.removeMoveableMarker();
-        this.setDefaultState();
-      }
-      if (menu.result === PoiActionsEnum.UPDATE) {
-        this.startUpdatingPoiPosition();
-        this.handleUpdateUserChoice();
-      }
-    });
+    sheetRef.onClick
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(
+        switchMap((menu) => {
+          if (menu.result === PoiActionsEnum.UPDATE) {
+            this.startUpdatingPoiPosition();
+            return this.handleUpdateUserChoice();
+          } else {
+            sheetRef.dismiss();
+            this._mapService.removeMoveableMarker();
+            this.setDefaultState();
+            return EMPTY;
+          }
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this._sharedUtilsService.openSnackbar(
+            'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
+            'SUCCESS',
+          );
+          sheetRef.dismiss();
+          this._mapService.removeMoveableMarker();
+          this.setDefaultState();
+        },
+      });
   }
 
   startUpdatingPoiPosition() {
@@ -192,46 +208,34 @@ export class UiOverlayComponent {
     const sheetRef = this._sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig, {
       disableClose: true,
     });
-    sheetRef.onClick
-      .pipe(
-        switchMap((menu) => {
-          console.log(menu);
-          if (menu.result === PoiActionsEnum.CONFIRM) {
-            if (!this._mapService.isAbleToAddOrEditParking()) {
-              this._sharedUtilsService.openSnackbar(
-                `Znacznik musi być oddalony co najmniej o ${PARKING_POI_RADIUS_BOUND} metrów od innych znaczników.`,
-                'ERROR',
-              );
-              return EMPTY;
-            } else {
-              return this.confirmUpdatedPoiPosition().pipe(
-                catchError(() => {
-                  this._sharedUtilsService.openSnackbar(
-                    'Wystąpił błąd podczas aktualizacji pozycji parkingu',
-                    'ERROR',
-                  );
-                  return EMPTY;
-                }),
-              );
-            }
-          } else {
-            this.stopUpdatingPoiPosition();
+
+    return sheetRef.onClick.pipe(
+      switchMap((menu) => {
+        if (menu.result === PoiActionsEnum.CONFIRM) {
+          if (this._mapService.isMarkerInsideDisabledZone()) {
+            this._sharedUtilsService.openSnackbar(
+              `Znacznik musi być oddalony co najmniej o ${PARKING_POI_RADIUS_BOUND} metrów od innych znaczników.`,
+              'ERROR',
+            );
             return EMPTY;
+          } else {
+            return this.confirmUpdatedPoiPosition().pipe(
+              catchError(() => {
+                this._sharedUtilsService.openSnackbar(
+                  'Wystąpił błąd podczas aktualizacji pozycji parkingu',
+                  'ERROR',
+                );
+                return EMPTY;
+              }),
+            );
           }
-        }),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe({
-        next: () => {
-          this._sharedUtilsService.openSnackbar(
-            'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
-            'SUCCESS',
-          );
-          sheetRef.dismiss();
-          this._mapService.removeMoveableMarker();
-          this.setDefaultState();
-        },
-      });
+        } else {
+          this.stopUpdatingPoiPosition();
+          return EMPTY;
+        }
+      }),
+      takeUntilDestroyed(this._destroyRef),
+    );
   }
 
   stopUpdatingPoiPosition() {

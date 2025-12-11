@@ -16,6 +16,7 @@ export const POLAND_MAX_BOUNDS = [
 export const PARKING_POI_RADIUS_BOUND = 20;
 const CLOSE_ZOOM = 17;
 const FAR_ZOOM = 11;
+const FLY_SPEED = 2;
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
@@ -35,7 +36,7 @@ export class MapService {
   getIsMapLoaded = this._isMapLoaded.asReadonly();
 
   selectedParking = signal<null | Parking>(null);
-  isAbleToAddOrEditParking = signal(true);
+  isMarkerInsideDisabledZone = signal(false);
 
   /**
    * Inicjalizuje mapę MapLibre i przygotowuje wszystkie warstwy
@@ -86,6 +87,7 @@ export class MapService {
       this._map!.flyTo({
         center: [e.lngLat.lng, e.lngLat.lat],
         zoom: this._map!.getZoom() + 3,
+        speed: FLY_SPEED,
       });
     };
     this._map!.on('click', 'clusters', this._clusterClickFnRef);
@@ -132,12 +134,12 @@ export class MapService {
 
     // Podłącz marker do ruchu mapy (marker podąża za centrum)
     this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
-    this._map!.on('move', this._moveMarkerFnRef);
 
     // Renderuj dodatkowe features po zakończeniu ruchu mapy lub przeciągnięcia markera
     this._renderFeaturesForMarkerOnMoveFnRef = () =>
       this._renderFeaturesForMarkerOnMove(fixedCoords);
 
+    this._map!.on('move', this._moveMarkerFnRef);
     this._map!.on('move', this._renderFeaturesForMarkerOnMoveFnRef);
     this._markerRef!.on('drag', this._renderFeaturesForMarkerOnMoveFnRef);
   }
@@ -192,7 +194,7 @@ export class MapService {
         this._mapRendererService.renderRadiusForParkingPoi(this._map!, parkingPoiInRadius);
         // Dodaj klasę 'disabled' do markera aby pokazać że nie można tu umieścić parkingu
         const markerElement = this._markerRef?.getElement();
-        this.isAbleToAddOrEditParking.set(false);
+        this.isMarkerInsideDisabledZone.set(true);
         if (markerElement) {
           markerElement.classList.add('disabled');
         }
@@ -202,7 +204,7 @@ export class MapService {
         const markerElement = this._markerRef?.getElement();
         markerElement!.classList.remove('disabled');
 
-        this.isAbleToAddOrEditParking.set(true);
+        this.isMarkerInsideDisabledZone.set(false);
       }
     }
   }
@@ -232,6 +234,17 @@ export class MapService {
     if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
     if (zoom === 'FAR_ZOOM') zoomValue = FAR_ZOOM;
     this._map!.jumpTo({ center: [coords.lng, coords.lat], zoom: zoomValue });
+  }
+
+  /**
+   * Przelatuje do określonego punktu na mapie z przybliżeniem
+   * @param coords - Współrzędne docelowego punktu
+   */
+  flyToPoi(coords: LocationCoords, zoom?: 'CLOSE_ZOOM' | 'FAR_ZOOM') {
+    let zoomValue: number | undefined;
+    if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
+    if (zoom === 'FAR_ZOOM') zoomValue = FAR_ZOOM;
+    this._map!.flyTo({ center: [coords.lng, coords.lat], zoom: zoomValue, speed: FLY_SPEED });
   }
 
   /**

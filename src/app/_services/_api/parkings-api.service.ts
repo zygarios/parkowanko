@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
+import { GlobalSpinnerService } from '../../_services/_core/global-spinner.service';
 import { Parking, ParkingSaveData } from '../../_types/parking.model';
 
 @Injectable({
@@ -9,6 +10,7 @@ import { Parking, ParkingSaveData } from '../../_types/parking.model';
 })
 export class ParkingsApiService {
   private _httpClient = inject(HttpClient);
+  private _globalSpinnerService = inject(GlobalSpinnerService);
 
   private parkingsList = signal<Parking[]>(
     [
@@ -84,6 +86,7 @@ export class ParkingsApiService {
   }
 
   postParking(body: ParkingSaveData): Observable<Parking> {
+    this._globalSpinnerService.isSpinnerActive.set(true);
     return this._httpClient
       .post<Parking>(`${environment.apiUrl}/parkings/`, body)
       .pipe(
@@ -94,26 +97,26 @@ export class ParkingsApiService {
   }
 
   patchParking(id: number, body: ParkingSaveData): Observable<Parking> {
-    return this._httpClient
-      .patch<Parking>(`${environment.apiUrl}/parkings/${id}/`, body)
-      .pipe(
-        tap((updatedParking: Parking) =>
-          this.parkingsList.update((parkings: Parking[]) =>
-            parkings.map((parking) => (parking.id !== id ? parking : new Parking(updatedParking))),
-          ),
+    this._globalSpinnerService.isSpinnerActive.set(true);
+    return this._httpClient.patch<Parking>(`${environment.apiUrl}/parkings/${id}/`, body).pipe(
+      tap((updatedParking: Parking) =>
+        this.parkingsList.update((parkings: Parking[]) =>
+          parkings.map((parking) => (parking.id !== id ? parking : new Parking(updatedParking))),
         ),
-      );
+      ),
+      finalize(() => this._globalSpinnerService.isSpinnerActive.set(false)),
+    );
   }
 
   deleteParking(id: number): Observable<void> {
-    return this._httpClient
-      .delete<void>(`${environment.apiUrl}/parkings/${id}/`)
-      .pipe(
-        tap(() =>
-          this.parkingsList.update((parkings: Parking[]) =>
-            parkings.filter((parking) => parking.id !== id),
-          ),
+    this._globalSpinnerService.isSpinnerActive.set(true);
+    return this._httpClient.delete<void>(`${environment.apiUrl}/parkings/${id}/`).pipe(
+      tap(() =>
+        this.parkingsList.update((parkings: Parking[]) =>
+          parkings.filter((parking) => parking.id !== id),
         ),
-      );
+      ),
+      finalize(() => this._globalSpinnerService.isSpinnerActive.set(false)),
+    );
   }
 }
