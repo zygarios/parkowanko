@@ -47,7 +47,7 @@ export class MapRendererService {
       mapRef.touchZoomRotate.disableRotation();
 
       // Załaduj ikonę POI parkingu
-      const imageUrl = '/icons/parking-free-poi.png';
+      const imageUrl = 'icons/parking-free-poi.png';
       try {
         const imageBitmap = await fetch(imageUrl)
           .then((response) => {
