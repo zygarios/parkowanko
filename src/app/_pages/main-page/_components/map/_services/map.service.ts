@@ -2,8 +2,8 @@ import { inject, Injectable, signal } from '@angular/core';
 import { booleanPointInPolygon, buffer, point } from '@turf/turf';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import * as maplibregl from 'maplibre-gl';
-import { LocationCoords } from '../../../../../_types/location-coords.model';
-import { Parking } from '../../../../../_types/parking.model';
+import { LocationCoords } from '../../../../../_types/location-coords.type';
+import { Parking } from '../../../../../_types/parking.type';
 import { MapRendererService } from './map-renderer.service';
 
 export const POLAND_BOUNDS: [number, number, number, number] = [14, 48, 24.5, 56];

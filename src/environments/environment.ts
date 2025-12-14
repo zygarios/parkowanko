@@ -1,4 +1,4 @@
-import { EnvironmentType } from '../app/_types/environment-type.model';
+import { EnvironmentType } from '../app/_types/environment-type.type';
 import { envShared } from './env-shared';
 
 export const environment = {

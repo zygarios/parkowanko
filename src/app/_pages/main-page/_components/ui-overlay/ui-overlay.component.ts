@@ -22,7 +22,7 @@ import { environment } from '../../../../../environments/environment.development
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
-import { Parking } from '../../../../_types/parking.model';
+import { Parking } from '../../../../_types/parking.type';
 import { AddReviewComponent } from '../add-review/add-review.component';
 import { MapService, PARKING_POI_RADIUS_BOUND } from '../map/_services/map.service';
 import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';

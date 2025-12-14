@@ -17,7 +17,7 @@ import { catchError, firstValueFrom, of } from 'rxjs';
 import { validationMessages } from '../../../../_others/_helpers/validation-messages';
 import { ReviewsApiService } from '../../../../_services/_api/reviews-api.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
-import { ReviewSaveData } from '../../../../_types/review.model';
+import { ReviewSaveData } from '../../../../_types/review.type';
 import { ReviewFormComponent } from './_components/review-form/review-form.component';
 
 @Component({

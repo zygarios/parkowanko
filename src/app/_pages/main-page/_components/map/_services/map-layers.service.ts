@@ -39,6 +39,26 @@ export class MapLayersService {
       layout: {
         'icon-image': 'parking-poi-icon', // Użyj załadowanej ikony parking-free-poi.png
         'icon-size': 0.3, // Skalowanie ikony (30% oryginalnego rozmiaru)
+        'text-field': '{scoreLabel}',
+        'text-font': ['Open Sans Bold'],
+        'text-offset': [1.2, -0.15],
+        'text-anchor': 'top-left',
+        'text-size': 12,
+        'text-allow-overlap': true,
+        'text-letter-spacing': 0,
+      },
+      paint: {
+        'text-color': [
+          'case',
+          ['>', ['get', 'score'], 0],
+          environment.colors.success,
+          ['<', ['get', 'score'], 0],
+          environment.colors.error,
+          environment.colors.primary,
+        ],
+        'text-halo-color': '#FFFFFF',
+        'text-halo-width': 1,
+        'text-translate-transition': { duration: 0 },
       },
     });
 
@@ -49,7 +69,7 @@ export class MapLayersService {
       source: PARKING_POI_SOURCE,
       filter: ['has', 'point_count'], // Pokaż tylko jeśli MA point_count (jest klastrem)
       paint: {
-        'circle-color': environment.primaryColor,
+        'circle-color': environment.colors.primary,
         // Rozmiar okręgu zależy od liczby POI:
         // <100 parkingów = 20px, 100-750 = 30px, >750 = 40px
         'circle-radius': ['step', ['get', 'point_count'], 20, 100, 30, 750, 40],
@@ -99,7 +119,7 @@ export class MapLayersService {
       source: PARKING_POI_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'fill-color': '#FF0000',
+        'fill-color': environment.colors.error,
         'fill-opacity': 0.15, // Delikatne wypełnienie dla lepszej czytelności
       },
     });
@@ -111,7 +131,7 @@ export class MapLayersService {
       source: PARKING_POI_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'line-color': '#FF0000',
+        'line-color': environment.colors.error,
         'line-width': 1,
       },
     });
@@ -137,7 +157,7 @@ export class MapLayersService {
       type: 'line',
       source: PARKING_POI_LINE_SOURCE,
       paint: {
-        'line-color': environment.primaryColor,
+        'line-color': environment.colors.primary,
         'line-width': 3,
         'line-dasharray': [2, 2], // Przerywana: 2px linia, 2px przerwa
       },
@@ -157,7 +177,7 @@ export class MapLayersService {
       },
       paint: {
         'text-color': '#FFFFFF',
-        'text-halo-color': environment.primaryColor,
+        'text-halo-color': environment.colors.primary,
         'text-halo-width': 1,
         'text-opacity-transition': { duration: 0 },
         'text-translate-transition': { duration: 0 },

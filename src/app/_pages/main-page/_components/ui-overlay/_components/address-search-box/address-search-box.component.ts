@@ -14,7 +14,7 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ComputedFuncPipe } from '../../../../../../_others/_helpers/computed-func.pipe';
-import { Localization, LocalizationType } from '../../../../../../_types/geocode-api.model';
+import { Localization, LocalizationType } from '../../../../../../_types/geocode-api.type';
 import { MapService } from './../../../map/_services/map.service';
 import { AddressSearchBoxService } from './address-search-box.service';
 

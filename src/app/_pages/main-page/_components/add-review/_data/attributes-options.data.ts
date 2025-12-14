@@ -1,4 +1,4 @@
-import { ValueLabelType } from '../../../../../_types/value-label-type.model';
+import { ValueLabelType } from '../../../../../_types/value-label-type.type';
 import { Attribute } from '../_types/attribute.model';
 
 export const attributesOptionsData: ValueLabelType<Attribute>[] = [

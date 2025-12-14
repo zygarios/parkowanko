@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { circle, distance, point } from '@turf/turf';
 import * as maplibregl from 'maplibre-gl';
-import { LocationCoords } from '../../../../../_types/location-coords.model';
-import { Parking } from '../../../../../_types/parking.model';
+import { LocationCoords } from '../../../../../_types/location-coords.type';
+import { Parking } from '../../../../../_types/parking.type';
 import {
   MapLayersService,
   PARKING_POI_LINE_SOURCE,
@@ -117,7 +117,12 @@ export class MapRendererService {
             coordinates: [parking.location.lng, parking.location.lat],
           },
           properties: {
-            parking: copiedParking, // Przechowaj cały obiekt parkingu dla event handlerów
+            parking: copiedParking,
+            score: parking.likeCount - parking.dislikeCount,
+            scoreLabel:
+              parking.likeCount - parking.dislikeCount > 0
+                ? `+${parking.likeCount - parking.dislikeCount}`
+                : `${parking.likeCount - parking.dislikeCount}`,
           },
         };
       }),

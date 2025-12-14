@@ -1,6 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   email,
@@ -16,10 +15,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { validationMessages } from '../../_others/_helpers/validation-messages';
 import { AuthService } from '../../_services/_core/auth.service';
 
 interface AuthData {
+  username: string;
   email: string;
   password: string;
   repeatedPassword: string;
@@ -58,9 +60,18 @@ export class AuthPageComponent {
   private _authService = inject(AuthService);
   private _router = inject(Router);
 
-  private authData = signal<AuthData>({ email: '', password: '', repeatedPassword: '' });
+  private authModel = signal<AuthData>({
+    username: '',
+    email: '',
+    password: '',
+    repeatedPassword: '',
+  });
 
-  authForm = form(this.authData, (path) => {
+  authForm = form(this.authModel, (path) => {
+    required(path.username, { message: validationMessages.required });
+    minLength(path.username, 3, { message: 'Minimalna długość znaków to 3' });
+    hidden(path.username, () => this.authMode() === AuthModeType.LOGIN);
+
     required(path.email, { message: validationMessages.required });
     email(path.email, { message: validationMessages.email });
 
@@ -96,30 +107,22 @@ export class AuthPageComponent {
   }
 
   submit() {
-    submit(this.authForm, async (form) => {
-      const { email, password, repeatedPassword } = form;
+    submit(this.authForm, async () => {
+      const { username, email, password } = this.authModel();
 
-      if (this.authMode() === AuthModeType.LOGIN) {
-        this._authService.login({ email, password }).subscribe({
-          next: () => {
-            this._router.navigate(['/']);
-          },
-          error: (err) => {
-            console.error(err);
+      const request$ =
+        this.authMode() === AuthModeType.LOGIN
+          ? this._authService.login({ email, password })
+          : this._authService.register({ username, email, password });
 
-          }
-        });
-      } else {
-        this._authService.register({ email, password, repeatedPassword }).subscribe({
-          next: () => {
-            this._router.navigate(['/']);
-          },
-          error: (err) => {
-            console.error(err);
-          }
-        });
+      try {
+        await firstValueFrom(request$);
+        this._router.navigate(['/']);
+        return;
+      } catch (err) {
+        console.error(err);
+        return;
       }
-      return null;
     });
   }
 }

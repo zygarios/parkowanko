@@ -1,4 +1,4 @@
-import { ValueLabelType } from '../../../../../_types/value-label-type.model';
+import { ValueLabelType } from '../../../../../_types/value-label-type.type';
 import { Occupancy } from '../_types/occupancy.model';
 
 export const occupancyOptionsData: ValueLabelType<Occupancy>[] = [

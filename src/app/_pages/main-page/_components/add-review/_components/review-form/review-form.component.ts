@@ -4,7 +4,7 @@ import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatOption, MatSelect, MatSelectTrigger } from '@angular/material/select';
-import { ReviewSaveData } from '../../../../../../_types/review.model';
+import { ReviewSaveData } from '../../../../../../_types/review.type';
 import { attributesOptionsData } from '../../_data/attributes-options.data';
 import { occupancyOptionsData } from '../../_data/occupancy-options.data';
 

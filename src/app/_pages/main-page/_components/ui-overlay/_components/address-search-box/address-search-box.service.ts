@@ -2,7 +2,7 @@ import { inject, Injectable, Signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { debounce, distinctUntilChanged, interval, of, switchMap } from 'rxjs';
 import { GeocodeApiService } from '../../../../../../_services/_api/geocode-api.service';
-import { Localization } from '../../../../../../_types/geocode-api.model';
+import { Localization } from '../../../../../../_types/geocode-api.type';
 
 @Injectable({
   providedIn: 'root',
