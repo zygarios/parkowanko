@@ -173,7 +173,6 @@ export class UiOverlayComponent {
   startEditingPoi() {
     if (!this.selectedParking() || this.activeMode() === ActiveModeEnum.ADDING_POI) return;
     this.activeMode.set(ActiveModeEnum.EDITING_POI);
-    this._mapService.jumpToPoi(this.selectedParking()!.location);
 
     const sheetRef = this._sharedUtilsService.openSheet(selectedPoiOptionsSheetConfig);
 

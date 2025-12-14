@@ -73,7 +73,14 @@ export class MapService {
       const stringifiedData = e.features?.[0]?.properties as {
         parking: string;
       };
-      this.selectedParking.set(JSON.parse(stringifiedData.parking));
+
+      if (!stringifiedData) return;
+
+      const parking: Parking = JSON.parse(stringifiedData.parking);
+
+      this.flyToPoi(parking.location);
+
+      this.selectedParking.set(parking);
     };
     this._map!.on('click', 'unclustered-point', this._poiClickFnRef);
   }
@@ -83,13 +90,9 @@ export class MapService {
    * Przybliża widok mapy do klikniętego klastra z animacją flyTo
    */
   private listenForClusterClick() {
-    this._clusterClickFnRef = (e: MapLayerMouseEvent) => {
-      this._map!.flyTo({
-        center: [e.lngLat.lng, e.lngLat.lat],
-        zoom: this._map!.getZoom() + 3,
-        speed: FLY_SPEED,
-      });
-    };
+    this._clusterClickFnRef = (e: MapLayerMouseEvent) =>
+      this.flyToPoi(e.lngLat, this._map!.getZoom() + 3);
+
     this._map!.on('click', 'clusters', this._clusterClickFnRef);
   }
 
@@ -240,10 +243,11 @@ export class MapService {
    * Przelatuje do określonego punktu na mapie z przybliżeniem
    * @param coords - Współrzędne docelowego punktu
    */
-  flyToPoi(coords: LocationCoords, zoom?: 'CLOSE_ZOOM' | 'FAR_ZOOM') {
-    let zoomValue: number | undefined;
-    if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
+  flyToPoi(coords: LocationCoords, zoom: 'CLOSE_ZOOM' | 'FAR_ZOOM' | number = CLOSE_ZOOM) {
+    let zoomValue!: number;
     if (zoom === 'FAR_ZOOM') zoomValue = FAR_ZOOM;
+    if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
+    else zoomValue = zoom as number;
     this._map!.flyTo({ center: [coords.lng, coords.lat], zoom: zoomValue, speed: FLY_SPEED });
   }
 

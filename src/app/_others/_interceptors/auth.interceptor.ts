@@ -1,6 +1,7 @@
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { BehaviorSubject, catchError, filter, Observable, switchMap, take, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../../_services/_core/auth.service';
 
 let isRefreshing = false;
@@ -15,7 +16,9 @@ export function authInterceptor(
 
   let request = req;
 
-  if (token) {
+  const isOwnApi = req.url.startsWith(environment.apiUrl);
+
+  if (isOwnApi && token) {
     request = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,
