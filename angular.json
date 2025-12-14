@@ -55,7 +55,8 @@
                   "maximumError": "150kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "preproduction": {
               "outputHashing": "all",
@@ -84,6 +85,9 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": { "buildTarget": ":build:development" }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }
