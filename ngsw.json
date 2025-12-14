@@ -1,0 +1,105 @@
+{
+  "configVersion": 1,
+  "timestamp": 1765753235679,
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/chunk-3S6A4T73.js",
+        "/chunk-5EB625NY.js",
+        "/chunk-6C5YU6OF.js",
+        "/chunk-ADCWLRPY.js",
+        "/chunk-AM5BGON4.js",
+        "/chunk-C6Q5SG76.js",
+        "/chunk-F74EWY2D.js",
+        "/chunk-PH3OTO4T.js",
+        "/chunk-RHDT65IA.js",
+        "/chunk-S5AG3UBK.js",
+        "/chunk-UQET437M.js",
+        "/favicon.ico",
+        "/index.html",
+        "/main-XCVWMMMT.js",
+        "/manifest.webmanifest",
+        "/styles-B4LCGYTX.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/icons/icon-128x128.png",
+        "/icons/icon-144x144.png",
+        "/icons/icon-152x152.png",
+        "/icons/icon-192x192.png",
+        "/icons/icon-384x384.png",
+        "/icons/icon-512x512.png",
+        "/icons/icon-72x72.png",
+        "/icons/icon-96x96.png",
+        "/icons/parking-free-poi.png",
+        "/icons/parking-marker.svg",
+        "/images/banner-logo.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/chunk-3S6A4T73.js": "d19f368d3a9d640a47e73fc1a514086537c973c1",
+    "/chunk-5EB625NY.js": "27711e7d2be60121785e3b4f84769168246fe980",
+    "/chunk-6C5YU6OF.js": "a5e7d1be623f1b7c26c74ff7b76d6dc1ea92a7b2",
+    "/chunk-ADCWLRPY.js": "13f1aa769cbc2b8aa78158e590462f3e2abd61b6",
+    "/chunk-AM5BGON4.js": "703fa987fa7c9b73a485abddc6e377f305e02d43",
+    "/chunk-C6Q5SG76.js": "fd4fc33dfc3c6ef846db1272f907a0dbbbb1e374",
+    "/chunk-F74EWY2D.js": "15201d0197ee77a2fa961f5c7c2ee856ad3ee351",
+    "/chunk-PH3OTO4T.js": "d4ce2f30302df1495c8a59ac34639a2e57a90251",
+    "/chunk-RHDT65IA.js": "fdfa2abf76bfd0ccf390e150eb6d171c3c5dc73e",
+    "/chunk-S5AG3UBK.js": "5eeb7831ec92acb984426d00d6f7e45fc473a2be",
+    "/chunk-UQET437M.js": "5776ee5c00cd20221244f6b3c768b82b3cb64ebd",
+    "/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
+    "/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
+    "/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
+    "/icons/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
+    "/icons/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
+    "/icons/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
+    "/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
+    "/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
+    "/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
+    "/icons/parking-free-poi.png": "3ab4608e66073a638dc2dcee32d386549fa44a1e",
+    "/icons/parking-marker.svg": "71cbc52b085e214209cbc0279dfc1538bc088daf",
+    "/images/banner-logo.png": "9c3bc936f6a68bffbb1a88d416f16fcf9476a572",
+    "/index.html": "a0774d1d897af668ab783282637e2eb981376c99",
+    "/main-XCVWMMMT.js": "263c51ded868d021a27ab5880966c90e9dca240e",
+    "/manifest.webmanifest": "3dc402c09fb567387497913dbf19f984657b4a87",
+    "/styles-B4LCGYTX.css": "2a5bd68b8d7f95b7e0119ceaf4336e2ec9d537b1"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
