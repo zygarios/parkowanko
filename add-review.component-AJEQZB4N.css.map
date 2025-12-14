@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/_pages/main-page/_components/add-review/add-review.component.ts", "add-review.component.ts"],
+  "sourcesContent": ["\n    ::ng-deep mat-tab-header {\n      display: none !important;\n    }\n    .success-icon {\n      color: var(--par-color-primary);\n    }\n  ", "::ng-deep mat-tab-header {\n  display: none !important;\n}\n\n.success-icon {\n  color: var(--par-color-primary);\n}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJmaWxlOi8vL0Q6L1Byb2dyYW1vd2FuaWUvcGFya293YW5rby1hcHAvc3JjL2FwcC9fcGFnZXMvbWFpbi1wYWdlL19jb21wb25lbnRzL2FkZC1yZXZpZXcvYWRkLXJldmlldy5jb21wb25lbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQ0k7RUFDRTs7O0FBRUY7RUFDRSIsInNvdXJjZXNDb250ZW50IjpbIlxuICAgIDo6bmctZGVlcCBtYXQtdGFiLWhlYWRlciB7XG4gICAgICBkaXNwbGF5OiBub25lICFpbXBvcnRhbnQ7XG4gICAgfVxuICAgIC5zdWNjZXNzLWljb24ge1xuICAgICAgY29sb3I6IHZhcigtLXBhci1jb2xvci1wcmltYXJ5KTtcbiAgICB9XG4gICJdfQ== */"],
+  "mappings": "AACI,UAAA,eACE,QAAA,cCAN,CDEI,CAAA,aACE,MAAA,IAAA,oBCCN",
+  "names": []
+}
