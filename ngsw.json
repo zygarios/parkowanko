@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1765753469144,
+  "timestamp": 1765754097268,
   "index": "/parkowanko/index.html",
   "assetGroups": [
     {
@@ -13,9 +13,9 @@
       "urls": [
         "/parkowanko/chunk-3S6A4T73.js",
         "/parkowanko/chunk-5EB625NY.js",
-        "/parkowanko/chunk-6C5YU6OF.js",
         "/parkowanko/chunk-ADCWLRPY.js",
         "/parkowanko/chunk-AM5BGON4.js",
+        "/parkowanko/chunk-BWVRPNDQ.js",
         "/parkowanko/chunk-C6Q5SG76.js",
         "/parkowanko/chunk-F74EWY2D.js",
         "/parkowanko/chunk-PH3OTO4T.js",
@@ -24,7 +24,7 @@
         "/parkowanko/chunk-UQET437M.js",
         "/parkowanko/favicon.ico",
         "/parkowanko/index.html",
-        "/parkowanko/main-XCVWMMMT.js",
+        "/parkowanko/main-GXPNKZ6R.js",
         "/parkowanko/manifest.webmanifest",
         "/parkowanko/styles-B4LCGYTX.css"
       ],
@@ -57,9 +57,9 @@
   "hashTable": {
     "/parkowanko/chunk-3S6A4T73.js": "d19f368d3a9d640a47e73fc1a514086537c973c1",
     "/parkowanko/chunk-5EB625NY.js": "27711e7d2be60121785e3b4f84769168246fe980",
-    "/parkowanko/chunk-6C5YU6OF.js": "a5e7d1be623f1b7c26c74ff7b76d6dc1ea92a7b2",
     "/parkowanko/chunk-ADCWLRPY.js": "13f1aa769cbc2b8aa78158e590462f3e2abd61b6",
     "/parkowanko/chunk-AM5BGON4.js": "703fa987fa7c9b73a485abddc6e377f305e02d43",
+    "/parkowanko/chunk-BWVRPNDQ.js": "c9c869fe4706ce988f9980b742c739b55f018f06",
     "/parkowanko/chunk-C6Q5SG76.js": "fd4fc33dfc3c6ef846db1272f907a0dbbbb1e374",
     "/parkowanko/chunk-F74EWY2D.js": "15201d0197ee77a2fa961f5c7c2ee856ad3ee351",
     "/parkowanko/chunk-PH3OTO4T.js": "d4ce2f30302df1495c8a59ac34639a2e57a90251",
@@ -78,8 +78,8 @@
     "/parkowanko/icons/parking-free-poi.png": "3ab4608e66073a638dc2dcee32d386549fa44a1e",
     "/parkowanko/icons/parking-marker.svg": "71cbc52b085e214209cbc0279dfc1538bc088daf",
     "/parkowanko/images/banner-logo.png": "9c3bc936f6a68bffbb1a88d416f16fcf9476a572",
-    "/parkowanko/index.html": "deb86cb0e68798dee881cebed3f38ddc73892121",
-    "/parkowanko/main-XCVWMMMT.js": "263c51ded868d021a27ab5880966c90e9dca240e",
+    "/parkowanko/index.html": "5ca37bbd8f5fcee1e9885c35ec012ec3df511c2e",
+    "/parkowanko/main-GXPNKZ6R.js": "9a3e4bbfe3758dd131c8bc112f29ddbb415e9359",
     "/parkowanko/manifest.webmanifest": "3dc402c09fb567387497913dbf19f984657b4a87",
     "/parkowanko/styles-B4LCGYTX.css": "2a5bd68b8d7f95b7e0119ceaf4336e2ec9d537b1"
   },
