@@ -24,7 +24,6 @@ interface GeocodeCity {
   // lng
   x: string;
   teryt: string;
-  type: LocalizationType;
 }
 interface GeocodeAddress {
   city: string;
@@ -41,5 +40,4 @@ interface GeocodeAddress {
   // pełna lokalizacja "{Państwo, województwo, powiat, gmina}"
   jednostka: string;
   teryt: string;
-  type: LocalizationType;
 }

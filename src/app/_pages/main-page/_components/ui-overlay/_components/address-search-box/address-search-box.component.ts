@@ -15,7 +15,7 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ComputedFuncPipe } from '../../../../../../_others/_helpers/computed-func.pipe';
-import { Localization, LocalizationType } from '../../../../../../_types/geocode-api.type';
+import { Localization } from '../../../../../../_types/geocode-api.type';
 import { MapService } from './../../../map/_services/map.service';
 import { AddressSearchBoxService } from './address-search-box.service';
 
@@ -78,7 +78,7 @@ export class AddressSearchBoxComponent {
               lng: Number(this.selectedAddress()!.x),
               lat: Number(this.selectedAddress()!.y),
             },
-            this.selectedAddress()!.type === LocalizationType.CITY ? 'FAR_ZOOM' : 'CLOSE_ZOOM',
+            'street' in this.selectedAddress()! ? 'CLOSE_ZOOM' : 'FAR_ZOOM',
           );
         }
       });

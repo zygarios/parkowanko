@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { PwaService } from './_services/_core/pwa.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,10 @@ import { RouterOutlet } from '@angular/router';
   styles: ``,
   templateUrl: './app.component.html',
 })
-export class AppComponent {}
+export class AppComponent {
+  private _pwaService = inject(PwaService);
+
+  constructor() {
+    this._pwaService.initPwaUpdates();
+  }
+}

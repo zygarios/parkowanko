@@ -252,8 +252,9 @@ export class MapService {
   flyToPoi(coords: LocationCoords, zoom: 'CLOSE_ZOOM' | 'FAR_ZOOM' | number = CLOSE_ZOOM) {
     let zoomValue!: number;
     if (zoom === 'FAR_ZOOM') zoomValue = FAR_ZOOM;
-    if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
+    else if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
     else zoomValue = zoom as number;
+
     this._map!.flyTo({ center: [coords.lng, coords.lat], zoom: zoomValue, speed: FLY_SPEED });
   }
 
