@@ -18,6 +18,7 @@ import { environment } from '../../../../../environments/environment.development
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
+import { GeocodeFeature } from '../../../../_types/geocode-api.type';
 import { Parking } from '../../../../_types/parking.type';
 import { AddReviewComponent } from '../add-review/add-review.component';
 import { MapService } from '../map/_services/map.service';
@@ -40,6 +41,17 @@ enum ActiveModeEnum {
   imports: [MatMenuModule, MatIconModule, MatButtonModule, AddressSearchBoxComponent, RouterLink],
   templateUrl: './ui-overlay.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    .add-location-button {
+      --mat-fab-small-container-color: var(--par-color-primary);
+      --mat-fab-small-foreground-color: white;
+    }
+
+    .find-nearest-parking-button {
+      --mat-fab-container-color: var(--par-color-success);
+      --mat-fab-foreground-color: white;
+    }
+  `,
 })
 export class UiOverlayComponent {
   private readonly _destroyRef = inject(DestroyRef);
@@ -55,6 +67,7 @@ export class UiOverlayComponent {
   isMapLoaded = this._mapService.getIsMapLoaded;
 
   readonly selectedParking = this._mapService.selectedParking;
+  selectedAddress = signal<GeocodeFeature | null>(null);
 
   constructor() {
     effect(() => this.listenForSelectedPoiToStartEdit());

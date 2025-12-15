@@ -1,6 +1,6 @@
 export const envShared = {
   geocodeApi: 'https://services.gugik.gov.pl/uug',
-  geoStatAPi: 'https://geo.stat.gov.pl/api/fts/',
+  geoStatApi: 'https://geo.stat.gov.pl/api/fts/ref/qq',
   colors: {
     primary: '#00aab9',
     success: '#01922b',

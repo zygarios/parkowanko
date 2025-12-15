@@ -11,7 +11,7 @@
     (blur)="addressSearchTerm.set($event.target.value)"
   />
   @if (!addressSearchTerm()) {
-    <mat-icon matPrefix>search</mat-icon>
+    <mat-icon matPrefix>location_on</mat-icon>
   }
   @if (selectedAddress()) {
     <button matSuffix matIconButton (click)="resetInput()">
@@ -20,9 +20,10 @@
   }
   <mat-autocomplete requireSelection #auto="matAutocomplete" [displayWith]="parseAddressToString">
     @for (address of addressesList(); track address) {
-      <mat-option [value]="address">{{
-        parseAddressToString | computedFunc: address : true
-      }}</mat-option>
+      <mat-option [value]="address">
+        <mat-icon class="text-gray-700!">location_on</mat-icon>
+        {{ parseAddressToString | computedFunc: address : true }}
+      </mat-option>
     }
   </mat-autocomplete>
 </mat-form-field>

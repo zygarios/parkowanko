@@ -2,49 +2,85 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { GeocodeResponse, Localization, LocalizationType } from '../../_types/geocode-api.type';
+import {
+  GeocodeFeature,
+  GeocodeFeatureResponse,
+  geocodeUselessClasses,
+} from '../../_types/geocode-api.type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GeocodeApiService {
-  private GEOCODE_API = `${environment.geocodeApi}/?request=GetAddress&srid=4326&address=`;
-  private GEOCODE_REVERSE_API = `${environment.geocodeApi}/?request=GetAddressReverse&srid=4326&location=`;
-
   private httpClient = inject(HttpClient);
 
-  getAddresses(address: string): Observable<Localization[]> {
-    const url = this.GEOCODE_API + address;
-    let localizationType = LocalizationType.ADDRESS;
+  getAddresses(searchTerm: string): Observable<GeocodeFeature[]> {
+    return this.httpClient
+      .get<GeocodeFeatureResponse>(environment.geoStatApi, {
+        params: { f: 'json', cnt: 10, idx: 'all', q: searchTerm, useExtSvc: true },
+      })
+      .pipe(
+        map((res: GeocodeFeatureResponse): GeocodeFeature[] => {
+          return res.features
+            .filter((feature) => !geocodeUselessClasses.includes(feature.properties.KLASA))
+            .map((feature) => {
+              const {
+                geometry: { coordinates },
+                _search: { desc, name },
+                properties: {
+                  woj_nazwa,
+                  pow_nazwa,
+                  gm_nazwa,
+                  miejsc_nazwa,
+                  ul_nazwa_glowna,
+                  pkt_numer,
+                  pkt_kodPocztowy,
+                },
+              } = feature;
 
-    return this.httpClient.get<GeocodeResponse>(url).pipe(
-      tap((res) => {
-        if (res.type === 'city') {
-          localizationType = LocalizationType.CITY;
-        }
-      }),
-      map((res): Localization[] => (res.results ? Object.values(res.results) : [])),
-      map((addresses) => this._filterDuplicatedCities(addresses)),
-      catchError(() => of([])),
-    );
-  }
+              let constructedName = name;
 
-  getAddressReverse(lat: string, lng: string): Observable<Localization[]> {
-    const url = `${this.GEOCODE_REVERSE_API}POINT(${lng} ${lat})`;
-    return this.httpClient.get<GeocodeResponse>(url).pipe(
-      map((res) => (res.results ? Object.values(res.results) : [])),
-      catchError(() => of([])),
-    );
-  }
+              if (ul_nazwa_glowna) {
+                const streetAndNumber = [ul_nazwa_glowna, pkt_numer].filter(Boolean).join(' ');
+                constructedName = [streetAndNumber, miejsc_nazwa].filter(Boolean).join(', ');
+              } else if (woj_nazwa && miejsc_nazwa) {
+                constructedName = `${miejsc_nazwa} (${woj_nazwa.toLowerCase()})`;
+              }
 
-  private _filterDuplicatedCities(results: Localization[]) {
-    const uniqueSet = new Set();
-    return results.filter((item) => {
-      if (!uniqueSet.has(item.teryt)) {
-        uniqueSet.add(item.teryt);
-        return true;
-      }
-      return false;
-    });
+              let lat: number;
+              let lng: number;
+
+              if (Array.isArray(coordinates[0])) {
+                lat = coordinates[0][1];
+                lng = coordinates[0][0];
+              } else {
+                lat = coordinates[1] as number;
+                lng = coordinates[0] as number;
+              }
+
+              return {
+                coords: {
+                  lat,
+                  lng,
+                },
+                details: {
+                  desc,
+                  name: constructedName,
+                  woj_nazwa,
+                  pow_nazwa,
+                  gm_nazwa,
+                  miejsc_nazwa,
+                  ul_nazwa_glowna,
+                  pkt_numer,
+                  pkt_kodPocztowy,
+                },
+              };
+            });
+        }),
+        tap((res) => {
+          console.log(res);
+        }),
+        catchError(() => of([])),
+      );
   }
 }

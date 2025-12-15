@@ -22,7 +22,8 @@ export const addingPoiConfirmSheetConfig = (
       },
     ],
     isMenuHorizontal: true,
-    title: 'Dodaj nowy parking',
+    title: 'Dodanie nowego parkingu',
+    description: 'Poruszaj mapą lub markerem, aby ustawić pozycję nowego parkingu.',
   };
 };
 
@@ -67,6 +68,7 @@ export const changingPoiPositionOptionsSheetConfig = (
       },
     ],
     isMenuHorizontal: true,
-    title: 'Zmiana lokalizacji',
+    title: 'Poprawa lokalizacji',
+    description: 'Poruszaj mapą lub markerem, aby poprawić lokalizację istniejącego parkingu.',
   };
 };

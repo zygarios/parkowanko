@@ -1,43 +1,38 @@
-export interface GeocodeResponse {
-  type: string;
-  foundObjects: number;
-  results: Record<string, Localization>;
+import { LocationCoords } from './location-coords.type';
+
+export const geocodeUselessClasses = ['hydrografia', 'pokrycie terenu', 'miejscowość'];
+
+export interface GeocodeFeatureResponse {
+  features: {
+    geometry: {
+      coordinates: [number, number] | [[number, number]];
+      type: string;
+    };
+    _search: { name: string; desc: string };
+    properties: {
+      woj_nazwa?: string;
+      pow_nazwa?: string;
+      gm_nazwa?: string;
+      miejsc_nazwa?: string;
+      ul_nazwa_glowna?: string;
+      pkt_numer?: string;
+      pkt_kodPocztowy?: string;
+      KLASA: string;
+    };
+  }[];
 }
 
-export type Localization = GeocodeCity | GeocodeAddress;
-
-export enum LocalizationType {
-  CITY = 'CITY',
-  ADDRESS = 'ADDRESS',
-}
-interface GeocodeCity {
-  city: string;
-  voivodeship: string;
-  // powiat
-  county: string;
-  // gmina
-  commune: string;
-  // pełna lokalizacja "{Państwo, województwo, powiat, gmina}"
-  jednostka: string;
-  // lat
-  y: string;
-  // lng
-  x: string;
-  teryt: string;
-}
-interface GeocodeAddress {
-  city: string;
-  street: string;
-  // numer budynku
-  number: string;
-  // kod pocztowy
-  code: string;
-
-  // lng
-  x: string;
-  // lat
-  y: string;
-  // pełna lokalizacja "{Państwo, województwo, powiat, gmina}"
-  jednostka: string;
-  teryt: string;
+export interface GeocodeFeature {
+  coords: LocationCoords;
+  details: {
+    name: string;
+    desc: string;
+    woj_nazwa?: string;
+    pow_nazwa?: string;
+    gm_nazwa?: string;
+    miejsc_nazwa?: string;
+    ul_nazwa_glowna?: string;
+    pkt_numer?: string;
+    pkt_kodPocztowy?: string;
+  };
 }

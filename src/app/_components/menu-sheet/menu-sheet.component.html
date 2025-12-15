@@ -4,7 +4,7 @@
     <hr class="mt-3 mb-5" />
   }
   @if (data.description) {
-    <div class="font-small mb-3">{{ data.description }}</div>
+    <div class="font-small mb-3 leading-normal">{{ data.description }}</div>
   }
   <div class="flex flex-col gap-2" [class]="data.isMenuHorizontal ? ['flex-row'] : ''">
     @for (menu of data.menuItems; track menu) {

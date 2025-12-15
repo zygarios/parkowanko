@@ -4,6 +4,7 @@ import {
   effect,
   ElementRef,
   inject,
+  output,
   signal,
   untracked,
   viewChild,
@@ -15,7 +16,7 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ComputedFuncPipe } from '../../../../../../_others/_helpers/computed-func.pipe';
-import { Localization } from '../../../../../../_types/geocode-api.type';
+import { GeocodeFeature } from '../../../../../../_types/geocode-api.type';
 import { MapService } from './../../../map/_services/map.service';
 import { AddressSearchBoxService } from './address-search-box.service';
 
@@ -58,8 +59,9 @@ export class AddressSearchBoxComponent {
   private readonly mapService = inject(MapService);
   private readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('searchInputRef');
 
+  selectedAddressEmitter = output<GeocodeFeature | null>();
   addressSearchTerm = signal('');
-  selectedAddress = signal<Localization | null>(null);
+  selectedAddress = signal<GeocodeFeature | null>(null);
   selectedAddressForm = form(this.selectedAddress);
 
   addressesList = this.addressSearchBoxService.getAddressesBySearchTerm(this.addressSearchTerm);
@@ -72,17 +74,21 @@ export class AddressSearchBoxComponent {
     effect(() => {
       this.selectedAddress();
       untracked(() => {
-        if (this.selectedAddress()) {
-          this.mapService.flyToPoi(
-            {
-              lng: Number(this.selectedAddress()!.x),
-              lat: Number(this.selectedAddress()!.y),
-            },
-            'street' in this.selectedAddress()! ? 'CLOSE_ZOOM' : 'FAR_ZOOM',
-          );
-        }
+        this.selectedAddressEmitter.emit(this.selectedAddress());
+        this.flyToSelectedAddress();
       });
     });
+  }
+
+  flyToSelectedAddress() {
+    if (!this.selectedAddress()) return;
+    this.mapService.flyToPoi(
+      {
+        lng: Number(this.selectedAddress()!.coords.lng),
+        lat: Number(this.selectedAddress()!.coords.lat),
+      },
+      'miejsc_nazwa' in this.selectedAddress()?.details! ? 'FAR_ZOOM' : 'CLOSE_ZOOM',
+    );
   }
 
   resetInput() {
@@ -91,21 +97,8 @@ export class AddressSearchBoxComponent {
     this.searchInputRef()!.nativeElement.value = '';
   }
 
-  parseAddressToString(address: Localization | null, isOptionLabel: boolean = false) {
+  parseAddressToString(address: GeocodeFeature | null, isOptionLabel: boolean = false) {
     if (!address) return '';
-
-    let addressSuggestion = address.city;
-
-    if ('street' in address && address.street) {
-      addressSuggestion = addressSuggestion + `, ${address.street}`;
-
-      if ('number' in address && address.number) {
-        addressSuggestion = addressSuggestion + ` ${address.number}`;
-      }
-    } else if (isOptionLabel && 'voivodeship' in address && address.voivodeship) {
-      addressSuggestion = addressSuggestion + ` (${address.voivodeship})`;
-    }
-
-    return addressSuggestion;
+    return address.details.name;
   }
 }
