@@ -1,9 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { SwUpdate, VersionEvent } from '@angular/service-worker';
+import { SharedUtilsService } from './shared-utils.service';
 
 @Injectable({ providedIn: 'root' })
 export class PwaService {
   private _swUpdate = inject(SwUpdate);
+  private _sharedUtilsService = inject(SharedUtilsService);
 
   initPwaUpdates() {
     if (this._swUpdate.isEnabled) {
@@ -13,7 +15,13 @@ export class PwaService {
             console.log(`Dostępna jest nowa wersja aplikacji: ${evt.version.hash}`);
             break;
           case 'VERSION_READY':
-            window.location.reload();
+            this._sharedUtilsService.openSnackbar(
+              'Dostępna jest nowa wersja aplikacji.',
+              'SUCCESS',
+            );
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
             break;
           case 'VERSION_INSTALLATION_FAILED':
             console.log(
