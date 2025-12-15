@@ -1,6 +1,6 @@
 {
-  "name": "parkowanko-app",
-  "short_name": "parkowanko-app",
+  "name": "parkowanko",
+  "short_name": "parkowanko",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
