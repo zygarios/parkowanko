@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "parkowanko-app": {
+    "parkowanko": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -90,7 +90,7 @@
           "builder": "angular-cli-ghpages:deploy",
           "options": {
             "baseHref": "/parkowanko/",
-            "buildTarget": "parkowanko-app:build:preproduction"
+            "buildTarget": "parkowanko:build:preproduction"
           }
         }
       }
