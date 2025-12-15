@@ -22,7 +22,6 @@ export class AppComponent {
   }
 
   setEnvData() {
-    this.pwaHash.set(`NO_NEW${1}`);
     this._swUpdate.versionUpdates.subscribe((evt: VersionEvent) => {
       switch (evt.type) {
         case 'NO_NEW_VERSION_DETECTED':
