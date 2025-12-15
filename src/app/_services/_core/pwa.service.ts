@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { SwUpdate } from '@angular/service-worker';
+import { SwUpdate, VersionEvent } from '@angular/service-worker';
 
 @Injectable({ providedIn: 'root' })
 export class PwaService {
@@ -7,7 +7,7 @@ export class PwaService {
 
   initPwaUpdates() {
     if (this._swUpdate.isEnabled) {
-      this._swUpdate.versionUpdates.subscribe((evt) => {
+      this._swUpdate.versionUpdates.subscribe((evt: VersionEvent) => {
         switch (evt.type) {
           case 'VERSION_DETECTED':
             console.log(`Dostępna jest nowa wersja aplikacji: ${evt.version.hash}`);

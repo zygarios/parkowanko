@@ -14,7 +14,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterLink } from '@angular/router';
 import { catchError, EMPTY, switchMap, tap } from 'rxjs';
-import { environment } from '../../../../../environments/environment.development';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
@@ -59,8 +58,6 @@ export class UiOverlayComponent {
   private readonly _parkingsApiService = inject(ParkingsApiService);
   private readonly _sharedUtilsService = inject(SharedUtilsService);
   private readonly _matDialog = inject(MatDialog);
-
-  environmentType = environment.environmentType;
 
   ACTIVE_MODE_ENUM = ActiveModeEnum;
   activeMode = signal(ActiveModeEnum.DEFAULT);
