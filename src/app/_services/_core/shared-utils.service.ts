@@ -47,4 +47,10 @@ export class SharedUtilsService {
       disableClose: config?.disableClose ?? false,
     });
   }
+
+  cleanUp() {
+    this._sheet.dismiss();
+    this._snackBar.dismiss();
+    this._matDialog.closeAll();
+  }
 }

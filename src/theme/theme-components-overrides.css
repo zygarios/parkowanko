@@ -31,6 +31,7 @@
     min-width: 100px;
   }
 
+  /* DIALOGS */
   .mat-mdc-dialog-panel {
     width: 95dvw;
   }
@@ -101,7 +102,7 @@
     margin-bottom: 20px;
     .mat-mdc-text-field-wrapper {
       background-color: var(--mat-sys-surface);
-      border-radius: var(--mat-sys-corner-extra-small);
+      /* border-radius: var(--mat-sys-corner-extra-small); */
     }
   }
 }

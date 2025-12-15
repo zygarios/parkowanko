@@ -31,7 +31,6 @@ import { MapService } from './_services/map.service';
     }
 
     .marker {
-      background-image: url('/icons/parking-marker.svg');
       background-size: cover;
       width: 60px;
       aspect-ratio: 1/1.2;

@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { booleanPointInPolygon, buffer, point } from '@turf/turf';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import * as maplibregl from 'maplibre-gl';
@@ -20,6 +20,7 @@ const FLY_SPEED = 2;
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
+  private _destroyRef = inject(DestroyRef);
   private _mapRendererService = inject(MapRendererService);
 
   private _map: maplibregl.Map | null = null;
@@ -37,6 +38,10 @@ export class MapService {
 
   selectedParking = signal<null | Parking>(null);
   isMarkerInsideDisabledZone = signal(false);
+
+  constructor() {
+    this._destroyRef.onDestroy(() => this.cleanUp());
+  }
 
   /**
    * Inicjalizuje mapę MapLibre i przygotowuje wszystkie warstwy
@@ -222,6 +227,7 @@ export class MapService {
 
     this._mapRendererService.renderLineForMarker(this._map);
     this._mapRendererService.renderRadiusForParkingPoi(this._map);
+    this.isMarkerInsideDisabledZone.set(false);
     this._map.off('move', this._moveMarkerFnRef!);
     this._map.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);
     this._markerRef?.off('drag', this._renderFeaturesForMarkerOnMoveFnRef!);
@@ -290,6 +296,8 @@ export class MapService {
     this._map?.remove();
 
     // Wyzeruj referencje (zapobiega wyciekowi pamięci)
+    this.selectedParking.set(null);
+    this.isMarkerInsideDisabledZone.set(false);
     this._map = null;
     this._markerRef = null;
     this._renderedParkingsCoordsList = [];

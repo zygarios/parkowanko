@@ -89,7 +89,8 @@
         "deploy": {
           "builder": "angular-cli-ghpages:deploy",
           "options": {
-            "baseHref": "/parkowanko/"
+            "baseHref": "/parkowanko/",
+            "buildTarget": "parkowanko-app:build:preproduction"
           }
         }
       }

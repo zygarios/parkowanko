@@ -5,6 +5,7 @@ import {
   ElementRef,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { Field, form } from '@angular/forms/signals';
@@ -32,8 +33,22 @@ import { AddressSearchBoxService } from './address-search-box.service';
   templateUrl: './address-search-box.component.html',
   styles: `
     :host {
-      flex: 1;
       --mat-form-field-container-text-size: 14px;
+      --mat-form-field-outlined-outline-color: var(--par-color-primary);
+      --mat-form-field-outlined-outline-width: 2px;
+      --mat-form-field-outlined-container-shape: var(--mat-sys-corner-large);
+      --mat-fab-container-elevation-shadow: none;
+
+      flex: 1;
+
+      ::ng-deep {
+        .mat-mdc-text-field-wrapper {
+          border-radius: var(--mat-form-field-outlined-container-shape) !important;
+        }
+        mat-form-field {
+          margin-bottom: 0 !important;
+        }
+      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,15 +70,18 @@ export class AddressSearchBoxComponent {
 
   listenForAddressChange() {
     effect(() => {
-      if (this.selectedAddress()) {
-        this.mapService.flyToPoi(
-          {
-            lng: Number(this.selectedAddress()!.x),
-            lat: Number(this.selectedAddress()!.y),
-          },
-          this.selectedAddress()!.type === LocalizationType.CITY ? 'FAR_ZOOM' : 'CLOSE_ZOOM',
-        );
-      }
+      this.selectedAddress();
+      untracked(() => {
+        if (this.selectedAddress()) {
+          this.mapService.flyToPoi(
+            {
+              lng: Number(this.selectedAddress()!.x),
+              lat: Number(this.selectedAddress()!.y),
+            },
+            this.selectedAddress()!.type === LocalizationType.CITY ? 'FAR_ZOOM' : 'CLOSE_ZOOM',
+          );
+        }
+      });
     });
   }
 

@@ -8,14 +8,10 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 import { environment } from '../../../../../environments/environment.development';
@@ -24,7 +20,7 @@ import { ParkingsApiService } from '../../../../_services/_api/parkings-api.serv
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { Parking } from '../../../../_types/parking.type';
 import { AddReviewComponent } from '../add-review/add-review.component';
-import { MapService, PARKING_POI_RADIUS_BOUND } from '../map/_services/map.service';
+import { MapService } from '../map/_services/map.service';
 import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';
 import {
   addingPoiConfirmSheetConfig,
@@ -41,34 +37,7 @@ enum ActiveModeEnum {
 }
 @Component({
   selector: 'app-ui-overlay',
-  imports: [
-    MatMenuModule,
-    MatIconModule,
-    MatButtonModule,
-    MatSnackBarModule,
-    MatBottomSheetModule,
-    MatInputModule,
-    MatAutocompleteModule,
-    AddressSearchBoxComponent,
-    RouterLink,
-  ],
-  styles: `
-    :host {
-      --mat-form-field-outlined-outline-color: var(--par-color-primary);
-      --mat-form-field-outlined-outline-width: 2px;
-      --mat-form-field-outlined-container-shape: 20px;
-      --mat-fab-container-elevation-shadow: none;
-
-      ::ng-deep {
-        .mat-mdc-text-field-wrapper {
-          border-radius: var(--mat-form-field-outlined-container-shape) !important;
-        }
-        mat-form-field {
-          margin-bottom: 0 !important;
-        }
-      }
-    }
-  `,
+  imports: [MatMenuModule, MatIconModule, MatButtonModule, AddressSearchBoxComponent, RouterLink],
   templateUrl: './ui-overlay.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -116,40 +85,35 @@ export class UiOverlayComponent {
     this.activeMode.set(ActiveModeEnum.ADDING_POI);
     this._mapService.renderMoveableMarker();
 
-    const sheetRef = this._sharedUtilsService.openSheet(addingPoiConfirmSheetConfig, {
-      disableClose: true,
-    });
+    const sheetRef = this._sharedUtilsService.openSheet(
+      addingPoiConfirmSheetConfig(this._mapService.isMarkerInsideDisabledZone),
+      {
+        disableClose: true,
+      },
+    );
 
     sheetRef.onClick
       .pipe(
         switchMap((menu) => {
           if (menu.result === PoiActionsEnum.CONFIRM) {
-            if (this._mapService.isMarkerInsideDisabledZone()) {
-              this._sharedUtilsService.openSnackbar(
-                `Znacznik musi być oddalony co najmniej o ${PARKING_POI_RADIUS_BOUND} metrów od innych znaczników.`,
-                'ERROR',
-              );
-              return EMPTY;
-            } else {
-              const location = this._mapService.getMarkerLatLng();
-              return this._parkingsApiService.postParking({ location }).pipe(
-                tap((newParking) =>
-                  this._matDialog.open(AddReviewComponent, {
-                    data: { parkingId: newParking.id, skipVoteStep: true },
-                  }),
-                ),
-                catchError(() => {
-                  this._matDialog.open(AddReviewComponent, {
-                    data: { parkingId: 1, skipVoteStep: true },
-                  });
-                  this._sharedUtilsService.openSnackbar(
-                    'Wystąpił błąd podczas dodawania parkingu',
-                    'ERROR',
-                  );
-                  return EMPTY;
+            const location = this._mapService.getMarkerLatLng();
+            return this._parkingsApiService.postParking({ location }).pipe(
+              tap((newParking) =>
+                this._matDialog.open(AddReviewComponent, {
+                  data: { parkingId: newParking.id, skipVoteStep: true },
                 }),
-              );
-            }
+              ),
+              catchError(() => {
+                this._matDialog.open(AddReviewComponent, {
+                  data: { parkingId: 1, skipVoteStep: true },
+                });
+                this._sharedUtilsService.openSnackbar(
+                  'Wystąpił błąd podczas dodawania parkingu',
+                  'ERROR',
+                );
+                return EMPTY;
+              }),
+            );
           } else {
             sheetRef.dismiss();
             this.stopAddingPoi();
@@ -187,19 +151,10 @@ export class UiOverlayComponent {
             sheetRef.dismiss();
             const location = this.selectedParking()?.location;
             if (location) {
-              const userAgent = navigator.userAgent;
-              const isIOS =
-                /iPad|iPhone|iPod/.test(userAgent) ||
-                (/Macintosh/i.test(userAgent) && navigator.maxTouchPoints > 0);
-
-              if (isIOS) {
-                window.location.href = `maps:?daddr=${location.lat},${location.lng}&dirflg=d`;
-              } else {
-                window.open(
-                  `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`,
-                  '_blank',
-                );
-              }
+              window.open(
+                `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`,
+                '_blank',
+              );
             }
             return EMPTY;
           } else {
@@ -232,30 +187,25 @@ export class UiOverlayComponent {
   }
 
   handleUpdateUserChoice() {
-    const sheetRef = this._sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig, {
-      disableClose: true,
-    });
+    const sheetRef = this._sharedUtilsService.openSheet(
+      changingPoiPositionOptionsSheetConfig(this._mapService.isMarkerInsideDisabledZone),
+      {
+        disableClose: true,
+      },
+    );
 
     return sheetRef.onClick.pipe(
       switchMap((menu) => {
         if (menu.result === PoiActionsEnum.CONFIRM) {
-          if (this._mapService.isMarkerInsideDisabledZone()) {
-            this._sharedUtilsService.openSnackbar(
-              `Znacznik musi być oddalony co najmniej o ${PARKING_POI_RADIUS_BOUND} metrów od innych znaczników.`,
-              'ERROR',
-            );
-            return EMPTY;
-          } else {
-            return this.confirmUpdatedPoiPosition().pipe(
-              catchError(() => {
-                this._sharedUtilsService.openSnackbar(
-                  'Wystąpił błąd podczas aktualizacji pozycji parkingu',
-                  'ERROR',
-                );
-                return EMPTY;
-              }),
-            );
-          }
+          return this.confirmUpdatedPoiPosition().pipe(
+            catchError(() => {
+              this._sharedUtilsService.openSnackbar(
+                'Wystąpił błąd podczas aktualizacji pozycji parkingu',
+                'ERROR',
+              );
+              return EMPTY;
+            }),
+          );
         } else {
           this.stopUpdatingPoiPosition();
           return EMPTY;

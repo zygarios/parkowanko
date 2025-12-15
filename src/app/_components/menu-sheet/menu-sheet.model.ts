@@ -1,12 +1,14 @@
+import { Signal } from '@angular/core';
 import { Subject } from 'rxjs';
 
 export interface MenuSheetItem<T = any> {
-  label: string;
-  icon: string;
   result: T;
+  label: string;
+  icon?: string;
   isPrimary?: boolean;
   isSuccess?: boolean;
   isError?: boolean;
+  isButtonDisabled?: Signal<boolean>;
 }
 export interface MenuSheetData {
   menuItems: MenuSheetItem[];

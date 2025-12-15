@@ -1,22 +1,29 @@
+import { Signal } from '@angular/core';
 import { MenuSheetData } from '../../../../../_components/menu-sheet/menu-sheet.model';
 import { PoiActionsEnum } from '../_types/poi-actions.model';
 
-export const addingPoiConfirmSheetConfig: MenuSheetData = {
-  menuItems: [
-    {
-      label: 'Anuluj',
-      icon: 'close',
-      result: PoiActionsEnum.CANCEL,
-    },
-    {
-      label: 'Potwierdź',
-      icon: 'edit_location_alt',
-      result: PoiActionsEnum.CONFIRM,
-      isPrimary: true,
-      isSuccess: true,
-    },
-  ],
-  isMenuHorizontal: true,
+export const addingPoiConfirmSheetConfig = (
+  isPrimaryButtonDisabled: Signal<boolean>,
+): MenuSheetData => {
+  return {
+    menuItems: [
+      {
+        label: 'Anuluj',
+        icon: 'close',
+        result: PoiActionsEnum.CANCEL,
+      },
+      {
+        label: 'Potwierdź',
+        icon: 'edit_location_alt',
+        result: PoiActionsEnum.CONFIRM,
+        isPrimary: true,
+        isSuccess: true,
+        isButtonDisabled: isPrimaryButtonDisabled,
+      },
+    ],
+    isMenuHorizontal: true,
+    title: 'Dodaj nowy parking',
+  };
 };
 
 export const selectedPoiOptionsSheetConfig: MenuSheetData = {
@@ -33,27 +40,33 @@ export const selectedPoiOptionsSheetConfig: MenuSheetData = {
       result: PoiActionsEnum.UPDATE,
     },
     {
-      label: 'Zamknij',
-      icon: 'keyboard_arrow_down',
+      label: 'Anuluj',
+      icon: 'close',
       result: PoiActionsEnum.CLOSE,
     },
   ],
 };
 
-export const changingPoiPositionOptionsSheetConfig: MenuSheetData = {
-  menuItems: [
-    {
-      label: 'Anuluj',
-      icon: 'close',
-      result: PoiActionsEnum.CANCEL,
-    },
-    {
-      label: 'Potwierdź',
-      icon: 'edit_location_alt',
-      result: PoiActionsEnum.CONFIRM,
-      isPrimary: true,
-      isSuccess: true,
-    },
-  ],
-  isMenuHorizontal: true,
+export const changingPoiPositionOptionsSheetConfig = (
+  isPrimaryButtonDisabled: Signal<boolean>,
+): MenuSheetData => {
+  return {
+    menuItems: [
+      {
+        label: 'Anuluj',
+        icon: 'close',
+        result: PoiActionsEnum.CANCEL,
+      },
+      {
+        label: 'Potwierdź',
+        icon: 'edit_location_alt',
+        result: PoiActionsEnum.CONFIRM,
+        isPrimary: true,
+        isSuccess: true,
+        isButtonDisabled: isPrimaryButtonDisabled,
+      },
+    ],
+    isMenuHorizontal: true,
+    title: 'Zmiana lokalizacji',
+  };
 };

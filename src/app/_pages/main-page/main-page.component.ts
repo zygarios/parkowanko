@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { SharedUtilsService } from '../../_services/_core/shared-utils.service';
+import { MapService } from './_components/map/_services/map.service';
 import { MapComponent } from './_components/map/map.component';
 import { UiOverlayComponent } from './_components/ui-overlay/ui-overlay.component';
 
@@ -8,4 +10,14 @@ import { UiOverlayComponent } from './_components/ui-overlay/ui-overlay.componen
   templateUrl: './main-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MainPageComponent {}
+export class MainPageComponent {
+  private _sharedUtilsService = inject(SharedUtilsService);
+  private _mapService = inject(MapService);
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      this._sharedUtilsService.cleanUp();
+      this._mapService.cleanUp();
+    });
+  }
+}

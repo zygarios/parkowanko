@@ -77,8 +77,10 @@ export class MapRendererService {
    * @returns Instancja maplibregl.Marker z możliwością przeciągania
    */
   prepareMarker(): maplibregl.Marker {
-    const el = document.createElement('div');
+    const el = document.createElement('img');
     el.className = 'marker';
+    el.src = 'icons/parking-marker.svg';
+    el.loading = 'lazy';
 
     return new maplibregl.Marker({
       element: el,
