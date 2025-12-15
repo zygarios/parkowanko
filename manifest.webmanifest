@@ -1,6 +1,6 @@
 {
-  "name": "parkowanko",
-  "short_name": "parkowanko",
+  "name": "Parkowanko",
+  "short_name": "PW",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
