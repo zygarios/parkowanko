@@ -1,7 +1,15 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
-import { booleanPointInPolygon, buffer, point } from '@turf/turf';
+import {
+  booleanPointInPolygon,
+  buffer,
+  distance,
+  featureCollection,
+  nearestPoint,
+  point,
+} from '@turf/turf';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import * as maplibregl from 'maplibre-gl';
+import { SharedUtilsService } from '../../../../../_services/_core/shared-utils.service';
 import { LocationCoords } from '../../../../../_types/location-coords.type';
 import { Parking } from '../../../../../_types/parking.type';
 import { MapRendererService } from './map-renderer.service';
@@ -17,11 +25,13 @@ export const PARKING_POI_RADIUS_BOUND = 20;
 const CLOSE_ZOOM = 17;
 const FAR_ZOOM = 11;
 const FLY_SPEED = 2;
+const MAX_DISTANCE_TO_NEAREST_PARKING_KM = 2;
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
   private _destroyRef = inject(DestroyRef);
   private _mapRendererService = inject(MapRendererService);
+  private _sharedUtilsService = inject(SharedUtilsService);
 
   private _map: maplibregl.Map | null = null;
   private _markerRef: maplibregl.Marker | null = null;
@@ -173,7 +183,7 @@ export class MapService {
    */
   private _renderLineBetweenPoints(fixedCoords: LocationCoords) {
     if (!this.selectedParking()) return;
-    this._mapRendererService.renderLineForMarker(this._map!, {
+    this._mapRendererService.renderLineBetweenPoints(this._map!, {
       fixedCoords: fixedCoords,
       targetCoords: this._markerRef!.getLngLat(),
     });
@@ -225,7 +235,7 @@ export class MapService {
     // Guard clause - sprawdź czy mapa jeszcze istnieje
     if (!this._map) return;
 
-    this._mapRendererService.renderLineForMarker(this._map);
+    this._mapRendererService.renderLineBetweenPoints(this._map);
     this._mapRendererService.renderRadiusForParkingPoi(this._map);
     this.isMarkerInsideDisabledZone.set(false);
     this._map.off('move', this._moveMarkerFnRef!);
@@ -234,14 +244,19 @@ export class MapService {
     this._markerRef?.remove();
   }
 
+  renderLineBetweenPoints(points?: { fixedCoords: LocationCoords; targetCoords: LocationCoords }) {
+    this._mapRendererService.renderLineBetweenPoints(this._map!, points);
+  }
+
   /**
    * Przeskakuje do określonego punktu na mapie z przybliżeniem
    * @param coords - Współrzędne docelowego punktu
    */
-  jumpToPoi(coords: LocationCoords, zoom?: 'CLOSE_ZOOM' | 'FAR_ZOOM') {
-    let zoomValue: number | undefined;
-    if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
+  jumpToPoi(coords: LocationCoords, zoom: 'CLOSE_ZOOM' | 'FAR_ZOOM' | number = CLOSE_ZOOM) {
+    let zoomValue!: number;
     if (zoom === 'FAR_ZOOM') zoomValue = FAR_ZOOM;
+    else if (zoom === 'CLOSE_ZOOM') zoomValue = CLOSE_ZOOM;
+    else zoomValue = zoom as number;
     this._map!.jumpTo({ center: [coords.lng, coords.lat], zoom: zoomValue });
   }
 
@@ -256,6 +271,44 @@ export class MapService {
     else zoomValue = zoom as number;
 
     this._map!.flyTo({ center: [coords.lng, coords.lat], zoom: zoomValue, speed: FLY_SPEED });
+  }
+
+  findNearestParking(coords: LocationCoords) {
+    const points = featureCollection(
+      this._renderedParkingsCoordsList.map((p) => point([p.lng, p.lat], { original: p })),
+    );
+    const nearestParkingLocationArray = nearestPoint([coords.lng, coords.lat], points).geometry
+      .coordinates;
+
+    const nearestParkingLocationCoords = this._renderedParkingsCoordsList.find(
+      (p) => p.lng === nearestParkingLocationArray[0] && p.lat === nearestParkingLocationArray[1],
+    )!;
+
+    if (
+      distance(
+        [coords.lng, coords.lat],
+        [nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat],
+      ) <= MAX_DISTANCE_TO_NEAREST_PARKING_KM
+    ) {
+      this._mapRendererService.renderLineBetweenPoints(this._map!, {
+        fixedCoords: coords,
+        targetCoords: nearestParkingLocationCoords,
+      });
+
+      this._map!.fitBounds(
+        [
+          [nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat],
+          [coords.lng, coords.lat],
+        ],
+        {
+          padding: 100,
+        },
+      );
+    } else {
+      this._sharedUtilsService.openSnackbar(
+        `Nie znaleziono najbliższego parkingu w zasięgu ${MAX_DISTANCE_TO_NEAREST_PARKING_KM} kilometrów. `,
+      );
+    }
   }
 
   /**

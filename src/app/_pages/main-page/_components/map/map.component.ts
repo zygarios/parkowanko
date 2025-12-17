@@ -15,7 +15,7 @@ import { MapService } from './_services/map.service';
   styles: `
     @import 'maplibre-gl/dist/maplibre-gl.css';
     #map {
-      height: 100vh;
+      height: 100dvh;
       width: 100%;
       display: flex;
       .maplibregl-ctrl-attrib {

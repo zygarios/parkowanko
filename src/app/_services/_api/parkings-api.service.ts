@@ -25,15 +25,28 @@ export class ParkingsApiService {
     return this.parkingsList.asReadonly();
   }
 
+  getParking(parkingId: number): Observable<Parking> {
+    return this._httpClient.get<Parking>(`${environment.apiUrl}/parkings/${parkingId}/`).pipe(
+      tap((res) => {
+        const parking = new Parking(res);
+        const parkingIndex = this.parkingsList().findIndex((item) => item.id === parking.id);
+        if (parkingIndex !== -1) {
+          this.parkingsList.update((parkings: Parking[]) =>
+            parkings.toSpliced(parkingIndex, 1, parking),
+          );
+        }
+      }),
+    );
+  }
+
   postParking(body: ParkingSaveData): Observable<Parking> {
     this._globalSpinnerService.isSpinnerActive.set(true);
-    return this._httpClient
-      .post<Parking>(`${environment.apiUrl}/parkings/`, body)
-      .pipe(
-        tap((newParking: Parking) =>
-          this.parkingsList.update((parkings: Parking[]) => [...parkings, new Parking(newParking)]),
-        ),
-      );
+    return this._httpClient.post<Parking>(`${environment.apiUrl}/parkings/`, body).pipe(
+      tap((newParking: Parking) =>
+        this.parkingsList.update((parkings: Parking[]) => [...parkings, new Parking(newParking)]),
+      ),
+      finalize(() => this._globalSpinnerService.isSpinnerActive.set(false)),
+    );
   }
 
   patchParking(id: number, body: ParkingSaveData): Observable<Parking> {

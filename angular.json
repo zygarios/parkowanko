@@ -39,7 +39,16 @@
               }
             ],
             "styles": ["src/styles.css"],
-            "outputPath": "dist"
+            "outputPath": "dist",
+            "allowedCommonJsDependencies": [
+              "maplibre-gl",
+              "@turf/jsts",
+              "rbush",
+              "skmeans",
+              "concaveman",
+              "fast-deep-equal",
+              "earcut"
+            ]
           },
           "configurations": {
             "production": {
@@ -56,6 +65,7 @@
                 }
               ],
               "outputHashing": "all",
+
               "serviceWorker": "ngsw-config.json"
             },
             "preproduction": {
@@ -66,7 +76,8 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.preproduction.ts"
                 }
-              ]
+              ],
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,
@@ -80,7 +91,7 @@
               ]
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "preproduction"
         },
         "serve": {
           "builder": "@angular/build:dev-server",

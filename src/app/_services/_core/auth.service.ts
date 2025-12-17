@@ -61,8 +61,11 @@ export class AuthService {
     localStorage.setItem('auth_data', JSON.stringify(res));
 
     const decodedToken: any = jwtDecode(res.access);
+    console.log(decodedToken);
     const expirationDate = new Date(decodedToken.exp * 1000);
     this.autoLogout(expirationDate.getTime() - new Date().getTime());
+
+    this._router.navigate(['/']);
   }
 
   private tryAutoLogin() {

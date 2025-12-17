@@ -22,7 +22,9 @@
     @for (address of addressesList(); track address) {
       <mat-option [value]="address">
         <mat-icon class="text-gray-700!">location_on</mat-icon>
-        {{ parseAddressToString | computedFunc: address : true }}
+        <div class="whitespace-pre-line leading-snug">
+          {{ parseAddressToString | computedFunc: address : true }}
+        </div>
       </mat-option>
     }
   </mat-autocomplete>

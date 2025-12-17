@@ -7,5 +7,5 @@ export const envShared = {
     error: '#ba1a1a',
   },
   sentryDsn:
-    'https://3d42d10d03971543fc60c52c31eb6a4f@o4508738029092864.ingest.de.sentry.io/4508738031452240',
+    'https://069cf899b4e34bae773e06ff484ff274@o4510541561462784.ingest.de.sentry.io/4510541566246992',
 };

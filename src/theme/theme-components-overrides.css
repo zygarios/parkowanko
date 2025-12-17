@@ -2,7 +2,6 @@
   /* BUTTON-FAB */
   --mat-fab-small-container-color: white;
   --mat-fab-container-color: white;
-  --mat-fab-disabled-state-container-color: lightgrey;
 
   /* BUTTON-TEXT */
   --mat-button-text-container-height: 50px;
@@ -30,6 +29,9 @@
   .mdc-button {
     min-width: 100px;
   }
+
+  /* MAT-OPTION */
+  --mat-option-label-text-size: 14px;
 
   /* DIALOGS */
   .mat-mdc-dialog-panel {

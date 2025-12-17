@@ -23,11 +23,7 @@ export const appConfig: ApplicationConfig = {
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 3000 } },
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
-      registrationStrategy: `registerWhenStable:${30000}`,
+      registrationStrategy: `registerWhenStable:${20000}`,
     }),
-    // {
-    //   provide: STEPPER_GLOBAL_OPTIONS,
-    //   useValue: { displayDefaultIndicatorType: false },
-    // },
   ],
 };

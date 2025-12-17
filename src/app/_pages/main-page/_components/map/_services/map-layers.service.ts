@@ -37,9 +37,20 @@ export class MapLayersService {
       source: PARKING_POI_SOURCE,
       filter: ['!', ['has', 'point_count']], // Pokaż tylko jeśli NIE ma point_count (nie jest klastrem)
       layout: {
-        'icon-image': 'parking-poi-icon', // Użyj załadowanej ikony parking-free-poi.png
-        'icon-size': 0.3, // Skalowanie ikony (30% oryginalnego rozmiaru)
-        'text-field': '{scoreLabel}',
+        'icon-image': [
+          'case',
+          ['get', 'isVerified'],
+          'parking-free-poi',
+          'parking-free-unverified-poi',
+        ],
+        'icon-size': 0.2,
+        'icon-overlap': 'always',
+        'text-field': [
+          'case',
+          ['==', ['get', 'score'], 0],
+          '',
+          ['to-string', ['get', 'scoreLabel']],
+        ],
         'text-font': ['Open Sans Bold'],
         'text-offset': [1.2, -0.15],
         'text-anchor': 'top-left',

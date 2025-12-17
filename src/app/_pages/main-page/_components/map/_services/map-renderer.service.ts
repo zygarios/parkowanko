@@ -46,28 +46,28 @@ export class MapRendererService {
       // Wyłącz rotację mapy gestem dotykowym
       mapRef.touchZoomRotate.disableRotation();
 
-      // Załaduj ikonę POI parkingu
-      const imageUrl = 'icons/parking-free-poi.png';
-      try {
-        const imageBitmap = await fetch(imageUrl)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`Failed to fetch parking icon: ${response.statusText}`);
-            }
-            return response.blob();
-          })
-          .then((blob) => createImageBitmap(blob));
+      const icons = [
+        { name: 'parking-free-poi', url: 'icons/parking-free-poi.svg' },
+        { name: 'parking-free-unverified-poi', url: 'icons/parking-free-unverified-poi.svg' },
+      ];
 
-        mapRef.addImage('parking-poi-icon', imageBitmap);
-      } catch (error) {
-        console.error('Failed to load parking POI icon:', error);
-        // Mapa może działać bez ikony, błąd jest zalogowany
-      }
+      await Promise.all(icons.map((i) => this.loadMapImage(mapRef, i.name, i.url)));
 
       return mapRef;
     } catch (error) {
       console.error('Failed to initialize MapLibre map:', error);
       throw error; // Propaguj błąd do wywołującego
+    }
+  }
+
+  async loadMapImage(map: maplibregl.Map, name: string, url: string, size = 128): Promise<void> {
+    try {
+      const image = new Image(size, size);
+      image.src = url;
+      await image.decode();
+      map.addImage(name, image);
+    } catch (error) {
+      console.error(`Failed to load image "${name}" from ${url}`, error);
     }
   }
 
@@ -125,6 +125,7 @@ export class MapRendererService {
               parking.likeCount - parking.dislikeCount > 0
                 ? `+${parking.likeCount - parking.dislikeCount}`
                 : `${parking.likeCount - parking.dislikeCount}`,
+            isVerified: parking.isVerified,
           },
         };
       }),
@@ -162,7 +163,7 @@ export class MapRendererService {
    * @param map - Instancja mapy
    * @param locations - Opcjonalne współrzędne początku i końca linii
    */
-  renderLineForMarker(
+  renderLineBetweenPoints(
     map: maplibregl.Map,
     locations?: {
       fixedCoords?: LocationCoords;

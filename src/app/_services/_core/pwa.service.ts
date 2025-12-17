@@ -12,7 +12,7 @@ export class PwaService {
       this._swUpdate.versionUpdates.subscribe((evt: VersionEvent) => {
         switch (evt.type) {
           case 'VERSION_DETECTED':
-            console.log(`Dostępna jest nowa wersja aplikacji: ${evt.version.hash}`);
+            console.log(`Dostępna jest nowa wersja aplikacji: ${evt.version.hash.slice(0, 6)}`);
             break;
           case 'VERSION_READY':
             this._sharedUtilsService.openSnackbar(
@@ -21,11 +21,11 @@ export class PwaService {
             );
             setTimeout(() => {
               window.location.reload();
-            }, 3000);
+            }, 5000);
             break;
           case 'VERSION_INSTALLATION_FAILED':
             console.log(
-              `Wystąpił błąd pobierania nowej wersji aplikacji: '${evt.version.hash}': ${evt.error}`,
+              `Wystąpił błąd pobierania nowej wersji aplikacji: '${evt.version.hash.slice(0, 6)}': ${evt.error}`,
             );
             break;
         }

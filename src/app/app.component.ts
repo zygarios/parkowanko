@@ -22,18 +22,22 @@ export class AppComponent {
   }
 
   setEnvData() {
-    this._swUpdate.versionUpdates.subscribe((evt: VersionEvent) => {
-      switch (evt.type) {
-        case 'NO_NEW_VERSION_DETECTED':
-          this.pwaHash.set(`NO_NEW${evt.version.hash}`);
-          break;
-        case 'VERSION_DETECTED':
-          this.pwaHash.set(`NEW_DETECTED${evt.version.hash}`);
-          break;
-        case 'VERSION_INSTALLATION_FAILED':
-          this.pwaHash.set(`VERSION_INSTALLATION_FAILED${evt.version.hash}`);
-          break;
-      }
-    });
+    if (this._swUpdate.isEnabled) {
+      this._swUpdate.versionUpdates.subscribe((evt: VersionEvent) => {
+        switch (evt.type) {
+          case 'NO_NEW_VERSION_DETECTED':
+            this.pwaHash.set(`NO_NEW${evt.version.hash}`);
+            break;
+          case 'VERSION_DETECTED':
+            this.pwaHash.set(`NEW_DETECTED${evt.version.hash}`);
+            break;
+          case 'VERSION_INSTALLATION_FAILED':
+            this.pwaHash.set(`VERSION_INSTALLATION_FAILED${evt.version.hash}`);
+            break;
+        }
+      });
+    } else {
+      this.pwaHash.set('SW_DISABLED');
+    }
   }
 }

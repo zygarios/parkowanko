@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { SharedUtilsService } from '../../_services/_core/shared-utils.service';
 import { MapService } from './_components/map/_services/map.service';
 import { MapComponent } from './_components/map/map.component';
+import { ReviewsComponent } from './_components/reviews/reviews.component';
 import { UiOverlayComponent } from './_components/ui-overlay/ui-overlay.component';
 
 @Component({
@@ -13,11 +15,13 @@ import { UiOverlayComponent } from './_components/ui-overlay/ui-overlay.componen
 export class MainPageComponent {
   private _sharedUtilsService = inject(SharedUtilsService);
   private _mapService = inject(MapService);
+  private _dialog = inject(MatDialog);
 
   constructor() {
     inject(DestroyRef).onDestroy(() => {
       this._sharedUtilsService.cleanUp();
       this._mapService.cleanUp();
     });
+    this._dialog.open(ReviewsComponent);
   }
 }

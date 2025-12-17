@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTab, MatTabsModule } from '@angular/material/tabs';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { validationMessages } from '../../../../_others/_helpers/validation-messages';
 import { ReviewsApiService } from '../../../../_services/_api/reviews-api.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
@@ -98,19 +98,18 @@ export class AddReviewComponent {
 
   submitReview() {
     submit(this.reviewForm, async () => {
-      // request
       try {
         await firstValueFrom(
-          this._reviewsApiService
-            .postReview(this._dialogData.parkingId, this.review())
-            // TODO: usunac catcherror
-            .pipe(catchError(() => of(null))),
+          this._reviewsApiService.postReview(this._dialogData.parkingId, this.review()),
         );
+        this._sharedUtilsService.openSnackbar(
+          'Dodałeś/aś opinię! Przyszli kierowcy będą ci wdzięczni. ;)',
+          'SUCCESS',
+        );
+        return;
       } catch (_) {
         this._sharedUtilsService.openSnackbar('Wystąpił błąd podczas dodawania oceny', 'ERROR');
-      } finally {
-        this.nextStep();
-        return null;
+        return;
       }
     });
   }

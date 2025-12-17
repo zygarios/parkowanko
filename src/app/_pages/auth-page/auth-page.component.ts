@@ -15,7 +15,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { validationMessages } from '../../_others/_helpers/validation-messages';
 import { AuthService } from '../../_services/_core/auth.service';
@@ -58,7 +57,6 @@ export class AuthPageComponent {
   authModeType = AuthModeType;
 
   private _authService = inject(AuthService);
-  private _router = inject(Router);
 
   private authModel = signal<AuthData>({
     username: '',
@@ -117,7 +115,6 @@ export class AuthPageComponent {
 
       try {
         await firstValueFrom(request$);
-        this._router.navigate(['/']);
         return;
       } catch (err) {
         console.error(err);

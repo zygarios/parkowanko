@@ -16,6 +16,7 @@ export class Review {
   attributes!: string[];
   occupancy!: string;
   isLiked!: boolean;
+  username!: string;
 
   constructor(props: Review) {
     if (props) {

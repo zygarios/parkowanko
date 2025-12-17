@@ -47,8 +47,8 @@ enum ActiveModeEnum {
     }
 
     .find-nearest-parking-button {
-      --mat-fab-container-color: var(--par-color-success);
-      --mat-fab-foreground-color: white;
+      --mat-fab-small-container-color: var(--par-color-success);
+      --mat-fab-small-foreground-color: white;
     }
   `,
 })
@@ -68,6 +68,26 @@ export class UiOverlayComponent {
 
   constructor() {
     effect(() => this.listenForSelectedPoiToStartEdit());
+    effect(() => this.listenForSelectedAddressToFindNearestParking());
+  }
+
+  listenForSelectedAddressToFindNearestParking() {
+    this.isMapLoaded();
+    this.selectedAddress();
+    this.selectedParking();
+
+    untracked(() => {
+      if (!this.isMapLoaded()) return;
+
+      if (this.selectedAddress()?.coords && this.selectedParking()?.location) {
+        this._mapService.renderLineBetweenPoints({
+          fixedCoords: this.selectedAddress()!.coords,
+          targetCoords: this.selectedParking()!.location,
+        });
+      } else {
+        this._mapService.renderLineBetweenPoints();
+      }
+    });
   }
 
   openHelpDialog() {
@@ -108,17 +128,9 @@ export class UiOverlayComponent {
           if (menu.result === PoiActionsEnum.CONFIRM) {
             const location = this._mapService.getMarkerLatLng();
             return this._parkingsApiService.postParking({ location }).pipe(
-              tap((newParking) =>
-                this._matDialog.open(AddReviewComponent, {
-                  data: { parkingId: newParking.id, skipVoteStep: true },
-                }),
-              ),
               catchError(() => {
-                this._matDialog.open(AddReviewComponent, {
-                  data: { parkingId: 1, skipVoteStep: true },
-                });
                 this._sharedUtilsService.openSnackbar(
-                  'Wystąpił błąd podczas dodawania parkingu',
+                  'Wystąpił błąd podczas dodawania parkingu.',
                   'ERROR',
                 );
                 return EMPTY;
@@ -130,18 +142,20 @@ export class UiOverlayComponent {
             return EMPTY;
           }
         }),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe({
-        next: () => {
+        tap((newParking: Parking) => {
           this._sharedUtilsService.openSnackbar(
-            'Gotowe!\nOznaczenie bezpłatnego parkingu zostało dodane',
+            'Gotowe!\nDodałeś/aś nowy punkt parkingowy.',
             'SUCCESS',
           );
           sheetRef.dismiss();
           this.stopAddingPoi();
-        },
-      });
+          this._matDialog.open(AddReviewComponent, {
+            data: { parkingId: newParking.id, skipVoteStep: true },
+          });
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe();
   }
 
   startEditingPoi() {
@@ -178,7 +192,7 @@ export class UiOverlayComponent {
       .subscribe({
         next: () => {
           this._sharedUtilsService.openSnackbar(
-            'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona',
+            'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona.',
             'SUCCESS',
           );
           sheetRef.dismiss();
@@ -210,7 +224,7 @@ export class UiOverlayComponent {
           return this.confirmUpdatedPoiPosition().pipe(
             catchError(() => {
               this._sharedUtilsService.openSnackbar(
-                'Wystąpił błąd podczas aktualizacji pozycji parkingu',
+                'Wystąpił błąd podczas aktualizacji pozycji parkingu.',
                 'ERROR',
               );
               return EMPTY;
@@ -234,5 +248,9 @@ export class UiOverlayComponent {
     const selectedPoi: Parking | null = this.selectedParking();
     const location = this._mapService.getMarkerLatLng();
     return this._parkingsApiService.patchParking(selectedPoi!.id, { location });
+  }
+
+  findNearestParking() {
+    this._mapService.findNearestParking(this.selectedAddress()?.coords!);
   }
 }

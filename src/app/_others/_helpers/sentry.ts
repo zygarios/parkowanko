@@ -1,4 +1,5 @@
-import { ErrorHandler, isDevMode } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, isDevMode } from '@angular/core';
+import { Router } from '@angular/router';
 import * as Sentry from '@sentry/angular';
 import { environment } from '../../../environments/environment.development';
 
@@ -26,6 +27,16 @@ export const provideSentry = () => {
     {
       provide: ErrorHandler,
       useValue: Sentry.createErrorHandler(),
+    },
+    {
+      provide: Sentry.TraceService,
+      deps: [Router],
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {},
+      deps: [Sentry.TraceService],
+      multi: true,
     },
   ];
 };

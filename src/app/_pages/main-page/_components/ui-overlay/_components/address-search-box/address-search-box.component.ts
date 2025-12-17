@@ -87,7 +87,7 @@ export class AddressSearchBoxComponent {
         lng: Number(this.selectedAddress()!.coords.lng),
         lat: Number(this.selectedAddress()!.coords.lat),
       },
-      'miejsc_nazwa' in this.selectedAddress()?.details! ? 'FAR_ZOOM' : 'CLOSE_ZOOM',
+      this.selectedAddress()?.details.ul_nazwa_glowna ? 'CLOSE_ZOOM' : 'FAR_ZOOM',
     );
   }
 
