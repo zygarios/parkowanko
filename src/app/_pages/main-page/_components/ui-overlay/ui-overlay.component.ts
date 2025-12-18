@@ -99,15 +99,6 @@ export class UiOverlayComponent {
     untracked(() => this.startEditingPoi());
   }
 
-  setDefaultState() {
-    this.selectedParking.set(null);
-  }
-
-  stopAddingPoi() {
-    this._mapService.removeMoveableMarker();
-    this.setDefaultState();
-  }
-
   startAddingPoi() {
     this._mapService.renderMoveableMarker();
 
@@ -129,12 +120,16 @@ export class UiOverlayComponent {
                   'Wystąpił błąd podczas dodawania parkingu.',
                   'ERROR',
                 );
+                sheetRef.dismiss();
+                this._mapService.removeMoveableMarker();
+                this.selectedParking.set(null);
                 return EMPTY;
               }),
             );
           } else {
             sheetRef.dismiss();
-            this.stopAddingPoi();
+            this._mapService.removeMoveableMarker();
+            this.selectedParking.set(null);
             return EMPTY;
           }
         }),
@@ -143,11 +138,12 @@ export class UiOverlayComponent {
             'Gotowe!\nDodałeś/aś nowy punkt parkingowy.',
             'SUCCESS',
           );
-          sheetRef.dismiss();
-          this.stopAddingPoi();
           this._matDialog.open(AddReviewComponent, {
             data: { parkingPointId: newParking.id, skipVoteStep: true },
           });
+          sheetRef.dismiss();
+          this._mapService.removeMoveableMarker();
+          this.selectedParking.set(null);
         }),
         takeUntilDestroyed(this._destroyRef),
       )
@@ -174,16 +170,20 @@ export class UiOverlayComponent {
             }
             return EMPTY;
           } else if (menu.result === PoiActionsEnum.ADD_REVIEW) {
-            sheetRef.dismiss();
             this._matDialog.open(AddReviewComponent, {
               data: { parkingPointId: this.selectedParking()?.id },
             });
+            sheetRef.dismiss();
+            this._mapService.removeMoveableMarker();
+            this.selectedParking.set(null);
             return EMPTY;
           } else if (menu.result === PoiActionsEnum.VIEW_REVIEWS) {
-            sheetRef.dismiss();
             this._matDialog.open(ReviewsComponent, {
               data: { parkingPointId: this.selectedParking()?.id },
             });
+            sheetRef.dismiss();
+            this._mapService.removeMoveableMarker();
+            this.selectedParking.set(null);
             return EMPTY;
           } else if (menu.result === PoiActionsEnum.UPDATE) {
             sheetRef.dismiss();
@@ -192,7 +192,7 @@ export class UiOverlayComponent {
           } else {
             sheetRef.dismiss();
             this._mapService.removeMoveableMarker();
-            this.setDefaultState();
+            this.selectedParking.set(null);
             return EMPTY;
           }
         }),
@@ -205,7 +205,7 @@ export class UiOverlayComponent {
           );
           sheetRef.dismiss();
           this._mapService.removeMoveableMarker();
-          this.setDefaultState();
+          this.selectedParking.set(null);
         },
       });
   }
@@ -234,6 +234,9 @@ export class UiOverlayComponent {
                 'Wystąpił błąd podczas aktualizacji pozycji parkingu.',
                 'ERROR',
               );
+              sheetRef.dismiss();
+              this._mapService.removeMoveableMarker();
+              this.selectedParking.set(null);
               return EMPTY;
             }),
           );
