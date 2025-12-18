@@ -121,7 +121,7 @@ export class MapLayersService {
       },
     });
 
-    const MIN_ZOOM_TO_SHOW_RADIUS = 15; // Promień widoczny dopiero przy bliskim zoomie
+    const MIN_ZOOM_TO_SHOW_RADIUS = 10; // Promień widoczny dopiero przy bliskim zoomie
 
     // Warstwa wypełnienia promienia (czerwony, półprzezroczysty)
     map.addLayer({

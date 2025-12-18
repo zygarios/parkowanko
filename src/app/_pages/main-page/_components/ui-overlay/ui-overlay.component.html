@@ -11,10 +11,10 @@
     <mat-icon>not_listed_location</mat-icon>
     <span>Poradnik</span>
   </button>
-  <a mat-menu-item routerLink="auth">
+  <button mat-menu-item (click)="logout()">
     <mat-icon>login</mat-icon>
-    <span>Zaloguj się</span>
-  </a>
+    <span>Wyloguj się</span>
+  </button>
 </mat-menu>
 
 @if (isMapLoaded()) {

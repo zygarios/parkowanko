@@ -1,120 +1,128 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { AuthResponse, LoginSaveData, RegisterSaveData } from '../../_types/auth/auth.model';
+import {
+  AuthResponse,
+  AuthResponseAfterRefresh,
+  LoginSaveData,
+  RegisterSaveData,
+} from '../../_types/auth/auth.model';
 import { User } from '../../_types/auth/user.type';
 
-@Injectable({
-  providedIn: 'root',
-})
+interface JwtPayload {
+  exp: number;
+}
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private _httpClient = inject(HttpClient);
+  private _http = inject(HttpClient);
   private _router = inject(Router);
 
-  private _currentUser: WritableSignal<User | null> = signal<User | null>(null);
+  private _tokenExpirationTimer?: ReturnType<typeof setTimeout>;
+  private _currentUser = signal<User | null>(null);
+
   currentUser = this._currentUser.asReadonly();
   isLoggedIn = computed(() => !!this._currentUser());
 
-  private tokenExpirationTimer: any;
-
   constructor() {
-    this.tryAutoLogin();
+    this._tryAutoLogin();
   }
 
   login(data: LoginSaveData): Observable<AuthResponse> {
-    return this._httpClient.post<AuthResponse>(`${environment.apiUrl}/auth/login/`, data).pipe(
-      tap((res) => this.handleAuthentication(res)),
-      catchError((err) => throwError(() => err)),
-    );
+    return this._http
+      .post<AuthResponse>(`${environment.apiUrl}/auth/login/`, data)
+      .pipe(tap((res) => this._setAuthData(res)));
   }
 
   register(data: RegisterSaveData): Observable<AuthResponse> {
-    return this._httpClient.post<AuthResponse>(`${environment.apiUrl}/auth/register/`, data).pipe(
-      tap((res) => this.handleAuthentication(res)),
-      catchError((err) => throwError(() => err)),
-    );
+    return this._http
+      .post<AuthResponse>(`${environment.apiUrl}/auth/register/`, data)
+      .pipe(tap((res) => this._setAuthData(res)));
   }
 
-  refreshToken(token: string): Observable<AuthResponse> {
-    return this._httpClient
-      .post<AuthResponse>(`${environment.apiUrl}/auth/refresh/`, { refresh: token })
-      .pipe(
-        tap((res) => this.handleAuthentication(res)),
-        catchError((err) => throwError(() => err)),
-      );
+  refreshToken(refresh: string): Observable<AuthResponse> {
+    return this._http
+      .post<AuthResponse>(`${environment.apiUrl}/auth/refresh/`, { refresh })
+      .pipe(tap((res) => this._setAuthAfterRefreshTokens(res)));
   }
 
-  logout() {
+  logout(): void {
+    clearTimeout(this._tokenExpirationTimer);
     this._currentUser.set(null);
     localStorage.removeItem('auth_data');
-    if (this.tokenExpirationTimer) {
-      clearTimeout(this.tokenExpirationTimer);
-    }
     this._router.navigate(['/auth']);
   }
 
-  private handleAuthentication(res: AuthResponse) {
-    this._currentUser.set(res.user);
-    localStorage.setItem('auth_data', JSON.stringify(res));
-
-    const decodedToken: any = jwtDecode(res.access);
-    console.log(decodedToken);
-    const expirationDate = new Date(decodedToken.exp * 1000);
-    this.autoLogout(expirationDate.getTime() - new Date().getTime());
-
-    this._router.navigate(['/']);
+  getAccessToken(): string | null {
+    return this._getStoredAuth()?.access ?? null;
   }
 
-  private tryAutoLogin() {
-    const storedData = localStorage.getItem('auth_data');
-
-    if (!storedData) {
-      return;
-    }
-
-    try {
-      const authData: AuthResponse = JSON.parse(storedData);
-      if (!authData.access || !authData.user) {
-        return;
-      }
-
-      const decodedToken: any = jwtDecode(authData.access);
-      const expirationDate = new Date(decodedToken.exp * 1000);
-      const now = new Date();
-
-      if (expirationDate > now) {
-        this._currentUser.set(authData.user);
-        this.autoLogout(expirationDate.getTime() - now.getTime());
-      } else {
-        this.logout();
-      }
-    } catch (e) {
-      this.logout();
-    }
+  getRefreshToken(): string | null {
+    return this._getStoredAuth()?.refresh ?? null;
   }
 
-  private autoLogout(expirationDuration: number) {
-    if (this.tokenExpirationTimer) {
-      clearTimeout(this.tokenExpirationTimer);
-    }
-    this.tokenExpirationTimer = setTimeout(() => {
-      this.logout();
-    }, expirationDuration);
-  }
-
-  private getAuthDataFromLocalStorage(): AuthResponse | null {
+  private _getStoredAuth(): AuthResponse | null {
     const data = localStorage.getItem('auth_data');
     return data ? JSON.parse(data) : null;
   }
 
-  getToken(): string | null {
-    return this.getAuthDataFromLocalStorage()?.access || null;
+  private _decodeJwt(token: string): JwtPayload | null {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = atob(payload);
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
   }
 
-  getRefreshToken(): string | null {
-    return this.getAuthDataFromLocalStorage()?.refresh || null;
+  private _setAuthData(res: AuthResponse): void {
+    this._currentUser.set(res.user);
+    localStorage.setItem('auth_data', JSON.stringify(res));
+    const exp = this._decodeJwt(res.access)?.exp;
+    if (exp) {
+      this._setupAutoLogout(exp);
+    }
+    this._router.navigate(['/']);
+  }
+
+  private _setAuthAfterRefreshTokens(res: AuthResponseAfterRefresh): void {
+    const storedAuth = this._getStoredAuth();
+    if (!storedAuth) return;
+
+    const exp = this._decodeJwt(res.access)?.exp;
+    if (!exp) return;
+
+    localStorage.setItem(
+      'auth_data',
+      JSON.stringify({
+        user: storedAuth.user,
+        access: res.access,
+        refresh: res.refresh,
+      }),
+    );
+
+    this._setupAutoLogout(exp);
+  }
+
+  private _setupAutoLogout(exp: number): void {
+    clearTimeout(this._tokenExpirationTimer);
+
+    const expiresInMs = exp * 1000 - Date.now();
+    this._tokenExpirationTimer = setTimeout(() => this.logout(), Math.max(expiresInMs, 0));
+  }
+
+  private _tryAutoLogin(): void {
+    const auth = this._getStoredAuth();
+    const token = auth?.access;
+    if (!token || !auth?.user) return;
+
+    const exp = this._decodeJwt(token)?.exp;
+    if (!exp || exp * 1000 < Date.now()) return;
+
+    this._currentUser.set(auth.user);
+    this._setupAutoLogout(exp);
   }
 }

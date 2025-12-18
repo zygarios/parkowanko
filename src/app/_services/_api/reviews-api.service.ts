@@ -10,15 +10,15 @@ import { Review, ReviewSaveData } from '../../_types/review.type';
 export class ReviewsApiService {
   private _httpClient = inject(HttpClient);
 
-  getReviews(parkingId: number): Observable<Review[]> {
+  getReviews(parkingPointId: number): Observable<Review[]> {
     return this._httpClient
-      .get<Review[]>(`${environment.apiUrl}/parkings/${parkingId}/reviews/`)
+      .get<Review[]>(`${environment.apiUrl}/parkings/${parkingPointId}/reviews/`)
       .pipe(map((reviews: Review[]) => reviews.map((review: Review) => new Review(review))));
   }
 
-  postReview(parkingId: number, body: ReviewSaveData): Observable<Review> {
+  postReview(parkingPointId: number, body: ReviewSaveData): Observable<Review> {
     return this._httpClient.post<Review>(
-      `${environment.apiUrl}/parkings/${parkingId}/reviews/`,
+      `${environment.apiUrl}/parkings/${parkingPointId}/reviews/`,
       body,
     );
   }

@@ -22,7 +22,6 @@ import { occupancyOptionsData } from '../../_data/occupancy-options.data';
     MatInputModule,
   ],
   templateUrl: './review-form.component.html',
-  styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewFormComponent {

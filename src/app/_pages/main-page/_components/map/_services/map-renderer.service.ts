@@ -2,14 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { circle, distance, point } from '@turf/turf';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../../../../_types/location-coords.type';
-import { Parking } from '../../../../../_types/parking.type';
+import { ParkingPoint } from '../../../../../_types/parking-point.type';
 import {
   MapLayersService,
   PARKING_POI_LINE_SOURCE,
   PARKING_POI_RADIUS_SOURCE,
   PARKING_POI_SOURCE,
 } from './map-layers.service';
-import { POLAND_BOUNDS, POLAND_MAX_BOUNDS } from './map.service';
+import { PARKING_POI_RADIUS_BOUND, POLAND_BOUNDS, POLAND_MAX_BOUNDS } from './map.service';
 
 @Injectable({ providedIn: 'root' })
 export class MapRendererService {
@@ -105,7 +105,7 @@ export class MapRendererService {
    * @param map - Instancja mapy
    * @param parkingsList - Lista parkingów do wyświetlenia
    */
-  renderPois(map: maplibregl.Map, parkingsList: Parking[]) {
+  renderPois(map: maplibregl.Map, parkingsList: ParkingPoint[]) {
     const parkingPoiSource = map.getSource(PARKING_POI_SOURCE) as maplibregl.GeoJSONSource;
 
     parkingPoiSource.setData({
@@ -133,7 +133,7 @@ export class MapRendererService {
   }
 
   /**
-   * Renderuje promień 20m wokół punktu parkingu
+   * Renderuje promień wokół punktu parkingu
    * Używane do wizualizacji zasięgu przy dodawaniu nowego parkingu
    * @param map - Instancja mapy
    * @param markerCoords - Współrzędne centrum promienia (opcjonalne)
@@ -148,7 +148,7 @@ export class MapRendererService {
       type: 'FeatureCollection',
       features: markerCoords
         ? [
-            circle([markerCoords.lng, markerCoords.lat], 20, {
+            circle([markerCoords.lng, markerCoords.lat], PARKING_POI_RADIUS_BOUND, {
               steps: 64, // Gładki okrąg (więcej kroków = bardziej okrągły)
               units: 'meters',
             }),

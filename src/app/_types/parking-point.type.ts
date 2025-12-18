@@ -1,9 +1,9 @@
 import { LocationCoords } from './location-coords.type';
-export interface ParkingSaveData {
+export interface ParkingPointSaveData {
   location: LocationCoords;
 }
 
-export class Parking {
+export class ParkingPoint {
   id!: number;
   createdAt!: Date;
   updatedAt!: Date;
@@ -14,7 +14,7 @@ export class Parking {
   hasEditLocationProposal!: boolean;
   isVerified!: boolean;
 
-  constructor(props: Parking) {
+  constructor(props: ParkingPoint) {
     if (props) {
       Object.assign(this, props);
 

@@ -1,5 +1,5 @@
 export interface ReviewSaveData {
-  parkingId: number;
+  parkingPointId: number;
   description: string;
   attributes: string[];
   occupancy: string;
@@ -11,7 +11,7 @@ export class Review {
   createdAt!: Date;
   updatedAt!: Date;
 
-  parkingId!: number;
+  parkingPointId!: number;
   description!: string;
   attributes!: string[];
   occupancy!: string;

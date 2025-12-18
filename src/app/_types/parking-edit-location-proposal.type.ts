@@ -12,7 +12,7 @@ export class ParkingEditLocationProposal {
   location!: LocationCoords;
   likeCount!: number;
   dislikeCount!: number;
-  parkingId!: number;
+  parkingPointId!: number;
 
   constructor(props: ParkingEditLocationProposal) {
     if (props) {

@@ -12,15 +12,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { RouterLink } from '@angular/router';
 import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
+import { AuthService } from '../../../../_services/_core/auth.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { GeocodeFeature } from '../../../../_types/geocode-api.type';
-import { Parking } from '../../../../_types/parking.type';
+import { ParkingPoint } from '../../../../_types/parking-point.type';
 import { AddReviewComponent } from '../add-review/add-review.component';
 import { MapService } from '../map/_services/map.service';
+import { ReviewsComponent } from '../reviews/reviews.component';
 import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';
 import {
   addingPoiConfirmSheetConfig,
@@ -29,15 +30,9 @@ import {
 } from './_data/poi-controller-sheet-configs.data';
 import { PoiActionsEnum } from './_types/poi-actions.model';
 
-enum ActiveModeEnum {
-  DEFAULT = 'DEFAULT',
-  ADDING_POI = 'ADDING_POI',
-  EDITING_POI = 'EDITING_POI',
-  UPDATING_POI_POSITION = 'UPDATE_POI_POSITION',
-}
 @Component({
   selector: 'app-ui-overlay',
-  imports: [MatMenuModule, MatIconModule, MatButtonModule, AddressSearchBoxComponent, RouterLink],
+  imports: [MatMenuModule, MatIconModule, MatButtonModule, AddressSearchBoxComponent],
   templateUrl: './ui-overlay.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -53,14 +48,13 @@ enum ActiveModeEnum {
   `,
 })
 export class UiOverlayComponent {
+  private readonly _authService = inject(AuthService);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _mapService = inject(MapService);
   private readonly _parkingsApiService = inject(ParkingsApiService);
   private readonly _sharedUtilsService = inject(SharedUtilsService);
   private readonly _matDialog = inject(MatDialog);
 
-  ACTIVE_MODE_ENUM = ActiveModeEnum;
-  activeMode = signal(ActiveModeEnum.DEFAULT);
   isMapLoaded = this._mapService.getIsMapLoaded;
 
   readonly selectedParking = this._mapService.selectedParking;
@@ -69,6 +63,10 @@ export class UiOverlayComponent {
   constructor() {
     effect(() => this.listenForSelectedPoiToStartEdit());
     effect(() => this.listenForSelectedAddressToFindNearestParking());
+  }
+
+  logout() {
+    this._authService.logout();
   }
 
   listenForSelectedAddressToFindNearestParking() {
@@ -102,7 +100,6 @@ export class UiOverlayComponent {
   }
 
   setDefaultState() {
-    this.activeMode.set(ActiveModeEnum.DEFAULT);
     this.selectedParking.set(null);
   }
 
@@ -112,7 +109,6 @@ export class UiOverlayComponent {
   }
 
   startAddingPoi() {
-    this.activeMode.set(ActiveModeEnum.ADDING_POI);
     this._mapService.renderMoveableMarker();
 
     const sheetRef = this._sharedUtilsService.openSheet(
@@ -142,7 +138,7 @@ export class UiOverlayComponent {
             return EMPTY;
           }
         }),
-        tap((newParking: Parking) => {
+        tap((newParking: ParkingPoint) => {
           this._sharedUtilsService.openSnackbar(
             'Gotowe!\nDodałeś/aś nowy punkt parkingowy.',
             'SUCCESS',
@@ -150,7 +146,7 @@ export class UiOverlayComponent {
           sheetRef.dismiss();
           this.stopAddingPoi();
           this._matDialog.open(AddReviewComponent, {
-            data: { parkingId: newParking.id, skipVoteStep: true },
+            data: { parkingPointId: newParking.id, skipVoteStep: true },
           });
         }),
         takeUntilDestroyed(this._destroyRef),
@@ -159,19 +155,15 @@ export class UiOverlayComponent {
   }
 
   startEditingPoi() {
-    if (!this.selectedParking() || this.activeMode() === ActiveModeEnum.ADDING_POI) return;
-    this.activeMode.set(ActiveModeEnum.EDITING_POI);
-
+    if (!this.selectedParking()) return;
+    this._mapService.removeMoveableMarker();
     const sheetRef = this._sharedUtilsService.openSheet(selectedPoiOptionsSheetConfig);
 
     sheetRef.onClick
       .pipe(takeUntilDestroyed(this._destroyRef))
       .pipe(
         switchMap((menu) => {
-          if (menu.result === PoiActionsEnum.UPDATE) {
-            this.startUpdatingPoiPosition();
-            return this.handleUpdateUserChoice();
-          } else if (menu.result === PoiActionsEnum.NAVIGATE) {
+          if (menu.result === PoiActionsEnum.NAVIGATE) {
             sheetRef.dismiss();
             const location = this.selectedParking()?.location;
             if (location) {
@@ -181,6 +173,22 @@ export class UiOverlayComponent {
               );
             }
             return EMPTY;
+          } else if (menu.result === PoiActionsEnum.ADD_REVIEW) {
+            sheetRef.dismiss();
+            this._matDialog.open(AddReviewComponent, {
+              data: { parkingPointId: this.selectedParking()?.id },
+            });
+            return EMPTY;
+          } else if (menu.result === PoiActionsEnum.VIEW_REVIEWS) {
+            sheetRef.dismiss();
+            this._matDialog.open(ReviewsComponent, {
+              data: { parkingPointId: this.selectedParking()?.id },
+            });
+            return EMPTY;
+          } else if (menu.result === PoiActionsEnum.UPDATE) {
+            sheetRef.dismiss();
+            this.startUpdatingPoiPosition();
+            return this.handleUpdateUserChoice();
           } else {
             sheetRef.dismiss();
             this._mapService.removeMoveableMarker();
@@ -203,9 +211,8 @@ export class UiOverlayComponent {
   }
 
   startUpdatingPoiPosition() {
-    const selectedPoi: Parking | null = this.selectedParking();
+    const selectedPoi: ParkingPoint | null = this.selectedParking();
     if (!selectedPoi) return;
-    this.activeMode.set(ActiveModeEnum.UPDATING_POI_POSITION);
     this._mapService.renderMoveableMarker(this.selectedParking()?.location);
     this._mapService.jumpToPoi(selectedPoi?.location, 'CLOSE_ZOOM');
   }
@@ -231,7 +238,8 @@ export class UiOverlayComponent {
             }),
           );
         } else {
-          this.stopUpdatingPoiPosition();
+          this._mapService.removeMoveableMarker();
+          this.startEditingPoi();
           return EMPTY;
         }
       }),
@@ -239,13 +247,8 @@ export class UiOverlayComponent {
     );
   }
 
-  stopUpdatingPoiPosition() {
-    this._mapService.removeMoveableMarker();
-    this.startEditingPoi();
-  }
-
   confirmUpdatedPoiPosition() {
-    const selectedPoi: Parking | null = this.selectedParking();
+    const selectedPoi: ParkingPoint | null = this.selectedParking();
     const location = this._mapService.getMarkerLatLng();
     return this._parkingsApiService.patchParking(selectedPoi!.id, { location });
   }

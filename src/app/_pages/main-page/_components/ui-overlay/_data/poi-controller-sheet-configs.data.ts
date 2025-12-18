@@ -36,6 +36,16 @@ export const selectedPoiOptionsSheetConfig: MenuSheetData = {
       isPrimary: true,
     },
     {
+      label: 'Dodaj opinię',
+      icon: 'rate_review',
+      result: PoiActionsEnum.ADD_REVIEW,
+    },
+    {
+      label: 'Zobacz opinie',
+      icon: 'forum',
+      result: PoiActionsEnum.VIEW_REVIEWS,
+    },
+    {
       label: 'Zaproponuj zmianę lokalizacji',
       icon: 'edit_location_alt',
       result: PoiActionsEnum.UPDATE,
@@ -43,7 +53,7 @@ export const selectedPoiOptionsSheetConfig: MenuSheetData = {
     {
       label: 'Anuluj',
       icon: 'close',
-      result: PoiActionsEnum.CLOSE,
+      result: PoiActionsEnum.CANCEL,
     },
   ],
 };

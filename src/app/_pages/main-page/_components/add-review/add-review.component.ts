@@ -46,7 +46,7 @@ export class AddReviewComponent {
   private _dialogRef = inject(MatDialogRef);
   private _reviewsApiService = inject(ReviewsApiService);
   private _sharedUtilsService = inject(SharedUtilsService);
-  private _dialogData = inject<{ parkingId: number; skipVoteStep?: boolean }>(MAT_DIALOG_DATA);
+  private _dialogData = inject<{ parkingPointId: number; skipVoteStep?: boolean }>(MAT_DIALOG_DATA);
   private _stepsRef = viewChildren(MatTab);
 
   skipVoteStep = this._dialogData.skipVoteStep;
@@ -55,7 +55,7 @@ export class AddReviewComponent {
   isLastStep = computed(() => this.activeStep() === this._stepsRef().length - 1);
 
   review = signal<ReviewSaveData>({
-    parkingId: this._dialogData.parkingId,
+    parkingPointId: this._dialogData.parkingPointId,
     description: '',
     attributes: [],
     occupancy: '',
@@ -70,8 +70,8 @@ export class AddReviewComponent {
 
   constructor() {
     this._dialogRef.disableClose = true;
-    if (!this._dialogData.parkingId && this._dialogData.parkingId !== 0) {
-      throw new Error('Formularz dodawania opinii wymaga przekazanie parkingId w dialogData');
+    if (!this._dialogData.parkingPointId && this._dialogData.parkingPointId !== 0) {
+      throw new Error('Formularz dodawania opinii wymaga przekazanie parkingPointId w dialogData');
     }
     if (this._dialogData.skipVoteStep) this.nextStep();
   }
@@ -100,12 +100,13 @@ export class AddReviewComponent {
     submit(this.reviewForm, async () => {
       try {
         await firstValueFrom(
-          this._reviewsApiService.postReview(this._dialogData.parkingId, this.review()),
+          this._reviewsApiService.postReview(this._dialogData.parkingPointId, this.review()),
         );
         this._sharedUtilsService.openSnackbar(
           'Dodałeś/aś opinię! Przyszli kierowcy będą ci wdzięczni. ;)',
           'SUCCESS',
         );
+        this._dialogRef.close();
         return;
       } catch (_) {
         this._sharedUtilsService.openSnackbar('Wystąpił błąd podczas dodawania oceny', 'ERROR');

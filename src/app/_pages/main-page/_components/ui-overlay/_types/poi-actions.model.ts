@@ -1,7 +1,8 @@
 export enum PoiActionsEnum {
   UPDATE = 'UPDATE',
-  CLOSE = 'CLOSE',
   CANCEL = 'CANCEL',
   NAVIGATE = 'NAVIGATE',
   CONFIRM = 'CONFIRM',
+  VIEW_REVIEWS = 'VIEW_REVIEWS',
+  ADD_REVIEW = 'ADD_REVIEW',
 }

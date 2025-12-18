@@ -14,5 +14,11 @@ export interface RegisterSaveData {
 export interface AuthResponse {
   access: string;
   refresh: string;
+  expiresIn: number;
   user: User;
+}
+export interface AuthResponseAfterRefresh {
+  access: string;
+  refresh: string;
+  expiresIn: number;
 }

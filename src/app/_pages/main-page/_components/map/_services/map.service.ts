@@ -11,7 +11,7 @@ import type { MapLayerMouseEvent } from 'maplibre-gl';
 import * as maplibregl from 'maplibre-gl';
 import { SharedUtilsService } from '../../../../../_services/_core/shared-utils.service';
 import { LocationCoords } from '../../../../../_types/location-coords.type';
-import { Parking } from '../../../../../_types/parking.type';
+import { ParkingPoint } from '../../../../../_types/parking-point.type';
 import { MapRendererService } from './map-renderer.service';
 
 export const POLAND_BOUNDS: [number, number, number, number] = [14, 48, 24.5, 56];
@@ -21,7 +21,7 @@ export const POLAND_MAX_BOUNDS = [
   POLAND_BOUNDS[2] + 3,
   POLAND_BOUNDS[3] + 3,
 ] as maplibregl.LngLatBoundsLike;
-export const PARKING_POI_RADIUS_BOUND = 20;
+export const PARKING_POI_RADIUS_BOUND = 40;
 const CLOSE_ZOOM = 17;
 const FAR_ZOOM = 11;
 const FLY_SPEED = 2;
@@ -46,7 +46,7 @@ export class MapService {
   private _isMapLoaded = signal(false);
   getIsMapLoaded = this._isMapLoaded.asReadonly();
 
-  selectedParking = signal<null | Parking>(null);
+  selectedParking = signal<null | ParkingPoint>(null);
   isMarkerInsideDisabledZone = signal(false);
 
   constructor() {
@@ -91,7 +91,7 @@ export class MapService {
 
       if (!stringifiedData) return;
 
-      const parking: Parking = JSON.parse(stringifiedData.parking);
+      const parking: ParkingPoint = JSON.parse(stringifiedData.parking);
 
       this.flyToPoi(parking.location);
 
@@ -116,7 +116,7 @@ export class MapService {
    * Przechowuje listę współrzędnych dla późniejszego wykrywania bliskości
    * @param parkingsList - Lista parkingów do wyświetlenia na mapie
    */
-  renderParkingsPois(parkingsList: Parking[]): void {
+  renderParkingsPois(parkingsList: ParkingPoint[]): void {
     this._renderedParkingsCoordsList = parkingsList.map((parking) => parking.location);
     this._mapRendererService.renderPois(this._map!, parkingsList);
   }
@@ -212,7 +212,14 @@ export class MapService {
         this._mapRendererService.renderRadiusForParkingPoi(this._map!, parkingPoiInRadius);
         // Dodaj klasę 'disabled' do markera aby pokazać że nie można tu umieścić parkingu
         const markerElement = this._markerRef?.getElement();
+
         this.isMarkerInsideDisabledZone.set(true);
+
+        this._mapRendererService.renderLineBetweenPoints(this._map!, {
+          fixedCoords: parkingPoiInRadius,
+          targetCoords: markerCoords,
+        });
+
         if (markerElement) {
           markerElement.classList.add('disabled');
         }
@@ -223,6 +230,8 @@ export class MapService {
         markerElement!.classList.remove('disabled');
 
         this.isMarkerInsideDisabledZone.set(false);
+
+        this._mapRendererService.renderLineBetweenPoints(this._map!);
       }
     }
   }

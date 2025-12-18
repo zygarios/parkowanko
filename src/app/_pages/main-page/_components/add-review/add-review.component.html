@@ -1,7 +1,10 @@
 @if (!skipVoteStep) {
   <div mat-dialog-title>
     @if (isFirstStep()) {
-      <div class="flex ml-auto mr-auto gap-2 relative">Udało się zaparkować?</div>
+      <div class="flex ml-auto mr-auto gap-2 relative">Czy dobrze oceniasz ten parking?</div>
+      <button mat-dialog-close matIconButton>
+        <mat-icon>close</mat-icon>
+      </button>
     } @else {
       <div class="flex ml-auto mr-auto gap-2 relative">
         <mat-icon
@@ -19,12 +22,14 @@
 <mat-tab-group [selectedIndex]="activeStep()" dynamicHeight>
   <mat-tab>
     <div class="p-6">
+      <div class="mb-5">Jeśli tu nie parkowałeś, po prostu zamknij to okno ;)</div>
       <div class="flex gap-2 justify-center">
+        <button mat-button mat-dialog-close>Zamknij</button>
         <button mat-flat-button class="button-error w-1/2!" (click)="addVote(false)">
-          <mat-icon>thumb_down</mat-icon>Nie...
+          <mat-icon>thumb_down</mat-icon>Nie
         </button>
         <button mat-flat-button class="button-success w-1/2!" (click)="addVote(true)">
-          <mat-icon>thumb_up</mat-icon>Udało się!
+          <mat-icon>thumb_up</mat-icon>Tak
         </button>
       </div>
     </div>
