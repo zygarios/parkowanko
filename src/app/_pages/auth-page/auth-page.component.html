@@ -36,7 +36,12 @@
       @if (authForm.password().errors()[0]; as error) {
         <mat-error>{{ error.message }}</mat-error>
       }
-      <button mat-icon-button matSuffix (click)="togglePasswordVisibility('password')">
+      <button
+        type="button"
+        mat-icon-button
+        matSuffix
+        (click)="togglePasswordVisibility('password')"
+      >
         <mat-icon>
           {{ isPasswordHidden() ? 'visibility_off' : 'visibility' }}
         </mat-icon>
@@ -53,7 +58,12 @@
         @if (authForm.repeatedPassword().errors()[0]; as error) {
           <mat-error>{{ error.message }}</mat-error>
         }
-        <button mat-icon-button matSuffix (click)="togglePasswordVisibility('repeatedPassword')">
+        <button
+          type="button"
+          mat-icon-button
+          matSuffix
+          (click)="togglePasswordVisibility('repeatedPassword')"
+        >
           <mat-icon>
             {{ isRepeatedPasswordHidden() ? 'visibility_off' : 'visibility' }}
           </mat-icon>
