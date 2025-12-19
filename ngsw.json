@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1766172500796,
+  "timestamp": 1766172760325,
   "index": "/parkowanko/index.html",
   "assetGroups": [
     {
@@ -23,7 +23,7 @@
         "/parkowanko/chunk-VZBGOO6O.js",
         "/parkowanko/favicon.ico",
         "/parkowanko/index.html",
-        "/parkowanko/main-2EYDILQ2.js",
+        "/parkowanko/main-KHLNBIAO.js",
         "/parkowanko/manifest.webmanifest",
         "/parkowanko/styles-Y6LXNS5H.css"
       ],
@@ -84,8 +84,8 @@
     "/parkowanko/icons/pwa/icon-72x72.png": "24517e9434dceca886a991eee644e258e90fd440",
     "/parkowanko/icons/pwa/icon-96x96.png": "b3ece95e0f4f95993f3839ea980914a54e3eab0c",
     "/parkowanko/images/banner-logo.png": "9c3bc936f6a68bffbb1a88d416f16fcf9476a572",
-    "/parkowanko/index.html": "cd1fee9e95c588d1f96d35cd33141690de96f4df",
-    "/parkowanko/main-2EYDILQ2.js": "69c2a470d7bd5b6b5cbd033b063c68adea8e456a",
+    "/parkowanko/index.html": "759eff6daeab0b8edc472fda740088487c7c65f2",
+    "/parkowanko/main-KHLNBIAO.js": "53ac25f5b68b2c0ce309d783d64b31699203412e",
     "/parkowanko/manifest.webmanifest": "71e368554ca9fd0d150055ce07366359bb238962",
     "/parkowanko/styles-Y6LXNS5H.css": "224ec7863a7f11a4d98710be05083e0ff60be722"
   },
