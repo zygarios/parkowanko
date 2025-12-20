@@ -19,13 +19,20 @@ export class MapRendererService {
   /**
    * Inicjalizuje i renderuje mapę MapLibre GL
    * Konfiguruje granice Polski, style OSM oraz kontrolki nawigacji i geolokalizacji
-   * @returns Promise z instancją mapy MapLibre
+   * @returns Promise z obiektem zawierającym instancję mapy i kontrolkę geolokalizacji
    * @throws Error jeśli nie uda się załadować stylu lub ikony
    */
-  async initRenderMap(): Promise<maplibregl.Map> {
+  async initRenderMap(): Promise<{ map: maplibregl.Map; geolocate: maplibregl.GeolocateControl }> {
     try {
       // Załaduj styl mapy OSM z pliku JSON
       const style = await import('../../../../../../../public/osm_bright.json');
+
+      const geolocate = new maplibregl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        showAccuracyCircle: false,
+        trackUserLocation: false, // Tylko jednorazowe centrowanie, bez śledzenia kamery
+        fitBoundsOptions: { maxZoom: 17, animate: false },
+      });
 
       // Utwórz instancję mapy z konfiguracją dla Polski
       const mapRef = new maplibregl.Map({
@@ -35,14 +42,9 @@ export class MapRendererService {
         style: style as any,
       })
         .addControl(new maplibregl.NavigationControl({ showCompass: false }))
-        .addControl(
-          new maplibregl.GeolocateControl({
-            positionOptions: { enableHighAccuracy: true },
-            showAccuracyCircle: false,
-            trackUserLocation: true,
-            fitBoundsOptions: { maxZoom: 17 }, // Max zoom przy geolokalizacji
-          }),
-        );
+        .addControl(geolocate);
+
+      mapRef.on('load', () => geolocate.trigger());
 
       // Wyłącz rotację mapy gestem dotykowym
       mapRef.touchZoomRotate.disableRotation();
@@ -55,7 +57,7 @@ export class MapRendererService {
 
       await Promise.all(icons.map((i) => this.loadMapImage(mapRef, i.name, i.url)));
 
-      return mapRef;
+      return { map: mapRef, geolocate };
     } catch (error) {
       console.error('Failed to initialize MapLibre map:', error);
       throw error; // Propaguj błąd do wywołującego

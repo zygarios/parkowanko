@@ -25,7 +25,7 @@ export const PARKING_POI_RADIUS_BOUND = 40;
 const CLOSE_ZOOM = 17;
 const FAR_ZOOM = 11;
 const FLY_SPEED = 2;
-const MAX_DISTANCE_TO_NEAREST_PARKING_KM = 2;
+const MAX_DISTANCE_TO_NEAREST_PARKING_KM = 3;
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
@@ -60,7 +60,8 @@ export class MapService {
   async initRenderMap(): Promise<void> {
     this.cleanUp();
 
-    this._map = await this._mapRendererService.initRenderMap();
+    const { map } = await this._mapRendererService.initRenderMap();
+    this._map = map;
 
     this._map.on('load', () => {
       this._isMapLoaded.set(true);
@@ -105,8 +106,9 @@ export class MapService {
    * Przybliża widok mapy do klikniętego klastra z animacją flyTo
    */
   private listenForClusterClick() {
-    this._clusterClickFnRef = (e: MapLayerMouseEvent) =>
+    this._clusterClickFnRef = (e: MapLayerMouseEvent) => {
       this.flyToPoi(e.lngLat, this._map!.getZoom() + 3);
+    };
 
     this._map!.on('click', 'clusters', this._clusterClickFnRef);
   }
@@ -292,39 +294,42 @@ export class MapService {
   }
 
   findNearestParking(coords: LocationCoords) {
+    if (this._renderedParkingsCoordsList.length === 0) {
+      this._sharedUtilsService.openSnackbar('Brak parkingów do przeszukania.', 'ERROR');
+      return;
+    }
+
     const points = featureCollection(
       this._renderedParkingsCoordsList.map((p) => point([p.lng, p.lat], { original: p })),
     );
-    const nearestParkingLocationArray = nearestPoint([coords.lng, coords.lat], points).geometry
-      .coordinates;
 
-    const nearestParkingLocationCoords = this._renderedParkingsCoordsList.find(
-      (p) => p.lng === nearestParkingLocationArray[0] && p.lat === nearestParkingLocationArray[1],
-    )!;
+    const nearestFeature = nearestPoint([coords.lng, coords.lat], points);
+    const nearestParkingLocationCoords = nearestFeature.properties['original'] as LocationCoords;
 
-    if (
-      distance(
-        [coords.lng, coords.lat],
-        [nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat],
-      ) <= MAX_DISTANCE_TO_NEAREST_PARKING_KM
-    ) {
+    const dist = distance(
+      [coords.lng, coords.lat],
+      [nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat],
+    );
+
+    if (dist <= MAX_DISTANCE_TO_NEAREST_PARKING_KM) {
       this._mapRendererService.renderLineBetweenPoints(this._map!, {
         fixedCoords: coords,
         targetCoords: nearestParkingLocationCoords,
       });
 
-      this._map!.fitBounds(
-        [
-          [nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat],
-          [coords.lng, coords.lat],
-        ],
-        {
-          padding: 100,
-        },
-      );
+      const bounds = new maplibregl.LngLatBounds()
+        .extend([coords.lng, coords.lat])
+        .extend([nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat]);
+
+      this._map!.fitBounds(bounds, {
+        padding: { top: 70, bottom: 150, left: 70, right: 70 },
+        maxZoom: 16,
+        duration: 1000,
+        essential: true,
+      });
     } else {
       this._sharedUtilsService.openSnackbar(
-        `Nie znaleziono najbliższego parkingu w zasięgu ${MAX_DISTANCE_TO_NEAREST_PARKING_KM} kilometrów. `,
+        `Nie znaleziono najbliższego parkingu w zasięgu ${MAX_DISTANCE_TO_NEAREST_PARKING_KM} km.`,
       );
     }
   }

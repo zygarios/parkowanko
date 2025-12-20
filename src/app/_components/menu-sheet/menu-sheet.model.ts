@@ -1,8 +1,10 @@
 import { Signal } from '@angular/core';
 import { Subject } from 'rxjs';
 
-export interface MenuSheetItem<T = any> {
-  result: T;
+export type MenuSheetResult = string | 'DISMISS';
+
+export interface MenuSheetItem {
+  result: MenuSheetResult;
   label: string;
   icon?: string;
   isPrimary?: boolean;
@@ -19,5 +21,5 @@ export interface MenuSheetData {
 
 export interface MenuSheetRef {
   dismiss: () => void;
-  onClick: Subject<MenuSheetItem>;
+  onClick: Subject<MenuSheetResult>;
 }

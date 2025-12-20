@@ -23,7 +23,7 @@ export class SharedUtilsService {
       autoFocus: false,
       backdropClass: 'backdrop-invisible',
       disableClose: config?.disableClose ?? false,
-      hasBackdrop: config?.hasBackdrop ?? false,
+      hasBackdrop: config?.hasBackdrop ?? true,
     });
 
     return sheetRef.instance.menuSheetRef;

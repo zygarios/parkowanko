@@ -16,6 +16,7 @@ import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { AuthService } from '../../../../_services/_core/auth.service';
+import { GlobalSpinnerService } from '../../../../_services/_core/global-spinner.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { GeocodeFeature } from '../../../../_types/geocode-api.type';
 import { ParkingPoint } from '../../../../_types/parking-point.type';
@@ -54,6 +55,7 @@ export class UiOverlayComponent {
   private readonly _parkingsApiService = inject(ParkingsApiService);
   private readonly _sharedUtilsService = inject(SharedUtilsService);
   private readonly _matDialog = inject(MatDialog);
+  private readonly _isSpinnerActive = inject(GlobalSpinnerService).isSpinnerActive;
 
   isMapLoaded = this._mapService.getIsMapLoaded;
 
@@ -110,14 +112,14 @@ export class UiOverlayComponent {
     const sheetRef = this._sharedUtilsService.openSheet(
       addingPoiConfirmSheetConfig(this._mapService.isMarkerInsideDisabledZone),
       {
-        disableClose: true,
+        hasBackdrop: false,
       },
     );
 
     sheetRef.onClick
       .pipe(
-        switchMap((menu) => {
-          if (menu.result === PoiActionsEnum.CONFIRM) {
+        switchMap((result) => {
+          if (result === PoiActionsEnum.CONFIRM) {
             const location = this._mapService.getMarkerLatLng();
             return this._parkingsApiService.postParking({ location }).pipe(
               catchError(() => {
@@ -158,13 +160,15 @@ export class UiOverlayComponent {
   startEditingPoi() {
     if (!this.selectedParking()) return;
     this._mapService.removeMoveableMarker();
-    const sheetRef = this._sharedUtilsService.openSheet(selectedPoiOptionsSheetConfig);
+    const sheetRef = this._sharedUtilsService.openSheet(selectedPoiOptionsSheetConfig, {
+      hasBackdrop: true,
+    });
 
     sheetRef.onClick
       .pipe(takeUntilDestroyed(this._destroyRef))
       .pipe(
-        switchMap((menu) => {
-          if (menu.result === PoiActionsEnum.NAVIGATE) {
+        switchMap((result) => {
+          if (result === PoiActionsEnum.NAVIGATE) {
             sheetRef.dismiss();
             const location = this.selectedParking()?.location;
             if (location) {
@@ -174,7 +178,7 @@ export class UiOverlayComponent {
               );
             }
             return EMPTY;
-          } else if (menu.result === PoiActionsEnum.ADD_REVIEW) {
+          } else if (result === PoiActionsEnum.ADD_REVIEW) {
             this._matDialog.open(AddReviewComponent, {
               data: { parkingPointId: this.selectedParking()?.id },
             });
@@ -182,7 +186,7 @@ export class UiOverlayComponent {
             this._mapService.removeMoveableMarker();
             this.selectedParking.set(null);
             return EMPTY;
-          } else if (menu.result === PoiActionsEnum.VIEW_REVIEWS) {
+          } else if (result === PoiActionsEnum.VIEW_REVIEWS) {
             this._matDialog.open(ReviewsComponent, {
               data: { parkingPointId: this.selectedParking()?.id },
             });
@@ -190,7 +194,7 @@ export class UiOverlayComponent {
             this._mapService.removeMoveableMarker();
             this.selectedParking.set(null);
             return EMPTY;
-          } else if (menu.result === PoiActionsEnum.UPDATE) {
+          } else if (result === PoiActionsEnum.UPDATE) {
             sheetRef.dismiss();
             this.startUpdatingPoiPosition();
             return this.handleUpdateUserChoice();
@@ -226,13 +230,13 @@ export class UiOverlayComponent {
     const sheetRef = this._sharedUtilsService.openSheet(
       changingPoiPositionOptionsSheetConfig(this._mapService.isMarkerInsideDisabledZone),
       {
-        disableClose: true,
+        hasBackdrop: false,
       },
     );
 
     return sheetRef.onClick.pipe(
-      switchMap((menu) => {
-        if (menu.result === PoiActionsEnum.CONFIRM) {
+      switchMap((result) => {
+        if (result === PoiActionsEnum.CONFIRM) {
           return this.confirmUpdatedPoiPosition().pipe(
             catchError(() => {
               this._sharedUtilsService.openSnackbar(
@@ -261,7 +265,33 @@ export class UiOverlayComponent {
     return this._parkingsApiService.patchParking(selectedPoi!.id, { location });
   }
 
-  findNearestParking() {
-    this._mapService.findNearestParking(this.selectedAddress()?.coords!);
+  async findNearestParking() {
+    try {
+      this._isSpinnerActive.set(true);
+      const position = await this._getCurrentPosition();
+      const coords = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      this._mapService.findNearestParking(coords);
+    } catch (err) {
+      console.error('Failed to get user location', err);
+      this._sharedUtilsService.openSnackbar(
+        'Nie udało się pobrać Twojej lokalizacji. Sprawdź ustawienia GPS.',
+        'ERROR',
+      );
+    } finally {
+      this._isSpinnerActive.set(false);
+    }
+  }
+
+  private _getCurrentPosition(): Promise<GeolocationPosition> {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      });
+    });
   }
 }
