@@ -13,7 +13,7 @@ import { PwaService } from './_services/_core/pwa.service';
 export class AppComponent {
   private _pwaService = inject(PwaService);
   private _swUpdate = inject(SwUpdate);
-  pwaHash = signal('');
+  pwaStatus = signal('');
   environmentType = environment.environmentType;
 
   constructor() {
@@ -24,20 +24,10 @@ export class AppComponent {
   setEnvData() {
     if (this._swUpdate.isEnabled) {
       this._swUpdate.versionUpdates.subscribe((evt: VersionEvent) => {
-        switch (evt.type) {
-          case 'NO_NEW_VERSION_DETECTED':
-            this.pwaHash.set(`NO_NEW${evt.version.hash}`);
-            break;
-          case 'VERSION_DETECTED':
-            this.pwaHash.set(`NEW_DETECTED${evt.version.hash}`);
-            break;
-          case 'VERSION_INSTALLATION_FAILED':
-            this.pwaHash.set(`VERSION_INSTALLATION_FAILED${evt.version.hash}`);
-            break;
-        }
+        this.pwaStatus.set(evt.type);
       });
     } else {
-      this.pwaHash.set('SW_DISABLED');
+      this.pwaStatus.set('SW_DISABLED');
     }
   }
 }

@@ -42,8 +42,8 @@ import { PoiActionsEnum } from './_types/poi-actions.model';
     }
 
     .find-nearest-parking-button {
-      --mat-fab-small-container-color: var(--par-color-success);
-      --mat-fab-small-foreground-color: white;
+      --mat-fab-container-color: var(--par-color-primary);
+      --mat-fab-foreground-color: white;
     }
   `,
 })

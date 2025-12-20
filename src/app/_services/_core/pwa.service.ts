@@ -21,12 +21,14 @@ export class PwaService {
             );
             setTimeout(() => {
               window.location.reload();
-            }, 5000);
+            }, 3000);
             break;
           case 'VERSION_INSTALLATION_FAILED':
-            console.log(
-              `Wystąpił błąd pobierania nowej wersji aplikacji: '${evt.version.hash.slice(0, 6)}': ${evt.error}`,
-            );
+            navigator.serviceWorker
+              .getRegistrations()
+              .then((r) => r.forEach((sw) => sw.unregister()));
+
+            caches.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
             break;
         }
       });

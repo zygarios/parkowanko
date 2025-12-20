@@ -18,6 +18,7 @@ import { MatInputModule } from '@angular/material/input';
 import { firstValueFrom } from 'rxjs';
 import { validationMessages } from '../../_others/_helpers/validation-messages';
 import { AuthService } from '../../_services/_core/auth.service';
+import { GlobalSpinnerService } from '../../_services/_core/global-spinner.service';
 
 interface AuthData {
   username: string;
@@ -51,12 +52,13 @@ enum AuthModeType {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthPageComponent {
+  private _authService = inject(AuthService);
+  private _isSpinnerActive = inject(GlobalSpinnerService).isSpinnerActive;
+
   isPasswordHidden = signal(true);
   isRepeatedPasswordHidden = signal(true);
   authMode = signal<AuthModeType>(AuthModeType.LOGIN);
   authModeType = AuthModeType;
-
-  private _authService = inject(AuthService);
 
   private authModel = signal<AuthData>({
     username: '',
@@ -114,10 +116,12 @@ export class AuthPageComponent {
           : this._authService.register({ username, email, password });
 
       try {
+        this._isSpinnerActive.set(true);
         await firstValueFrom(request$);
-        return;
       } catch (err) {
         console.error(err);
+      } finally {
+        this._isSpinnerActive.set(false);
         return;
       }
     });
