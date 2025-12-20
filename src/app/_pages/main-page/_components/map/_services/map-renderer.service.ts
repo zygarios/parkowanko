@@ -8,6 +8,7 @@ import {
   PARKING_POI_LINE_SOURCE,
   PARKING_POI_RADIUS_SOURCE,
   PARKING_POI_SOURCE,
+  TARGET_LOCATION_SOURCE,
 } from './map-layers.service';
 import { PARKING_POI_RADIUS_BOUND, POLAND_BOUNDS, POLAND_MAX_BOUNDS } from './map.service';
 
@@ -49,6 +50,7 @@ export class MapRendererService {
       const icons = [
         { name: 'parking-free-poi', url: 'icons/parking-free-poi.svg' },
         { name: 'parking-free-unverified-poi', url: 'icons/parking-free-unverified-poi.svg' },
+        { name: 'target-location', url: 'icons/target-location.svg' },
       ];
 
       await Promise.all(icons.map((i) => this.loadMapImage(mapRef, i.name, i.url)));
@@ -97,6 +99,7 @@ export class MapRendererService {
     this._mapLayersService.prepareLayersForPoisWithClusters(map);
     this._mapLayersService.prepareLayersForPoisRadius(map);
     this._mapLayersService.prepareLayersForPoiLines(map, this._getLineGeoJson());
+    this._mapLayersService.prepareLayersForTargetLocation(map);
   }
 
   /**
@@ -107,6 +110,7 @@ export class MapRendererService {
    */
   renderPois(map: maplibregl.Map, parkingsList: ParkingPoint[]) {
     const parkingPoiSource = map.getSource(PARKING_POI_SOURCE) as maplibregl.GeoJSONSource;
+    if (!parkingPoiSource) return;
 
     parkingPoiSource.setData({
       type: 'FeatureCollection',
@@ -142,6 +146,7 @@ export class MapRendererService {
     const parkingPoiRadiusSource = map.getSource(
       PARKING_POI_RADIUS_SOURCE,
     ) as maplibregl.GeoJSONSource;
+    if (!parkingPoiRadiusSource) return;
 
     // Renderuj okrąg tylko jeśli podano współrzędne
     parkingPoiRadiusSource.setData({
@@ -171,7 +176,35 @@ export class MapRendererService {
     },
   ) {
     const lineSource = map.getSource(PARKING_POI_LINE_SOURCE) as maplibregl.GeoJSONSource;
+    if (!lineSource) return;
+
     lineSource.setData(this._getLineGeoJson(locations?.fixedCoords, locations?.targetCoords));
+  }
+
+  /**
+   * Renderuje ikonę celu w określonym punkcie
+   * @param map - Instancja mapy
+   * @param coords - Współrzędne celu (opcjonalne - null usuwa ikonę)
+   */
+  renderTargetLocation(map: maplibregl.Map, coords?: LocationCoords) {
+    const targetSource = map.getSource(TARGET_LOCATION_SOURCE) as maplibregl.GeoJSONSource;
+    if (!targetSource) return;
+
+    targetSource.setData({
+      type: 'FeatureCollection',
+      features: coords
+        ? [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [coords.lng, coords.lat],
+              },
+              properties: {},
+            },
+          ]
+        : [],
+    });
   }
 
   /**

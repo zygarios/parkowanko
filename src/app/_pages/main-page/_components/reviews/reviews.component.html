@@ -4,8 +4,12 @@
   <div class="py-5 flex flex-col gap-5">
     @for (review of reviews(); track review.id) {
       <div>
-        <div>{{ review.username }}</div>
-        <div>{{ review.createdAt }}</div>
+        <div class="flex justify-between items-center">
+          <span class="font-bold">{{ review.username }}</span>
+          <span class="text-xs opacity-60" [title]="review.createdAt | date: 'HH:mm dd.MM.yyyy'">
+            {{ review.createdAt | relativeTime }}
+          </span>
+        </div>
         <div>{{ review.occupancy }}</div>
         <div>{{ review.isLiked }}</div>
         <div>{{ review.description }}</div>

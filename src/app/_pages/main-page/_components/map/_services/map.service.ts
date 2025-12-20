@@ -258,6 +258,15 @@ export class MapService {
   }
 
   /**
+   * Renderuje ikonę celu (wybrany adres) na mapie
+   * @param coords - Współrzędne celu
+   */
+  renderTargetLocation(coords?: LocationCoords) {
+    if (!this._map) return;
+    this._mapRendererService.renderTargetLocation(this._map, coords);
+  }
+
+  /**
    * Przeskakuje do określonego punktu na mapie z przybliżeniem
    * @param coords - Współrzędne docelowego punktu
    */
@@ -354,7 +363,10 @@ export class MapService {
   }
 
   private _cleanUpMapCore() {
-    // Usuń instancje mapy i markera z DOM
+    if (!this._map) return;
+
+    this._mapRendererService.renderLineBetweenPoints(this._map);
+    this._mapRendererService.renderTargetLocation(this._map);
     this._markerRef?.remove();
     this._map?.remove();
 

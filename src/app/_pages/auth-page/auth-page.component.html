@@ -7,7 +7,7 @@
     height="216"
   />
   <h1 class="font-large">{{ authMode() === authModeType.LOGIN ? 'Logowanie' : 'Rejestracja' }}</h1>
-  <form class="flex-1 flex flex-col pt-5 pb-5" (submit)="submit(); $event.preventDefault()">
+  <form class="flex-1 flex flex-col pt-5 pb-5" (submit)="submit()">
     @if (!authForm.username().hidden()) {
       <mat-form-field subscriptSizing="dynamic">
         <mat-label>Nazwa użytkownika</mat-label>

@@ -77,10 +77,15 @@ export class UiOverlayComponent {
     untracked(() => {
       if (!this.isMapLoaded()) return;
 
-      if (this.selectedAddress()?.coords && this.selectedParking()?.location) {
+      const addressCoords = this.selectedAddress()?.coords;
+      const parkingLocation = this.selectedParking()?.location;
+
+      this._mapService.renderTargetLocation(addressCoords);
+
+      if (addressCoords && parkingLocation) {
         this._mapService.renderLineBetweenPoints({
-          fixedCoords: this.selectedAddress()!.coords,
-          targetCoords: this.selectedParking()!.location,
+          fixedCoords: addressCoords,
+          targetCoords: parkingLocation,
         });
       } else {
         this._mapService.renderLineBetweenPoints();

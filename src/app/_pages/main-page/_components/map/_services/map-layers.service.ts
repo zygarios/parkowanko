@@ -4,6 +4,7 @@ import { environment } from '../../../../../../environments/environment.developm
 export const PARKING_POI_SOURCE = 'parkingPoiSource';
 export const PARKING_POI_RADIUS_SOURCE = 'parkingMarkerRadiusSource';
 export const PARKING_POI_LINE_SOURCE = 'parkingPoiLineSource';
+export const TARGET_LOCATION_SOURCE = 'targetLocationSource';
 
 @Injectable({ providedIn: 'root' })
 export class MapLayersService {
@@ -192,6 +193,32 @@ export class MapLayersService {
         'text-halo-width': 1,
         'text-opacity-transition': { duration: 0 },
         'text-translate-transition': { duration: 0 },
+      },
+    });
+  }
+
+  /**
+   * Przygotowuje warstwę dla wybranego celu (np. adresu z wyszukiwarki)
+   * Wyświetla ikonę location-target w wybranym punkcie
+   * @param map - Instancja mapy MapLibre
+   */
+  prepareLayersForTargetLocation(map: maplibregl.Map) {
+    map.addSource(TARGET_LOCATION_SOURCE, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    map.addLayer({
+      id: 'target-location-point',
+      type: 'symbol',
+      source: TARGET_LOCATION_SOURCE,
+      layout: {
+        'icon-image': 'target-location',
+        'icon-size': 0.35,
+        'icon-overlap': 'always',
       },
     });
   }
