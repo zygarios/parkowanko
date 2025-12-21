@@ -44,3 +44,7 @@ strong {
 hr {
   border-bottom: var(--par-border-line);
 }
+
+button {
+  white-space: nowrap;
+}
