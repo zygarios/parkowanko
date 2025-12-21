@@ -24,21 +24,30 @@
   --mat-dialog-container-small-max-width: none;
   --mat-dialog-headline-padding: 20px 24px 15px;
 
+  /* MAT-TOOLTIP */
+  --mat-tooltip-container-color: var(--par-color-primary);
+  --mat-tooltip-label-text-color: white;
+
+  /* MAT-OPTION */
+  --mat-option-label-text-size: 14px;
+
+  /* STEPPER */
+  /* Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze */
+  --mat-stepper-header-done-state-icon-background-color: var(--mat-sys-on-surface-variant);
+  --mat-stepper-header-done-state-icon-foreground-color: white;
+
   /* BUTTONS-ALL */
 
   .mdc-button {
     min-width: 100px;
   }
 
-  /* MAT-OPTION */
-  --mat-option-label-text-size: 14px;
-
   /* DIALOGS */
   .mat-mdc-dialog-panel {
     width: 95dvw;
   }
 
-  .mat-mdc-dialog-title {
+  .mat-mdc-dialog-title.mdc-dialog__title {
     font-size: 20px;
     display: flex;
     align-items: center;
@@ -55,11 +64,6 @@
     position: sticky;
     bottom: 0;
   }
-
-  /* STEPPER */
-  /* Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze */
-  --mat-stepper-header-done-state-icon-background-color: var(--mat-sys-on-surface-variant);
-  --mat-stepper-header-done-state-icon-foreground-color: white;
 
   /* SNACKBAR */
   --mat-snack-bar-container-color: var(--mat-sys-primary);

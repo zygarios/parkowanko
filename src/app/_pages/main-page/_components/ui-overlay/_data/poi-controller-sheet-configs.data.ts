@@ -27,35 +27,43 @@ export const addingPoiConfirmSheetConfig = (
   };
 };
 
-export const selectedPoiOptionsSheetConfig: MenuSheetData = {
-  menuItems: [
-    {
-      label: 'Nawiguj',
-      icon: 'navigation',
-      result: PoiActionsEnum.NAVIGATE,
-      isPrimary: true,
-    },
-    {
-      label: 'Dodaj opinię',
-      icon: 'rate_review',
-      result: PoiActionsEnum.ADD_REVIEW,
-    },
-    {
-      label: 'Zobacz opinie',
-      icon: 'forum',
-      result: PoiActionsEnum.VIEW_REVIEWS,
-    },
-    {
-      label: 'Zaproponuj zmianę lokalizacji',
-      icon: 'edit_location_alt',
-      result: PoiActionsEnum.UPDATE,
-    },
-    {
-      label: 'Anuluj',
-      icon: 'close',
-      result: PoiActionsEnum.CANCEL,
-    },
-  ],
+export const selectedPoiOptionsSheetConfig = ({
+  hasEditLocationProposal,
+}: {
+  hasEditLocationProposal: boolean;
+}): MenuSheetData => {
+  return {
+    menuItems: [
+      {
+        label: 'Nawiguj',
+        icon: 'navigation',
+        result: PoiActionsEnum.NAVIGATE,
+        isPrimary: true,
+      },
+      {
+        label: 'Dodaj opinię',
+        icon: 'rate_review',
+        result: PoiActionsEnum.ADD_REVIEW,
+      },
+      {
+        label: 'Zobacz opinie',
+        icon: 'forum',
+        result: PoiActionsEnum.VIEW_REVIEWS,
+      },
+      hasEditLocationProposal
+        ? {
+            label: 'Zagłosuj za poprawą lokalizacji',
+            icon: 'edit_location_alt',
+            result: PoiActionsEnum.VIEW_UPDATE_LOCATION_PROPOSAL,
+          }
+        : {
+            label: 'Popraw lokalizację',
+            icon: 'edit_location_alt',
+            result: PoiActionsEnum.UPDATE_LOCATION,
+          },
+    ],
+    isMenuHorizontalWithScroll: true,
+  };
 };
 
 export const changingPoiPositionOptionsSheetConfig = (

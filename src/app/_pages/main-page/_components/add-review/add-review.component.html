@@ -22,9 +22,7 @@
 <mat-tab-group [selectedIndex]="activeStep()" dynamicHeight>
   <mat-tab>
     <div class="p-6">
-      <div class="mb-5">Jeśli tu nie parkowałeś, po prostu zamknij to okno ;)</div>
       <div class="flex gap-2 justify-center">
-        <button mat-button mat-dialog-close>Zamknij</button>
         <button mat-flat-button class="button-error w-1/2!" (click)="addVote(false)">
           <mat-icon>thumb_down</mat-icon>Nie
         </button>
