@@ -27,7 +27,7 @@ export class MenuSheetComponent {
   }
 
   handleCancelSheet() {
-    // Obsługa kliknięcia w tło
+    // Obsługa zamykania menu po kliknięciu w tło lub wciśnięciu klawisza Escape
     merge(
       this.sheetRef.backdropClick(),
       this.sheetRef.keydownEvents().pipe(filter((event) => event.key === 'Escape')),

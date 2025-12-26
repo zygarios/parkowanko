@@ -16,7 +16,7 @@ export class ParkingEditLocationApiService {
 
   getEditLocationProposal(id: number): Observable<ParkingEditLocationProposal> {
     return this._httpClient
-      .get<ParkingEditLocationProposal>(`${environment.apiUrl}/parkings/${id}/edit-location`)
+      .get<ParkingEditLocationProposal>(`${environment.apiUrl}/parkings/${id}/edit-location/`)
       .pipe(map((res) => new ParkingEditLocationProposal(res)));
   }
 
@@ -25,14 +25,14 @@ export class ParkingEditLocationApiService {
     body: ParkingEditLocationProposalSaveData,
   ): Observable<ParkingEditLocationProposal> {
     return this._httpClient.post<ParkingEditLocationProposal>(
-      `${environment.apiUrl}/parkings/${id}/edit-location`,
+      `${environment.apiUrl}/parkings/${id}/edit-location/`,
       body,
     );
   }
 
   addEditLocationVote(id: number, body: ParkingEditLocationVoteSaveData): Observable<void> {
     return this._httpClient.post<void>(
-      `${environment.apiUrl}/parkings/${id}/edit-location/vote`,
+      `${environment.apiUrl}/parkings/${id}/edit-location/vote/`,
       body,
     );
   }
