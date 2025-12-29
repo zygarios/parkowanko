@@ -19,6 +19,7 @@ import { ReviewsApiService } from '../../../../_services/_api/reviews-api.servic
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { ReviewSaveData } from '../../../../_types/review.type';
 import { ReviewFormComponent } from './_components/review-form/review-form.component';
+import { Occupancy } from './_types/occupancy.model';
 
 @Component({
   selector: 'app-add-review',
@@ -58,8 +59,8 @@ export class AddReviewComponent {
     parkingPointId: this._dialogData.parkingPointId,
     description: '',
     attributes: [],
-    occupancy: '',
-    isLiked: true,
+    occupancy: '' as Occupancy,
+    isLike: true,
   });
 
   reviewForm = form(this.review, (path) => {

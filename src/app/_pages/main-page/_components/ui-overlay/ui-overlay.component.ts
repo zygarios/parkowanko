@@ -196,7 +196,7 @@ export class UiOverlayComponent {
             });
           } else if (result === PoiActionsEnum.VIEW_REVIEWS) {
             this._matDialog.open(ReviewsComponent, {
-              data: { parkingPointId: this.selectedParking()?.id },
+              data: { parkingPoint: this.selectedParking() },
             });
           } else if (result === PoiActionsEnum.UPDATE_LOCATION) {
             sheetRef.dismiss();

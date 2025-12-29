@@ -23,7 +23,7 @@ export const POLAND_MAX_BOUNDS = [
 ] as maplibregl.LngLatBoundsLike;
 export const PARKING_POI_RADIUS_BOUND = 40;
 const CLOSE_ZOOM = 17;
-const FAR_ZOOM = 11;
+const FAR_ZOOM = 13;
 const FLY_SPEED = 2;
 const MAX_DISTANCE_TO_NEAREST_PARKING_KM = 3;
 

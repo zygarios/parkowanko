@@ -1,9 +1,13 @@
+import { Attribute } from '../_pages/main-page/_components/add-review/_types/attribute.model';
+import { Occupancy } from '../_pages/main-page/_components/add-review/_types/occupancy.model';
+import { User } from './auth/user.type';
+
 export interface ReviewSaveData {
   parkingPointId: number;
   description: string;
-  attributes: string[];
-  occupancy: string;
-  isLiked: boolean;
+  attributes: Attribute[];
+  occupancy: Occupancy;
+  isLike: boolean;
 }
 
 export class Review {
@@ -13,10 +17,10 @@ export class Review {
 
   parkingPointId!: number;
   description!: string;
-  attributes!: string[];
-  occupancy!: string;
-  isLiked!: boolean;
-  username!: string;
+  attributes!: Attribute[];
+  occupancy!: Occupancy;
+  isLike!: boolean;
+  user!: User;
 
   constructor(props: Review) {
     if (props) {

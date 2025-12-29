@@ -1,33 +1,33 @@
 import { ValueLabelType } from '../../../../../_types/value-label-type.type';
-import { Attribute } from '../_types/attribute.model';
+import { Attribute, AttributeLabel } from '../_types/attribute.model';
 
 export const attributesOptionsData: ValueLabelType<Attribute>[] = [
   {
     value: Attribute.FREE_OFF_SEASON,
-    label: 'Darmowe tylko poza sezonem',
+    label: AttributeLabel.FREE_OFF_SEASON,
   },
   {
     value: Attribute.PARKING_RESTRICTIONS,
-    label: 'Ryzyko mandatów lub kontroli',
+    label: AttributeLabel.PARKING_RESTRICTIONS,
   },
   {
     value: Attribute.DANGEROUS_AREA,
-    label: 'Niebezpieczna okolica',
+    label: AttributeLabel.DANGEROUS_AREA,
   },
   {
     value: Attribute.POOR_SURFACE,
-    label: 'Dziurawa nawierzchnia',
+    label: AttributeLabel.POOR_SURFACE,
   },
   {
     value: Attribute.HARD_ACCESS,
-    label: 'Trudny dojazd',
+    label: AttributeLabel.HARD_ACCESS,
   },
   {
     value: Attribute.FLOOD_PRONE,
-    label: 'Zalewane po ulewach',
+    label: AttributeLabel.FLOOD_PRONE,
   },
   {
     value: Attribute.POOR_LIGHTING,
-    label: 'Słabo oświetlone',
+    label: AttributeLabel.POOR_LIGHTING,
   },
 ];

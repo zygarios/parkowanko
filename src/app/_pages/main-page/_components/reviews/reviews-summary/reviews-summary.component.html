@@ -1,0 +1,18 @@
+<div class="flex h-5 overflow-hidden rounded-xl">
+  <div
+    class="h-full flex items-center px-2 gap-1 justify-start"
+    style="background-color: var(--par-color-success)"
+    [style.flex]="parkingPoint().likeCount"
+  >
+    <div class="text-white font-medium">+{{ parkingPoint().likeCount }}</div>
+    <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_up</mat-icon>
+  </div>
+  <div
+    class="h-full flex items-center px-2 gap-1 justify-end"
+    style="background-color: var(--par-color-error)"
+    [style.flex]="parkingPoint().dislikeCount"
+  >
+    <div class="text-white font-medium">-{{ parkingPoint().dislikeCount }}</div>
+    <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_down</mat-icon>
+  </div>
+</div>

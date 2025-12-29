@@ -1,0 +1,38 @@
+<div
+  class="border! p-3 rounded-xl flex flex-col gap-3 rounded-br-none"
+  [style.borderColor]="review().isLike ? 'var(--par-color-success)' : 'var(--par-color-error)'"
+>
+  <div class="flex justify-between items-center">
+    <span class="font-bold">{{ review().user.username }}</span>
+    <span class="text-xs opacity-60" [title]="review().createdAt | date: 'HH:mm dd.MM.yyyy'">
+      {{ review().createdAt | relativeTime }}
+    </span>
+  </div>
+  <div class="italic">{{ review().description || '-' }}</div>
+  @if (areDetailsOpen()) {
+    <hr />
+    <div class="flex gap-1">
+      <div>Obłożenie:</div>
+      <div class="font-medium">{{ occupancyLabel[review().occupancy] }}</div>
+    </div>
+    <hr />
+    <div class="flex flex-col gap-1">
+      <div>Właściwości:</div>
+      <div class="flex gap-2 flex-wrap">
+        @for (attr of review().attributes; track attr) {
+          <div class="px-2 py-1 rounded-md border! border-gray-400 text-xs">
+            {{ attributeLabel[attr] }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+  @if (review().occupancy !== occupancy.NO_DATA && review().attributes.length > 0) {
+    <button
+      class="ml-auto text-xs font-medium mt-2"
+      (click)="areDetailsOpen.set(!areDetailsOpen())"
+    >
+      {{ areDetailsOpen() ? 'Zwiń' : 'Więcej szczegółów' }}
+    </button>
+  }
+</div>

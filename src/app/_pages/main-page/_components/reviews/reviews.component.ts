@@ -1,25 +1,27 @@
-import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
-import { RelativeTimePipe } from '../../../../_pipes/relative-time.pipe';
 import { ReviewsApiService } from '../../../../_services/_api/reviews-api.service';
+import { ParkingPoint } from '../../../../_types/parking-point.type';
 import { Review } from '../../../../_types/review.type';
+import { ReviewComponent } from './review/review.component';
+import { ReviewsSummaryComponent } from './reviews-summary/reviews-summary.component';
 
 @Component({
   selector: 'app-reviews',
-  imports: [MatChipsModule, MatDialogModule, MatButtonModule, DatePipe, RelativeTimePipe],
+  imports: [MatDialogModule, MatButtonModule, ReviewComponent, ReviewsSummaryComponent],
   templateUrl: './reviews.component.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewsComponent {
-  private _dialogData = inject<{ parkingPointId: number }>(MAT_DIALOG_DATA);
-  private _reviewsApiService = inject(ReviewsApiService);
-  reviews = signal<Review[]>([]);
-  isLoading = signal<boolean>(false);
+  private readonly _reviewsApiService = inject(ReviewsApiService);
+
+  readonly dialogData = inject<{ parkingPoint: ParkingPoint }>(MAT_DIALOG_DATA);
+
+  readonly reviews = signal<Review[]>([]);
+  readonly isLoading = signal<boolean>(false);
 
   constructor() {
     this._getReviews();
@@ -30,7 +32,7 @@ export class ReviewsComponent {
 
     try {
       const reviews = await firstValueFrom(
-        this._reviewsApiService.getReviews(this._dialogData.parkingPointId),
+        this._reviewsApiService.getReviews(this.dialogData.parkingPoint.id),
       );
       this.reviews.set(reviews);
     } finally {
