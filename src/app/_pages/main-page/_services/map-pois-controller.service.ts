@@ -11,7 +11,6 @@ import {
   addingPoiConfirmSheetConfig,
   changingPoiPositionOptionsSheetConfig,
   selectedPoiOptionsSheetConfig,
-  voteForUpdatedPoiPositionProposalSheetConfig,
 } from '../_components/map-ui-overlay/_data/poi-controller-sheet-configs.data';
 import { PoiActionsEnum } from '../_components/map-ui-overlay/_types/poi-actions.model';
 import { ReviewsComponent } from '../_components/reviews/reviews.component';
@@ -39,14 +38,9 @@ export class MapPoisControllerService {
     this._mapService.removeMoveableMarker();
     this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    const sheetRef = this._sharedUtilsService.openSheet(
-      selectedPoiOptionsSheetConfig({
-        hasEditLocationProposal: this._selectedParking()!.hasEditLocationProposal,
-      }),
-      {
-        hasBackdrop: true,
-      },
-    );
+    const sheetRef = this._sharedUtilsService.openSheet(selectedPoiOptionsSheetConfig(), {
+      hasBackdrop: true,
+    });
 
     sheetRef.onClick
       .pipe(
@@ -76,8 +70,6 @@ export class MapPoisControllerService {
             case PoiActionsEnum.UPDATE_LOCATION:
               sheetRef.dismiss();
               return this.handleUpdateUserChoice();
-            case PoiActionsEnum.VIEW_UPDATE_LOCATION_PROPOSAL:
-              return this.handleVoteForUpdatedPoiPositionProposal();
           }
 
           sheetRef.dismiss();
@@ -144,72 +136,6 @@ export class MapPoisControllerService {
     const location = this._mapService.getMarkerLatLng();
     return this._parkingEditLocationApiService.addEditLocationProposal(selectedPoi!.id, {
       location,
-    });
-  }
-
-  handleVoteForUpdatedPoiPositionProposal() {
-    const parkingPoint = this._selectedParking()!;
-    const coords = {
-      lat: parkingPoint!.location.lat,
-      lng: parkingPoint!.location.lng,
-    };
-
-    return this._parkingEditLocationApiService.getEditLocationProposal(parkingPoint.id).pipe(
-      tap((res) => {
-        this._mapService.renderMarker(res.location);
-        this._mapService.renderLineBetweenPoints({
-          fixedCoords: coords,
-          targetCoords: res.location,
-        });
-        this._mapService.fitBoundsToPoints(coords, res.location);
-      }),
-      switchMap(() => {
-        const sheetRef = this._sharedUtilsService.openSheet(
-          voteForUpdatedPoiPositionProposalSheetConfig(),
-          {
-            hasBackdrop: false,
-          },
-        );
-        return sheetRef.onClick.pipe(
-          switchMap((result) => {
-            this._mapService.removeMarker();
-            sheetRef.dismiss();
-            if (result === PoiActionsEnum.CONFIRM || result === PoiActionsEnum.CANCEL) {
-              return this.confirmEditLocationVote(true).pipe(
-                tap(() => {
-                  this._sharedUtilsService.openSnackbar(
-                    'Gotowe!\nOddano głos za zmianą pozycji parkingu.',
-                    'SUCCESS',
-                  );
-                  this._selectedParking.set(null);
-                }),
-                catchError(() => {
-                  this._sharedUtilsService.openSnackbar(
-                    'Wystąpił błąd podczas oddania głosu za zmianą pozycji parkingu.',
-                    'ERROR',
-                  );
-                  this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
-                  this.openDefaultPoiMenu();
-                  return EMPTY;
-                }),
-              );
-            } else {
-              this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
-              this.openDefaultPoiMenu();
-              return EMPTY;
-            }
-          }),
-
-          takeUntilDestroyed(this._destroyRef),
-        );
-      }),
-    );
-  }
-
-  confirmEditLocationVote(isLike: boolean) {
-    const selectedPoi: ParkingPoint | null = this._selectedParking();
-    return this._parkingEditLocationApiService.addEditLocationVote(selectedPoi!.id, {
-      isLike,
     });
   }
 

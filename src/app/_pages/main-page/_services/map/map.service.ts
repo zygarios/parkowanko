@@ -103,23 +103,6 @@ export class MapService {
   }
 
   /**
-   * Renderuje marker w określonym punkcie (fokus na wybrany parking)
-   * @param coords - Współrzędne gdzie umieścić marker
-   */
-  renderMarker(coords: LocationCoords) {
-    this.removeMarker();
-    this._markerRef?.setDraggable(false);
-    this._markerRef!.setLngLat(coords).addTo(this._map!);
-  }
-
-  /**
-   * Usuwa marker fokusu z mapy
-   */
-  removeMarker() {
-    this._markerRef?.remove();
-  }
-
-  /**
    * Renderuje ruchomy marker który podąża za centrum mapy
    * Opcjonalnie rysuje linię do punktu stałego
    * Używane przy dodawaniu nowego parkingu
@@ -128,7 +111,7 @@ export class MapService {
   renderMoveableMarkerWithRadiusAndLineToFixedPoint(fixedCoords?: LocationCoords): void {
     this.removeMoveableMarker();
 
-    this._markerRef?.setDraggable(true);
+    this._markerRef!.setDraggable(true);
 
     // Ustaw marker w centrum mapy i dodaj do widoku
     this._markerRef!.setLngLat(this._map!.getCenter()).addTo(this._map!);

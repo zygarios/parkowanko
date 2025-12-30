@@ -11,7 +11,6 @@ export class ParkingPoint {
   location!: LocationCoords;
   likeCount!: number;
   dislikeCount!: number;
-  hasEditLocationProposal!: boolean;
   isVerified!: boolean;
 
   constructor(props: ParkingPoint) {
