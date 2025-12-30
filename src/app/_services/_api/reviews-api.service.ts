@@ -1,14 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { Review, ReviewSaveData } from '../../_types/review.type';
+import { ParkingsApiService } from './parkings-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReviewsApiService {
   private _httpClient = inject(HttpClient);
+  private _parkingsApiService = inject(ParkingsApiService);
 
   getReviews(parkingPointId: number): Observable<Review[]> {
     return this._httpClient
@@ -16,10 +18,9 @@ export class ReviewsApiService {
       .pipe(map((reviews: Review[]) => reviews.map((review: Review) => new Review(review))));
   }
 
-  postReview(parkingPointId: number, body: ReviewSaveData): Observable<Review> {
-    return this._httpClient.post<Review>(
-      `${environment.apiUrl}/parkings/${parkingPointId}/reviews/`,
-      body,
-    );
+  postReview(parkingPointId: number, body: ReviewSaveData) {
+    return this._httpClient
+      .post(`${environment.apiUrl}/parkings/${parkingPointId}/reviews/`, body)
+      .pipe(switchMap(() => this._parkingsApiService.getParking(parkingPointId)));
   }
 }

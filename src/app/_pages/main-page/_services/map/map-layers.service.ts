@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../environments/environment.development';
+import { environment } from '../../../../../environments/environment.development';
 
 export const PARKING_POI_SOURCE = 'parkingPoiSource';
 export const PARKING_POI_RADIUS_SOURCE = 'parkingMarkerRadiusSource';
 export const PARKING_POI_LINE_SOURCE = 'parkingPoiLineSource';
 export const TARGET_LOCATION_SOURCE = 'targetLocationSource';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class MapLayersService {
   /**
    * Przygotowuje warstwy dla wyświetlania POI parkingów z klastrowaniem

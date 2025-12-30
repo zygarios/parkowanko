@@ -9,7 +9,8 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
-import { MapService } from './_services/map.service';
+import { MapPoisControllerService } from '../../_services/map-pois-controller.service';
+import { MapService } from '../../_services/map/map.service';
 
 @Component({
   styles: `
@@ -55,25 +56,23 @@ export class MapComponent {
   private _mapService = inject(MapService);
   private _parkingsApiService = inject(ParkingsApiService);
   private _destroyRef = inject(DestroyRef);
+  private _mapPoisControllerService = inject(MapPoisControllerService);
 
   parkingsList = this._parkingsApiService.getParkings();
 
   constructor() {
-    afterNextRender(() => {
-      this._mapService.initRenderMap().catch((error) => {
-        console.error('Failed to initialize map in component:', error);
-      });
-    });
+    afterNextRender(() => this._mapService.initRenderMap());
+    afterRenderEffect(() => this.setParkingsPois());
+    afterRenderEffect(() => this._mapPoisControllerService.listenForSelectedPoiToStartEdit());
 
-    afterRenderEffect(() => {
-      if (this._mapService.getIsMapLoaded()) {
-        const parkings = this.parkingsList();
-        untracked(() => this._mapService.renderParkingsPois(parkings));
-      }
-    });
+    this._destroyRef.onDestroy(() => this._mapService.cleanUp());
+  }
 
-    this._destroyRef.onDestroy(() => {
-      this._mapService.cleanUp();
-    });
+  setParkingsPois() {
+    if (this._mapService.isMapLoaded()) {
+      const parkings = this.parkingsList();
+
+      untracked(() => this._mapService.renderParkingsPois(parkings));
+    }
   }
 }

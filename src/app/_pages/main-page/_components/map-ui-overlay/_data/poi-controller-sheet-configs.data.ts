@@ -13,7 +13,7 @@ export const addingPoiConfirmSheetConfig = (
         result: PoiActionsEnum.CANCEL,
       },
       {
-        label: 'Potwierdź',
+        label: 'Zatwierdź',
         icon: 'edit_location_alt',
         result: PoiActionsEnum.CONFIRM,
         isPrimary: true,
@@ -77,7 +77,7 @@ export const changingPoiPositionOptionsSheetConfig = (
         result: PoiActionsEnum.CANCEL,
       },
       {
-        label: 'Potwierdź',
+        label: 'Zatwierdź',
         icon: 'edit_location_alt',
         result: PoiActionsEnum.CONFIRM,
         isPrimary: true,
@@ -88,5 +88,30 @@ export const changingPoiPositionOptionsSheetConfig = (
     isMenuHorizontal: true,
     title: 'Poprawa lokalizacji',
     description: 'Poruszaj mapą lub markerem, aby poprawić lokalizację istniejącego parkingu.',
+  };
+};
+
+export const voteForUpdatedPoiPositionProposalSheetConfig = (): MenuSheetData => {
+  return {
+    menuItems: [
+      {
+        label: 'Nie popieram',
+        icon: 'close',
+        result: PoiActionsEnum.CANCEL,
+        isPrimary: true,
+        isError: true,
+      },
+      {
+        label: 'Popieram',
+        icon: 'edit_location_alt',
+        result: PoiActionsEnum.CONFIRM,
+        isPrimary: true,
+        isSuccess: true,
+      },
+    ],
+    isMenuHorizontal: true,
+    title: 'Zmiana lokalizacji parkingu',
+    description: 'Zagłosuj za proponowaną zmianą lokalizacji parkingu.',
+    showTitleCloseButton: true,
   };
 };

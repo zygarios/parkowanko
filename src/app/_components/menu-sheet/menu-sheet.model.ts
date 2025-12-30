@@ -18,6 +18,7 @@ export interface MenuSheetData {
   description?: string;
   isMenuHorizontal?: boolean;
   isMenuHorizontalWithScroll?: boolean;
+  showTitleCloseButton?: boolean;
 }
 
 export interface MenuSheetRef {

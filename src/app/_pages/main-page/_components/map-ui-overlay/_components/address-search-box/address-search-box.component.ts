@@ -6,7 +6,6 @@ import {
   inject,
   output,
   signal,
-  untracked,
   viewChild,
 } from '@angular/core';
 import { Field, form } from '@angular/forms/signals';
@@ -17,8 +16,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ComputedFuncPipe } from '../../../../../../_others/_helpers/computed-func.pipe';
 import { GeocodeFeature } from '../../../../../../_types/geocode-api.type';
-import { MapService } from './../../../map/_services/map.service';
-import { AddressSearchBoxService } from './address-search-box.service';
+import { AddressSearchService } from '../../../../_services/address-search.service';
+import { MapService } from '../../../../_services/map/map.service';
 
 @Component({
   selector: 'app-address-search-box',
@@ -55,49 +54,29 @@ import { AddressSearchBoxService } from './address-search-box.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddressSearchBoxComponent {
-  private readonly addressSearchBoxService = inject(AddressSearchBoxService);
-  private readonly mapService = inject(MapService);
-  private readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('searchInputRef');
+  private readonly _addressSearchService = inject(AddressSearchService);
+  private readonly _mapService = inject(MapService);
+  private readonly _searchInputRef = viewChild<ElementRef<HTMLInputElement>>('searchInputRef');
 
   selectedAddressEmitter = output<GeocodeFeature | null>();
+
   addressSearchTerm = signal('');
-  selectedAddress = signal<GeocodeFeature | null>(null);
+  selectedAddress = this._addressSearchService.selectedAddress;
   selectedAddressForm = form(this.selectedAddress);
 
-  addressesList = this.addressSearchBoxService.getAddressesBySearchTerm(this.addressSearchTerm);
+  addressesList = this._addressSearchService.getAddressesBySearchTerm(this.addressSearchTerm);
 
   constructor() {
-    this.listenForAddressChange();
-  }
-
-  listenForAddressChange() {
-    effect(() => {
-      this.selectedAddress();
-      untracked(() => {
-        this.selectedAddressEmitter.emit(this.selectedAddress());
-        this.flyToSelectedAddress();
-      });
-    });
-  }
-
-  flyToSelectedAddress() {
-    if (!this.selectedAddress()) return;
-    this.mapService.flyToPoi(
-      {
-        lng: Number(this.selectedAddress()!.coords.lng),
-        lat: Number(this.selectedAddress()!.coords.lat),
-      },
-      this.selectedAddress()?.details.ul_nazwa_glowna ? 'CLOSE_ZOOM' : 'FAR_ZOOM',
-    );
+    effect(() => this.selectedAddressEmitter.emit(this.selectedAddress()));
   }
 
   resetInput() {
     this.addressSearchTerm.set('');
     this.selectedAddress.set(null);
-    this.searchInputRef()!.nativeElement.value = '';
+    this._searchInputRef()!.nativeElement.value = '';
   }
 
-  parseAddressToString(address: GeocodeFeature | null, isOptionLabel: boolean = false) {
+  parseAddressToString(address: GeocodeFeature | null) {
     if (!address) return '';
     return address.details.name;
   }
