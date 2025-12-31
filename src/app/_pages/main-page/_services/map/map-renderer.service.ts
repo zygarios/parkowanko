@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { circle, distance, point } from '@turf/turf';
+import type { FeatureCollection, LineString } from 'geojson';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../../../_types/location-coords.type';
 import { ParkingPoint } from '../../../../_types/parking-point.type';
@@ -149,30 +150,32 @@ export class MapRendererService {
     fixedCoords?: LocationCoords,
     targetCoords?: LocationCoords,
     isColliding: boolean = false,
-  ): any {
-    let coordinates: any = [];
-    let distanceInMeters = 0;
-
-    // Utwórz linię tylko jeśli podano oba punkty
-    if (fixedCoords && targetCoords) {
-      coordinates = [
-        [fixedCoords.lng, fixedCoords.lat],
-        [targetCoords.lng, targetCoords.lat],
-      ];
-
-      // Oblicz dystans w metrach używając Turf.js
-      const from = point([fixedCoords.lng, fixedCoords.lat]);
-      const to = point([targetCoords.lng, targetCoords.lat]);
-      distanceInMeters = Math.round(distance(from, to, { units: 'meters' }));
+  ): FeatureCollection<LineString> {
+    // Early return jeśli brak współrzędnych - nie tworzymy pustych features
+    if (!fixedCoords || !targetCoords) {
+      return {
+        type: 'FeatureCollection' as const,
+        features: [],
+      };
     }
 
-    const lineGeoJson = {
-      type: 'FeatureCollection',
+    const coordinates = [
+      [fixedCoords.lng, fixedCoords.lat],
+      [targetCoords.lng, targetCoords.lat],
+    ];
+
+    // Oblicz dystans w metrach używając Turf.js
+    const from = point([fixedCoords.lng, fixedCoords.lat]);
+    const to = point([targetCoords.lng, targetCoords.lat]);
+    const distanceInMeters = Math.round(distance(from, to, { units: 'meters' }));
+
+    const lineGeoJson: FeatureCollection<LineString> = {
+      type: 'FeatureCollection' as const,
       features: [
         {
-          type: 'Feature',
+          type: 'Feature' as const,
           geometry: {
-            type: 'LineString',
+            type: 'LineString' as const,
             coordinates,
           },
           properties: {

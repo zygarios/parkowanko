@@ -7,7 +7,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   template: `
     <mat-spinner />
     @if (message()) {
-      <div class="text-(--par-color-primary) rounded-2xl bg-white px-6 py-3 shadow-lg">
+      <div
+        class="text-(--par-color-primary) rounded-2xl bg-white px-6 py-3 shadow-lg border-3! border-(--par-color-primary)"
+      >
         {{ message() }}
       </div>
     }

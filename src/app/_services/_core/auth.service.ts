@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import {
   AuthResponse,
@@ -22,24 +22,30 @@ export class AuthService {
 
   private _tokenExpirationTimer?: ReturnType<typeof setTimeout>;
   private _currentUser = signal<User | null>(null);
+  private _isAuthenticating = signal(false);
 
   currentUser = this._currentUser.asReadonly();
   isLoggedIn = computed(() => !!this._currentUser());
+  isAuthenticating = this._isAuthenticating.asReadonly();
 
   constructor() {
     this._tryAutoLogin();
   }
 
   login(data: LoginSaveData): Observable<AuthResponse> {
-    return this._http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/login/`, data)
-      .pipe(tap((res) => this._setAuthData(res)));
+    this._isAuthenticating.set(true);
+    return this._http.post<AuthResponse>(`${environment.apiUrl}/auth/login/`, data).pipe(
+      tap((res) => this._setAuthData(res)),
+      finalize(() => this._isAuthenticating.set(false)),
+    );
   }
 
   register(data: RegisterSaveData): Observable<AuthResponse> {
-    return this._http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register/`, data)
-      .pipe(tap((res) => this._setAuthData(res)));
+    this._isAuthenticating.set(true);
+    return this._http.post<AuthResponse>(`${environment.apiUrl}/auth/register/`, data).pipe(
+      tap((res) => this._setAuthData(res)),
+      finalize(() => this._isAuthenticating.set(false)),
+    );
   }
 
   refreshToken(refresh: string): Observable<AuthResponse> {

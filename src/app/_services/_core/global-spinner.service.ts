@@ -20,7 +20,9 @@ export class GlobalSpinnerService {
 
   private _spinnerPortal = new ComponentPortal(GlobalSpinnerComponent);
 
-  isSpinnerActive = signal(false);
+  private _isSpinnerActive = signal(false);
+
+  isSpinnerActive = this._isSpinnerActive.asReadonly();
   message = signal<string | null>(null);
 
   constructor() {
@@ -29,12 +31,14 @@ export class GlobalSpinnerService {
 
   show(message?: string) {
     this.message.set(message || null);
-    this.isSpinnerActive.set(true);
+    this._isSpinnerActive.set(true);
   }
 
-  hide() {
-    this.isSpinnerActive.set(false);
-    this.message.set(null);
+  hide(delay: number = 300) {
+    setTimeout(() => {
+      this._isSpinnerActive.set(false);
+      this.message.set(null);
+    }, delay);
   }
 
   private listenForSpinnerStateChange() {

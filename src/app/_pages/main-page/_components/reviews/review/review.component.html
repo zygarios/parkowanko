@@ -1,38 +1,60 @@
 <div
-  class="border! p-3 rounded-xl flex flex-col gap-3 rounded-br-none"
+  class="border-2! p-3 rounded-xl flex flex-col gap-3 rounded-br-none"
   [style.borderColor]="review().isLike ? 'var(--par-color-success)' : 'var(--par-color-error)'"
 >
-  <div class="flex justify-between items-center">
+  <div class="flex items-center">
+    <mat-icon
+      [style.color]="review().isLike ? 'var(--par-color-success)' : 'var(--par-color-error)'"
+      class="mr-2"
+    >
+      {{ review().isLike ? 'thumb_up' : 'thumb_down' }}
+    </mat-icon>
     <span class="font-bold">{{ review().user.username }}</span>
-    <span class="text-xs opacity-60" [title]="review().createdAt | date: 'HH:mm dd.MM.yyyy'">
+    <div class="text-xs opacity-60 ml-auto" [title]="review().createdAt | date: 'HH:mm dd.MM.yyyy'">
       {{ review().createdAt | relativeTime }}
-    </span>
-  </div>
-  <div class="italic">{{ review().description || '-' }}</div>
-  @if (areDetailsOpen()) {
-    <hr />
-    <div class="flex gap-1">
-      <div>Obłożenie:</div>
-      <div class="font-medium">{{ occupancyLabel[review().occupancy] }}</div>
     </div>
-    <hr />
-    <div class="flex flex-col gap-1">
-      <div>Właściwości:</div>
-      <div class="flex gap-2 flex-wrap">
+  </div>
+  <hr />
+  <div class="flex gap-1 items-center">
+    <div class="mr-auto">Obłożenie:</div>
+    <div class="font-medium">{{ occupancyLabel[review().occupancy] }}</div>
+    @let icon = getOccupancyIcon | computedFunc: review().occupancy;
+    @if (icon) {
+      <mat-icon>{{ icon }}</mat-icon>
+    }
+  </div>
+  <hr />
+  <div class="flex flex-col gap-1">
+    <div>Właściwości:</div>
+    <div class="flex gap-2 flex-wrap">
+      @if (!review().attributes.length) {
+        <div>Brak</div>
+      } @else if (review().attributes.length > 1 && !areDetailsOpen()) {
+        <div class="px-2 py-1 rounded-md border! border-gray-400 text-xs">
+          {{ attributeLabel[review().attributes[0]] }}
+        </div>
+        <div class="flex items-center">+ {{ review().attributes.length - 1 }} inne</div>
+      } @else {
         @for (attr of review().attributes; track attr) {
           <div class="px-2 py-1 rounded-md border! border-gray-400 text-xs">
             {{ attributeLabel[attr] }}
           </div>
         }
-      </div>
+      }
     </div>
-  }
-  @if (review().occupancy !== occupancy.NO_DATA && review().attributes.length > 0) {
+  </div>
+  <hr />
+
+  <div [class.italic]="review().description">
+    {{ displayedDescription() }}
+  </div>
+
+  @if (showExpandButton()) {
     <button
       class="ml-auto text-xs font-medium mt-2"
       (click)="areDetailsOpen.set(!areDetailsOpen())"
     >
-      {{ areDetailsOpen() ? 'Zwiń' : 'Więcej szczegółów' }}
+      {{ areDetailsOpen() ? 'Zwiń' : 'Więcej' }}
     </button>
   }
 </div>

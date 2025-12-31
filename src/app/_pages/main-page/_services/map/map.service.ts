@@ -146,24 +146,12 @@ export class MapService {
   };
 
   /**
-   * Renderuje przerywaną linię między punktem stałym a markerem
-   * Używane do pokazania dystansu
-   */
-  private _renderLineBetweenPoints(fixedCoords: LocationCoords) {
-    if (!this.selectedParking()) return;
-    this._mapRendererService.renderLineBetweenPoints(this._map!, {
-      fixedCoords: fixedCoords,
-      targetCoords: this._markerRef!.getLngLat(),
-    });
-  }
-
-  /**
    * Renderuje promienie wokół wszystkich widocznych punktów parkingowych
    * Zarządza również linią dystansu (priorytet ma linia kolizji)
    * @param oldLocationCoords - Opcjonalne współrzędne starej lokalizacji (przy edycji)
    */
   private _renderFeaturesForParkingPoi(oldLocationCoords?: LocationCoords) {
-    const markerCoords = this._markerRef!.getLngLat();
+    const markerCoords = this.getMarkerLatLng();
     const markerPoint = point([markerCoords.lng, markerCoords.lat]);
     const bounds = this._map!.getBounds();
 
@@ -193,7 +181,7 @@ export class MapService {
       this.isMarkerInsideDisabledZone.set(true);
       markerElement?.classList.add('disabled');
 
-      this._mapRendererService.renderLineBetweenPoints(this._map!, {
+      this.renderLineBetweenPoints({
         fixedCoords: parkingPoiInRadius,
         targetCoords: markerCoords,
         isColliding: true,
@@ -205,14 +193,14 @@ export class MapService {
 
       if (oldLocationCoords) {
         // Jeśli nie ma kolizji, ale edytujemy punkt -> pokazujemy dystans od oryginału
-        this._mapRendererService.renderLineBetweenPoints(this._map!, {
+        this.renderLineBetweenPoints({
           fixedCoords: oldLocationCoords,
           targetCoords: markerCoords,
           isColliding: false,
         });
       } else {
         // W przeciwnym razie usuwamy linię całkowicie
-        this._mapRendererService.renderLineBetweenPoints(this._map!);
+        this.removeLineBetweenPoints();
       }
     }
   }
@@ -225,7 +213,7 @@ export class MapService {
     // Guard clause - sprawdź czy mapa jeszcze istnieje
     if (!this._map) return;
 
-    this._mapRendererService.renderLineBetweenPoints(this._map);
+    this.removeLineBetweenPoints();
     this._mapRendererService.renderRadiiForPois(this._map, []);
     this.isMarkerInsideDisabledZone.set(false);
     this._map.off('move', this._moveMarkerFnRef!);
@@ -234,8 +222,16 @@ export class MapService {
     this._markerRef?.remove();
   }
 
-  renderLineBetweenPoints(points?: { fixedCoords: LocationCoords; targetCoords: LocationCoords }) {
+  renderLineBetweenPoints(points?: {
+    fixedCoords: LocationCoords;
+    targetCoords: LocationCoords;
+    isColliding?: boolean;
+  }) {
     this._mapRendererService.renderLineBetweenPoints(this._map!, points);
+  }
+
+  removeLineBetweenPoints() {
+    this._mapRendererService.renderLineBetweenPoints(this._map!);
   }
 
   /**
@@ -285,6 +281,18 @@ export class MapService {
     });
   }
 
+  fitBoundsToPoints(firstLocationCoords: LocationCoords, secondsLocationCoords: LocationCoords) {
+    const bounds = new maplibregl.LngLatBounds()
+      .extend([firstLocationCoords.lng, firstLocationCoords.lat])
+      .extend([secondsLocationCoords.lng, secondsLocationCoords.lat]);
+
+    this._map!.fitBounds(bounds, {
+      padding: { top: 100, bottom: 250, left: 70, right: 70 },
+      duration: 1000,
+      essential: true,
+    });
+  }
+
   private _getCurrentPositionGPS(): Promise<GeolocationPosition> {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -296,7 +304,6 @@ export class MapService {
   }
 
   async findNearestParking(coords?: LocationCoords) {
-    const startTime = Date.now();
     this._globalSpinnerService.show('Szukanie najbliższego parkingu...');
 
     // Jeśli nie podano współrzędnych, pobierz aktualną lokalizację
@@ -311,17 +318,13 @@ export class MapService {
           lng: position.coords.longitude,
         };
       } catch (err) {
-        this._globalSpinnerService.hide();
+        this._globalSpinnerService.hide(0);
         this._sharedUtilsService.openSnackbar('Nie udało się pobrać lokalizacji GPS.', 'ERROR');
         return;
       }
     }
 
-    const timeElapsed = Date.now() - startTime;
-    const remainingDelay = Math.max(0, 2000 - timeElapsed);
-    if (remainingDelay > 0) {
-      await new Promise((resolve) => setTimeout(resolve, remainingDelay));
-    }
+    this._globalSpinnerService.hide();
 
     if (this._renderedParkingsCoordsList.length === 0) {
       this._sharedUtilsService.openSnackbar('Brak parkingów do przeszukania.', 'ERROR');
@@ -341,7 +344,7 @@ export class MapService {
     );
 
     if (dist <= mapConfigData.MAX_DISTANCE_TO_NEAREST_PARKING_KM) {
-      this._mapRendererService.renderLineBetweenPoints(this._map!, {
+      this.renderLineBetweenPoints({
         fixedCoords: locationCoords,
         targetCoords: nearestParkingLocationCoords,
         isColliding: false,
@@ -353,19 +356,6 @@ export class MapService {
         `Nie znaleziono najbliższego parkingu w zasięgu ${mapConfigData.MAX_DISTANCE_TO_NEAREST_PARKING_KM} km.`,
       );
     }
-    this._globalSpinnerService.hide();
-  }
-
-  fitBoundsToPoints(firstLocationCoords: LocationCoords, secondsLocationCoords: LocationCoords) {
-    const bounds = new maplibregl.LngLatBounds()
-      .extend([firstLocationCoords.lng, firstLocationCoords.lat])
-      .extend([secondsLocationCoords.lng, secondsLocationCoords.lat]);
-
-    this._map!.fitBounds(bounds, {
-      padding: { top: 100, bottom: 250, left: 70, right: 70 },
-      duration: 1000,
-      essential: true,
-    });
   }
 
   /**
@@ -404,8 +394,8 @@ export class MapService {
   private _cleanUpMapCore() {
     if (!this._map) return;
 
-    this._mapRendererService.renderLineBetweenPoints(this._map);
-    this._mapRendererService.renderTargetLocationPoi(this._map);
+    this.removeLineBetweenPoints();
+    this.removeTargetLocationPoi;
     this._markerRef?.remove();
     this._map?.remove();
 

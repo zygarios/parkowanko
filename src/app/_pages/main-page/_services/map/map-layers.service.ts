@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment.development';
+import { mapConfigData } from '../../_data/map-config-data';
 
 export const PARKING_POI_SOURCE = 'parkingPoiSource';
 export const PARKING_POI_RADIUS_SOURCE = 'parkingMarkerRadiusSource';
@@ -122,14 +123,12 @@ export class MapLayersService {
       },
     });
 
-    const MIN_ZOOM_TO_SHOW_RADIUS = 15; // Promień widoczny dopiero przy bliskim przybliżeniu
-
     // Warstwa wypełnienia promienia (czerwony, półprzezroczysty)
     map.addLayer({
       id: 'location-radius',
       type: 'fill',
       source: PARKING_POI_RADIUS_SOURCE,
-      minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
+      minzoom: mapConfigData.MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
         'fill-color': [
           'case',
@@ -146,7 +145,7 @@ export class MapLayersService {
       id: 'location-radius-outline',
       type: 'line',
       source: PARKING_POI_RADIUS_SOURCE,
-      minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
+      minzoom: mapConfigData.MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
         'line-color': [
           'case',

@@ -1,52 +1,52 @@
-<div class="flex py-5" [class]="data.isMenuHorizontalWithScroll ? 'flex-row' : 'flex-col'">
-  <div class="font-big flex items-center gap-2">
-    {{ data.title || '' }}
-    @if (data.showTitleCloseButton) {
-      <!-- <mat-icon class="ml-auto" (click)="menuSheetRef.onClick.next(poiActionsEnum.DISMISS)">
-        close
-      </mat-icon> -->
+<div class="flex flex-col py-4">
+  <div>
+    <div class="font-big flex items-center gap-2">
+      {{ data.title || '' }}
+      <button
+        class="ml-auto"
+        matIconButton
+        (click)="menuSheetRef.onClick.next(poiActionsEnum.DISMISS)"
+      >
+        <mat-icon> close </mat-icon>
+      </button>
+    </div>
+    <hr class="mt-3 mb-6" />
+    @if (data.description) {
+      <div class="font-small mb-5 leading-normal whitespace-pre">{{ data.description }}</div>
     }
   </div>
-  <hr class="mt-3 mb-5" />
 
-  @if (data.description) {
-    <div class="font-small mb-5 leading-normal">{{ data.description }}</div>
-  }
-  <div
-    class="flex gap-2"
-    [class]="data.isMenuHorizontal || data.isMenuHorizontalWithScroll ? 'flex-row' : 'flex-col'"
-    [class]="data.isMenuHorizontalWithScroll ? 'pr-4' : ''"
-  >
-    @for (menu of data.menuItems; track menu) {
-      @if (menu.isPrimary || menu.isSuccess || menu.isError) {
-        <button
-          mat-flat-button
-          [class.button-error]="menu.isError"
-          [class.button-success]="menu.isSuccess"
-          [class]="data.isMenuHorizontal ? ['justify-center!', 'w-1/2'] : 'justify-start!'"
-          class="flex"
-          (click)="choose(menu)"
-          [disabled]="menu.isButtonDisabled?.()"
-        >
-          @if (menu.icon) {
-            <mat-icon>{{ menu.icon }}</mat-icon>
-          }
-          <div>{{ menu.label }}</div>
-        </button>
-      } @else {
-        <button
-          mat-stroked-button
-          [class]="data.isMenuHorizontal ? ['justify-center!', 'w-1/2'] : 'justify-start!'"
-          class="flex"
-          (click)="choose(menu)"
-          [disabled]="menu.isButtonDisabled?.()"
-        >
-          @if (menu.icon) {
-            <mat-icon>{{ menu.icon }}</mat-icon>
-          }
-          <div>{{ menu.label }}</div>
-        </button>
+  <div class="relative -translate-x-1/2 left-1/2 w-dvw pb-2">
+    <div class="flex flex-row gap-2 px-4 flex-nowrap" [class.w-fit]="data.hasHorizontalScroll">
+      @for (menu of data.menuItems; track menu) {
+        @if (menu.isPrimary || menu.isSuccess || menu.isError) {
+          <button
+            mat-flat-button
+            [class.button-error]="menu.isError"
+            [class.button-success]="menu.isSuccess"
+            [class]="data.hasHorizontalScroll ? 'w-auto' : 'w-1/2'"
+            class="flex justify-center!"
+            (click)="choose(menu)"
+          >
+            @if (menu.icon) {
+              <mat-icon>{{ menu.icon }}</mat-icon>
+            }
+            <div>{{ menu.label }}</div>
+          </button>
+        } @else {
+          <button
+            mat-stroked-button
+            [class]="data.hasHorizontalScroll ? 'w-auto' : 'w-1/2'"
+            class="flex justify-center!"
+            (click)="choose(menu)"
+          >
+            @if (menu.icon) {
+              <mat-icon>{{ menu.icon }}</mat-icon>
+            }
+            <div>{{ menu.label }}</div>
+          </button>
+        }
       }
-    }
+    </div>
   </div>
 </div>

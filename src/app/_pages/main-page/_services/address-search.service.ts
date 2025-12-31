@@ -40,6 +40,7 @@ export class AddressSearchService {
           this.flyToSelectedAddress();
         } else {
           this._mapService.removeTargetLocationPoi();
+          this._mapService.removeLineBetweenPoints();
         }
       });
     });

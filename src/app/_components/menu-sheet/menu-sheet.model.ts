@@ -1,4 +1,3 @@
-import { Signal } from '@angular/core';
 import { Subject } from 'rxjs';
 
 export type MenuSheetResult = string | 'DISMISS';
@@ -10,15 +9,12 @@ export interface MenuSheetItem {
   isPrimary?: boolean;
   isSuccess?: boolean;
   isError?: boolean;
-  isButtonDisabled?: Signal<boolean>;
 }
 export interface MenuSheetData {
   menuItems: MenuSheetItem[];
   title?: string;
   description?: string;
-  isMenuHorizontal?: boolean;
-  isMenuHorizontalWithScroll?: boolean;
-  showTitleCloseButton?: boolean;
+  hasHorizontalScroll?: boolean;
 }
 
 export interface MenuSheetRef {

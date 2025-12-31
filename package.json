@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:remote": "ng serve --host 0.0.0.0",
+    "start:remote": "ng serve --host 0.0.0.0 --ssl",
     "build": "ng build"
   },
   "prettier": {
@@ -43,6 +43,7 @@
     "@angular/cli": "^21.0.2",
     "@angular/compiler-cli": "^21.0.3",
     "@tailwindcss/postcss": "^4.1.17",
+    "@types/geojson": "^7946.0.16",
     "angular-cli-ghpages": "^2.0.3",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",

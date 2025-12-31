@@ -39,7 +39,7 @@ export class MapInitializerService {
       const geolocate = new maplibregl.GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         showAccuracyCircle: false,
-        trackUserLocation: false, // Tylko jednorazowe centrowanie, bez śledzenia kamery
+        trackUserLocation: true, // Tylko jednorazowe centrowanie, bez śledzenia kamery
         fitBoundsOptions: { maxZoom: 17, animate: false },
       });
 

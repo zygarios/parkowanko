@@ -38,9 +38,15 @@ export class MapPoisControllerService {
     this._mapService.removeMoveableMarker();
     this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    const sheetRef = this._sharedUtilsService.openSheet(selectedPoiOptionsSheetConfig(), {
-      hasBackdrop: true,
-    });
+    const sheetRef = this._sharedUtilsService.openSheet(
+      selectedPoiOptionsSheetConfig(
+        this._selectedParking()!.likeCount,
+        this._selectedParking()!.dislikeCount,
+      ),
+      {
+        hasBackdrop: true,
+      },
+    );
 
     sheetRef.onClick
       .pipe(
