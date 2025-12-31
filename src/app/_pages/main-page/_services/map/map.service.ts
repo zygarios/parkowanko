@@ -115,7 +115,7 @@ export class MapService {
 
     // Ustaw marker w centrum mapy i dodaj do widoku
     this._markerRef!.setLngLat(this._map!.getCenter()).addTo(this._map!);
-    this._renderRadiusForParkingPoi();
+    this._renderFeaturesForParkingPoi();
 
     // Podłącz marker do ruchu mapy (marker podąża za centrum)
     this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
@@ -133,7 +133,7 @@ export class MapService {
    * Renderuje features mapy po zakończeniu ruchu: promień i opcjonalnie linię
    */
   private _renderFeaturesForMarkerOnMove(fixedCoords?: LocationCoords) {
-    this._renderRadiusForParkingPoi();
+    this._renderFeaturesForParkingPoi();
     if (fixedCoords) this._renderLineBetweenPoints(fixedCoords);
   }
 
@@ -157,51 +157,51 @@ export class MapService {
   }
 
   /**
-   * Renderuje promień 20m wokół markera i sprawdza czy jest w nim parking
-   * Wyświetla czerwony okrąg jeśli w promieniu znajdzie się jakikolwiek parking
+   * Renderuje promienie wokół wszystkich widocznych punktów parkingowych
+   * Sprawdza czy ruchomy marker znajduje się w promieniu zakazanym (zbyt blisko innego punktu)
    * Dodatkowo dodaje klasę 'disabled' na markerze aby wizualnie pokazać że nie można tam umieścić parkingu
-   * Wykorzystuje bibliotekę Turf.js do obliczeń geometrycznych
    */
-  private _renderRadiusForParkingPoi() {
+  private _renderFeaturesForParkingPoi() {
     const markerCoords = this._markerRef!.getLngLat();
     const markerPoint = point([markerCoords.lng, markerCoords.lat]);
+    const bounds = this._map!.getBounds();
 
-    // Utwórz bufor 20m wokół markera używając Turf.js
+    // Filtrujemy punkty widoczne w aktualnym widoku (viewport), aby nie renderować niepotrzebnie tysięcy okręgów
+    const visiblePoints = this._renderedParkingsCoordsList.filter((p) =>
+      bounds.contains([p.lng, p.lat]),
+    );
+
+    // Renderujemy wszystkie promienie dla widocznych punktów
+    this._mapRendererService.renderRadiiForPois(this._map!, visiblePoints);
+
+    // Sprawdzamy czy marker jest w zasięgu KTÓREGOŚ z parkingów (limit określony w configu)
     const bufferPoi = buffer(markerPoint, mapConfigData.PARKING_POI_RADIUS_BOUND, {
       units: 'meters',
     });
-    if (bufferPoi) {
-      // Sprawdź czy którykolwiek z wyrenderowanych parkingów jest w promieniu
-      const parkingPoiInRadius = this._renderedParkingsCoordsList.find((coords: LocationCoords) =>
-        booleanPointInPolygon([coords.lng, coords.lat], bufferPoi),
-      );
 
-      // Renderuj promień tylko jeśli parking jest w zasięgu
-      if (parkingPoiInRadius) {
-        this._mapRendererService.renderRadiusForPoi(this._map!, parkingPoiInRadius);
-        // Dodaj klasę 'disabled' do markera aby pokazać że nie można tu umieścić parkingu
-        const markerElement = this._markerRef?.getElement();
+    if (!bufferPoi) return;
 
-        this.isMarkerInsideDisabledZone.set(true);
+    const parkingPoiInRadius = this._renderedParkingsCoordsList.find((coords: LocationCoords) =>
+      booleanPointInPolygon([coords.lng, coords.lat], bufferPoi),
+    );
 
-        this._mapRendererService.renderLineBetweenPoints(this._map!, {
-          fixedCoords: parkingPoiInRadius,
-          targetCoords: markerCoords,
-        });
+    const markerElement = this._markerRef?.getElement();
 
-        if (markerElement) {
-          markerElement.classList.add('disabled');
-        }
-      } else {
-        this._mapRendererService.renderRadiusForPoi(this._map!);
-        // Usuń klasę 'disabled' z markera
-        const markerElement = this._markerRef?.getElement();
-        markerElement!.classList.remove('disabled');
+    if (parkingPoiInRadius) {
+      this.isMarkerInsideDisabledZone.set(true);
+      markerElement?.classList.add('disabled');
 
-        this.isMarkerInsideDisabledZone.set(false);
+      // Rysujemy linię do najbliższego kolidującego punktu
+      this._mapRendererService.renderLineBetweenPoints(this._map!, {
+        fixedCoords: parkingPoiInRadius,
+        targetCoords: markerCoords,
+      });
+    } else {
+      this.isMarkerInsideDisabledZone.set(false);
+      markerElement?.classList.remove('disabled');
 
-        this._mapRendererService.renderLineBetweenPoints(this._map!);
-      }
+      // Czyścimy linię jeśli brak kolizji
+      this._mapRendererService.renderLineBetweenPoints(this._map!);
     }
   }
 
@@ -214,7 +214,7 @@ export class MapService {
     if (!this._map) return;
 
     this._mapRendererService.renderLineBetweenPoints(this._map);
-    this._mapRendererService.renderRadiusForPoi(this._map);
+    this._mapRendererService.renderRadiiForPois(this._map, []);
     this.isMarkerInsideDisabledZone.set(false);
     this._map.off('move', this._moveMarkerFnRef!);
     this._map.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);

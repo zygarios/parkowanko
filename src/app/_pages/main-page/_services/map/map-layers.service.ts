@@ -131,8 +131,8 @@ export class MapLayersService {
       source: PARKING_POI_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'fill-color': environment.colors.error,
-        'fill-opacity': 0.15, // Delikatne wypełnienie dla lepszej czytelności
+        'fill-color': environment.colors.primary,
+        'fill-opacity': 0.05, // Delikatne wypełnienie dla lepszej czytelności
       },
     });
 
@@ -143,8 +143,9 @@ export class MapLayersService {
       source: PARKING_POI_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'line-color': environment.colors.error,
+        'line-color': environment.colors.primary,
         'line-width': 1,
+        'line-opacity': 0.7,
       },
     });
   }

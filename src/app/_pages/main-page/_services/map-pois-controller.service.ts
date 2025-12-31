@@ -87,71 +87,71 @@ export class MapPoisControllerService {
     );
     this._mapService.jumpToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    const sheetRef = this._sharedUtilsService.openSheet(
-      changingPoiPositionOptionsSheetConfig(this._mapService.isMarkerInsideDisabledZone),
-      {
-        hasBackdrop: false,
-      },
-    );
+    const sheetRef = this._sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig(), {
+      hasBackdrop: false,
+    });
 
     return sheetRef.onClick.pipe(
       switchMap((result) => {
         if (result === PoiActionsEnum.CONFIRM) {
-          return this.confirmUpdatedPoiPosition().pipe(
-            tap(() => {
-              this._sharedUtilsService.openSnackbar(
-                'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona.',
-                'SUCCESS',
-              );
-              this._mapService.removeMoveableMarker();
-              sheetRef.dismiss();
-              this._selectedParking.set(null);
-            }),
-            catchError(() => {
-              this._sharedUtilsService.openSnackbar(
-                'Wystąpił błąd podczas aktualizacji pozycji parkingu.',
-                'ERROR',
-              );
-              this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
-              this._mapService.removeMoveableMarker();
-              sheetRef.dismiss();
-              this.openDefaultPoiMenu();
-              return EMPTY;
-            }),
-          );
+          if (this._mapService.isMarkerInsideDisabledZone()) {
+            this._sharedUtilsService.openSnackbar(
+              'Twoje miejsce znajduje się zbyt blisko innych punktów parkingowych.',
+              'ERROR',
+            );
+            return EMPTY;
+          }
+
+          const selectedPoi: ParkingPoint | null = this._selectedParking();
+          const location = this._mapService.getMarkerLatLng();
+          return this._parkingEditLocationApiService
+            .addEditLocationProposal(selectedPoi!.id, {
+              location,
+            })
+            .pipe(
+              tap(() => {
+                this._sharedUtilsService.openSnackbar(
+                  'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona.',
+                  'SUCCESS',
+                );
+              }),
+              catchError(() => {
+                this._sharedUtilsService.openSnackbar(
+                  'Wystąpił błąd podczas aktualizacji pozycji parkingu.',
+                  'ERROR',
+                );
+                return of(null);
+              }),
+            );
         } else {
-          this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
-          this._mapService.removeMoveableMarker();
-          sheetRef.dismiss();
-          this.openDefaultPoiMenu();
-          return EMPTY;
+          return of(null);
         }
+      }),
+      tap(() => {
+        sheetRef.dismiss();
+        this.openDefaultPoiMenu();
       }),
       takeUntilDestroyed(this._destroyRef),
     );
   }
 
-  confirmUpdatedPoiPosition() {
-    const selectedPoi: ParkingPoint | null = this._selectedParking();
-    const location = this._mapService.getMarkerLatLng();
-    return this._parkingEditLocationApiService.addEditLocationProposal(selectedPoi!.id, {
-      location,
-    });
-  }
-
   startAddingPoi() {
     this._mapService.renderMoveableMarkerWithRadiusAndLineToFixedPoint();
 
-    const sheetRef = this._sharedUtilsService.openSheet(
-      addingPoiConfirmSheetConfig(this._mapService.isMarkerInsideDisabledZone),
-      {
-        hasBackdrop: false,
-      },
-    );
+    const sheetRef = this._sharedUtilsService.openSheet(addingPoiConfirmSheetConfig(), {
+      hasBackdrop: false,
+    });
 
     return sheetRef.onClick.pipe(
       switchMap((result) => {
         if (result === PoiActionsEnum.CONFIRM) {
+          if (this._mapService.isMarkerInsideDisabledZone()) {
+            this._sharedUtilsService.openSnackbar(
+              'Twoje miejsce znajduje się zbyt blisko innych punktów parkingowych.',
+              'ERROR',
+            );
+            return EMPTY;
+          }
           const location = this._mapService.getMarkerLatLng();
           return this._parkingsApiService.postParking({ location }).pipe(
             tap((newParking: ParkingPoint) => {

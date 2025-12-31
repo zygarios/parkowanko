@@ -1,10 +1,7 @@
-import { Signal } from '@angular/core';
 import { MenuSheetData } from '../../../../../_components/menu-sheet/menu-sheet.model';
 import { PoiActionsEnum } from '../_types/poi-actions.model';
 
-export const addingPoiConfirmSheetConfig = (
-  isPrimaryButtonDisabled: Signal<boolean>,
-): MenuSheetData => {
+export const addingPoiConfirmSheetConfig = (): MenuSheetData => {
   return {
     menuItems: [
       {
@@ -18,7 +15,6 @@ export const addingPoiConfirmSheetConfig = (
         result: PoiActionsEnum.CONFIRM,
         isPrimary: true,
         isSuccess: true,
-        isButtonDisabled: isPrimaryButtonDisabled,
       },
     ],
     isMenuHorizontal: true,
@@ -56,9 +52,7 @@ export const selectedPoiOptionsSheetConfig = (): MenuSheetData => {
   };
 };
 
-export const changingPoiPositionOptionsSheetConfig = (
-  isPrimaryButtonDisabled: Signal<boolean>,
-): MenuSheetData => {
+export const changingPoiPositionOptionsSheetConfig = (): MenuSheetData => {
   return {
     menuItems: [
       {
@@ -72,7 +66,6 @@ export const changingPoiPositionOptionsSheetConfig = (
         result: PoiActionsEnum.CONFIRM,
         isPrimary: true,
         isSuccess: true,
-        isButtonDisabled: isPrimaryButtonDisabled,
       },
     ],
     isMenuHorizontal: true,

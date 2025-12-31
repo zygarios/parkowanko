@@ -48,28 +48,25 @@ export class MapRendererService {
   }
 
   /**
-   * Renderuje promień wokół punktu parkingu
-   * Używane do wizualizacji zasięgu przy dodawaniu nowego parkingu
+   * Renderuje promienie wokół punktów parkingów
+   * Używane do wizualizacji zasięgu przy dodawaniu nowego parkingu dla wszystkich widocznych punktów
    * @param map - Instancja mapy
-   * @param markerCoords - Współrzędne centrum promienia (opcjonalne)
+   * @param coordsList - Lista współrzędnych centrów promieni
    */
-  renderRadiusForPoi(map: maplibregl.Map, markerCoords?: LocationCoords) {
+  renderRadiiForPois(map: maplibregl.Map, coordsList: LocationCoords[]) {
     const parkingPoiRadiusSource = map.getSource(
       PARKING_POI_RADIUS_SOURCE,
     ) as maplibregl.GeoJSONSource;
     if (!parkingPoiRadiusSource) return;
 
-    // Renderuj okrąg tylko jeśli podano współrzędne
     parkingPoiRadiusSource.setData({
       type: 'FeatureCollection',
-      features: markerCoords
-        ? [
-            circle([markerCoords.lng, markerCoords.lat], mapConfigData.PARKING_POI_RADIUS_BOUND, {
-              steps: 64, // Gładki okrąg (więcej kroków = bardziej okrągły)
-              units: 'meters',
-            }),
-          ]
-        : [], // Pusta lista = usuń promień
+      features: coordsList.map((coords) =>
+        circle([coords.lng, coords.lat], mapConfigData.PARKING_POI_RADIUS_BOUND, {
+          steps: 64,
+          units: 'meters',
+        }),
+      ),
     });
   }
 
