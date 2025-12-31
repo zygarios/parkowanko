@@ -1,15 +1,14 @@
-<div class="flex py-3" [class]="data.isMenuHorizontalWithScroll ? 'flex-row' : 'flex-col'">
-  @if (data.title) {
-    <div class="font-big flex items-center gap-2">
-      {{ data.title }}
-      @if (data.showTitleCloseButton) {
-        <mat-icon class="ml-auto" (click)="menuSheetRef.onClick.next(poiActionsEnum.DISMISS)">
-          close
-        </mat-icon>
-      }
-    </div>
-    <hr class="mt-3 mb-5" />
-  }
+<div class="flex py-5" [class]="data.isMenuHorizontalWithScroll ? 'flex-row' : 'flex-col'">
+  <div class="font-big flex items-center gap-2">
+    {{ data.title || '' }}
+    @if (data.showTitleCloseButton) {
+      <!-- <mat-icon class="ml-auto" (click)="menuSheetRef.onClick.next(poiActionsEnum.DISMISS)">
+        close
+      </mat-icon> -->
+    }
+  </div>
+  <hr class="mt-3 mb-5" />
+
   @if (data.description) {
     <div class="font-small mb-5 leading-normal">{{ data.description }}</div>
   }

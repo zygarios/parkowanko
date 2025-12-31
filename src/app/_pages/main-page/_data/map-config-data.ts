@@ -5,7 +5,7 @@ export let mapConfigData = {
   CLOSE_ZOOM: 17,
   FAR_ZOOM: 13,
   FLY_SPEED: 2,
-  MAX_DISTANCE_TO_NEAREST_PARKING_KM: 3,
+  MAX_DISTANCE_TO_NEAREST_PARKING_KM: 10,
 };
 mapConfigData.POLAND_MAX_BOUNDS = [
   mapConfigData.POLAND_BOUNDS[0] - 3,

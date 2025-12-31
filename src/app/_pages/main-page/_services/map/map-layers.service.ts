@@ -122,7 +122,7 @@ export class MapLayersService {
       },
     });
 
-    const MIN_ZOOM_TO_SHOW_RADIUS = 10; // Promień widoczny dopiero przy bliskim zoomie
+    const MIN_ZOOM_TO_SHOW_RADIUS = 15; // Promień widoczny dopiero przy bliskim przybliżeniu
 
     // Warstwa wypełnienia promienia (czerwony, półprzezroczysty)
     map.addLayer({
@@ -131,7 +131,12 @@ export class MapLayersService {
       source: PARKING_POI_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'fill-color': environment.colors.primary,
+        'fill-color': [
+          'case',
+          ['boolean', ['get', 'isColliding'], false],
+          environment.colors.error,
+          environment.colors.primary,
+        ],
         'fill-opacity': 0.05, // Delikatne wypełnienie dla lepszej czytelności
       },
     });
@@ -143,7 +148,12 @@ export class MapLayersService {
       source: PARKING_POI_RADIUS_SOURCE,
       minzoom: MIN_ZOOM_TO_SHOW_RADIUS,
       paint: {
-        'line-color': environment.colors.primary,
+        'line-color': [
+          'case',
+          ['boolean', ['get', 'isColliding'], false],
+          environment.colors.error,
+          environment.colors.primary,
+        ],
         'line-width': 1,
         'line-opacity': 0.7,
       },
@@ -170,9 +180,15 @@ export class MapLayersService {
       type: 'line',
       source: PARKING_POI_LINE_SOURCE,
       paint: {
-        'line-color': environment.colors.primary,
+        'line-color': [
+          'case',
+          ['boolean', ['get', 'isColliding'], false],
+          environment.colors.error,
+          environment.colors.primary,
+        ],
         'line-width': 3,
         'line-dasharray': [2, 2], // Przerywana: 2px linia, 2px przerwa
+        'line-opacity': 0.8,
       },
     });
 
@@ -190,10 +206,16 @@ export class MapLayersService {
       },
       paint: {
         'text-color': '#FFFFFF',
-        'text-halo-color': environment.colors.primary,
+        'text-halo-color': [
+          'case',
+          ['boolean', ['get', 'isColliding'], false],
+          environment.colors.error,
+          environment.colors.primary,
+        ],
         'text-halo-width': 1,
         'text-opacity-transition': { duration: 0 },
         'text-translate-transition': { duration: 0 },
+        'text-opacity': 0.8,
       },
     });
   }

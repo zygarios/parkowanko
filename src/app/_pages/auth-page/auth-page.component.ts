@@ -53,7 +53,7 @@ enum AuthModeType {
 })
 export class AuthPageComponent {
   private _authService = inject(AuthService);
-  private _isSpinnerActive = inject(GlobalSpinnerService).isSpinnerActive;
+  private _globalSpinnerService = inject(GlobalSpinnerService);
 
   isPasswordHidden = signal(true);
   isRepeatedPasswordHidden = signal(true);
@@ -116,12 +116,12 @@ export class AuthPageComponent {
           : this._authService.register({ username, email, password });
 
       try {
-        this._isSpinnerActive.set(true);
+        this._globalSpinnerService.show();
         await firstValueFrom(request$);
       } catch (err) {
         console.error(err);
       } finally {
-        this._isSpinnerActive.set(false);
+        this._globalSpinnerService.hide();
         return;
       }
     });

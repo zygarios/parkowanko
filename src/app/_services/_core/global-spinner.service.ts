@@ -1,6 +1,6 @@
-import { Overlay } from '@angular/cdk/overlay';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { effect, inject, Injectable, signal } from '@angular/core';
+import { ComponentRef, effect, inject, Injectable, signal } from '@angular/core';
 import { GlobalSpinnerComponent } from '../../_components/global-spinner/global-spinner.component';
 
 @Injectable({
@@ -8,8 +8,9 @@ import { GlobalSpinnerComponent } from '../../_components/global-spinner/global-
 })
 export class GlobalSpinnerService {
   private readonly _overlay = inject(Overlay);
+  private _componentRef: ComponentRef<GlobalSpinnerComponent> | null = null;
 
-  private _overlayRef = this._overlay.create({
+  private _overlayRef: OverlayRef = this._overlay.create({
     hasBackdrop: false,
     positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),
     scrollStrategy: this._overlay.scrollStrategies.block(),
@@ -20,32 +21,37 @@ export class GlobalSpinnerService {
   private _spinnerPortal = new ComponentPortal(GlobalSpinnerComponent);
 
   isSpinnerActive = signal(false);
+  message = signal<string | null>(null);
 
   constructor() {
     this.listenForSpinnerStateChange();
   }
 
+  show(message?: string) {
+    this.message.set(message || null);
+    this.isSpinnerActive.set(true);
+  }
+
+  hide() {
+    this.isSpinnerActive.set(false);
+    this.message.set(null);
+  }
+
   private listenForSpinnerStateChange() {
     effect(() => {
       const isOpen = this.isSpinnerActive();
-
+      const msg = this.message();
       if (isOpen) {
-        this.showSpinner();
+        if (!this._overlayRef.hasAttached()) {
+          this._componentRef = this._overlayRef.attach(this._spinnerPortal);
+        }
+        this._componentRef?.setInput('message', msg || '');
       } else {
-        this.hideSpinner();
+        if (this._overlayRef.hasAttached()) {
+          this._overlayRef.detach();
+          this._componentRef = null;
+        }
       }
     });
-  }
-
-  private showSpinner() {
-    if (!this._overlayRef.hasAttached()) {
-      this._overlayRef.attach(this._spinnerPortal);
-    }
-  }
-
-  private hideSpinner() {
-    if (this._overlayRef.hasAttached()) {
-      this._overlayRef.detach();
-    }
   }
 }

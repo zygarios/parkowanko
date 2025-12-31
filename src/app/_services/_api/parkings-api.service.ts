@@ -42,7 +42,7 @@ export class ParkingsApiService {
   }
 
   postParking(body: ParkingPointSaveData): Observable<ParkingPoint> {
-    this._globalSpinnerService.isSpinnerActive.set(true);
+    this._globalSpinnerService.show();
     return this._httpClient.post<ParkingPoint>(`${environment.apiUrl}/parkings/`, body).pipe(
       tap((newParking: ParkingPoint) =>
         this.parkingsList.update((parkings: ParkingPoint[]) => [
@@ -50,12 +50,12 @@ export class ParkingsApiService {
           new ParkingPoint(newParking),
         ]),
       ),
-      finalize(() => this._globalSpinnerService.isSpinnerActive.set(false)),
+      finalize(() => this._globalSpinnerService.hide()),
     );
   }
 
   patchParking(id: number, body: ParkingPointSaveData): Observable<ParkingPoint> {
-    this._globalSpinnerService.isSpinnerActive.set(true);
+    this._globalSpinnerService.show();
     return this._httpClient.patch<ParkingPoint>(`${environment.apiUrl}/parkings/${id}/`, body).pipe(
       tap((updatedParking: ParkingPoint) =>
         this.parkingsList.update((parkings: ParkingPoint[]) =>
@@ -64,7 +64,7 @@ export class ParkingsApiService {
           ),
         ),
       ),
-      finalize(() => this._globalSpinnerService.isSpinnerActive.set(false)),
+      finalize(() => this._globalSpinnerService.hide()),
     );
   }
 }

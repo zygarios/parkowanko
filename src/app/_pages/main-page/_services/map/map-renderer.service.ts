@@ -53,7 +53,11 @@ export class MapRendererService {
    * @param map - Instancja mapy
    * @param coordsList - Lista współrzędnych centrów promieni
    */
-  renderRadiiForPois(map: maplibregl.Map, coordsList: LocationCoords[]) {
+  renderRadiiForPois(
+    map: maplibregl.Map,
+    coordsList: LocationCoords[],
+    collidingCoords?: LocationCoords,
+  ) {
     const parkingPoiRadiusSource = map.getSource(
       PARKING_POI_RADIUS_SOURCE,
     ) as maplibregl.GeoJSONSource;
@@ -61,12 +65,28 @@ export class MapRendererService {
 
     parkingPoiRadiusSource.setData({
       type: 'FeatureCollection',
-      features: coordsList.map((coords) =>
-        circle([coords.lng, coords.lat], mapConfigData.PARKING_POI_RADIUS_BOUND, {
-          steps: 64,
-          units: 'meters',
-        }),
-      ),
+      features: coordsList.map((coords) => {
+        const isColliding =
+          collidingCoords &&
+          coords.lat === collidingCoords.lat &&
+          coords.lng === collidingCoords.lng;
+
+        const circleFeature = circle(
+          [coords.lng, coords.lat],
+          mapConfigData.PARKING_POI_RADIUS_BOUND,
+          {
+            steps: 64,
+            units: 'meters',
+          },
+        );
+
+        circleFeature.properties = {
+          ...circleFeature.properties,
+          isColliding,
+        };
+
+        return circleFeature;
+      }),
     });
   }
 
@@ -81,12 +101,15 @@ export class MapRendererService {
     locations?: {
       fixedCoords?: LocationCoords;
       targetCoords?: LocationCoords;
+      isColliding?: boolean;
     },
   ) {
     const lineSource = map.getSource(PARKING_POI_LINE_SOURCE) as maplibregl.GeoJSONSource;
     if (!lineSource) return;
 
-    lineSource.setData(this.getLineGeoJson(locations?.fixedCoords, locations?.targetCoords));
+    lineSource.setData(
+      this.getLineGeoJson(locations?.fixedCoords, locations?.targetCoords, locations?.isColliding),
+    );
   }
 
   /**
@@ -122,7 +145,11 @@ export class MapRendererService {
    * @param targetCoords - Punkt końcowy linii
    * @returns GeoJSON FeatureCollection z linią i dystansem lub pustą kolekcją
    */
-  getLineGeoJson(fixedCoords?: LocationCoords, targetCoords?: LocationCoords): any {
+  getLineGeoJson(
+    fixedCoords?: LocationCoords,
+    targetCoords?: LocationCoords,
+    isColliding: boolean = false,
+  ): any {
     let coordinates: any = [];
     let distanceInMeters = 0;
 
@@ -150,6 +177,7 @@ export class MapRendererService {
           },
           properties: {
             distance: distanceInMeters, // Dystans w metrach dla label
+            isColliding,
           },
         },
       ],

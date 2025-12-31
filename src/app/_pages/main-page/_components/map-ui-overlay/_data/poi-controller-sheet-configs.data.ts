@@ -18,6 +18,7 @@ export const addingPoiConfirmSheetConfig = (): MenuSheetData => {
       },
     ],
     isMenuHorizontal: true,
+    showTitleCloseButton: true,
     title: 'Dodanie nowego parkingu',
     description: 'Poruszaj mapą lub markerem, aby ustawić pozycję nowego parkingu.',
   };
@@ -48,6 +49,7 @@ export const selectedPoiOptionsSheetConfig = (): MenuSheetData => {
         result: PoiActionsEnum.UPDATE_LOCATION,
       },
     ],
+    showTitleCloseButton: true,
     isMenuHorizontalWithScroll: true,
   };
 };
@@ -68,6 +70,7 @@ export const changingPoiPositionOptionsSheetConfig = (): MenuSheetData => {
         isSuccess: true,
       },
     ],
+    showTitleCloseButton: true,
     isMenuHorizontal: true,
     title: 'Poprawa lokalizacji',
     description: 'Poruszaj mapą lub markerem, aby poprawić lokalizację istniejącego parkingu.',
