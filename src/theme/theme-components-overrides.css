@@ -36,6 +36,9 @@
   --mat-stepper-header-done-state-icon-background-color: var(--mat-sys-on-surface-variant);
   --mat-stepper-header-done-state-icon-foreground-color: white;
 
+  /* SNACKBAR */
+  --mat-snack-bar-container-color: var(--mat-sys-primary);
+
   /* BUTTONS-ALL */
 
   .mdc-button {
@@ -74,6 +77,11 @@
       var(--mat-sys-level3);
   }
 
+  .mat-mdc-snack-bar-handset {
+    margin-top: auto !important;
+    margin-bottom: auto !important;
+  }
+
   /* BOTTOM SHEET */
   .mat-bottom-sheet-container {
     border-top-left-radius: 20px;
@@ -108,7 +116,12 @@
     margin-bottom: 20px;
     .mat-mdc-text-field-wrapper {
       background-color: var(--mat-sys-surface);
-      /* border-radius: var(--mat-sys-corner-extra-small); */
     }
+  }
+
+  /* TOOLTIP */
+  .mat-mdc-tooltip-surface {
+    border: 2px solid white;
+    box-shadow: var(--mat-sys-level2);
   }
 }

@@ -1,4 +1,5 @@
 import { MenuSheetData } from '../../../../../_components/menu-sheet/menu-sheet.model';
+import { ParkingPoint } from '../../../../../_types/parking-point.type';
 import { PoiActionsEnum } from '../_types/poi-actions.model';
 
 export const addingPoiConfirmSheetConfig = (): MenuSheetData => {
@@ -23,11 +24,8 @@ export const addingPoiConfirmSheetConfig = (): MenuSheetData => {
   };
 };
 
-export const selectedPoiOptionsSheetConfig = (
-  likeCount: number,
-  dislikeCount: number,
-): MenuSheetData => {
-  return {
+export const selectedPoiOptionsSheetConfig = (parkingPoint: ParkingPoint): MenuSheetData => {
+  const options = {
     menuItems: [
       {
         label: 'Nawiguj',
@@ -52,9 +50,15 @@ export const selectedPoiOptionsSheetConfig = (
       },
     ],
     title: 'Parking',
-    description: `Oceny pozytywne: ${likeCount}\nOceny negatywne: ${dislikeCount}`,
+    description: `Oceny pozytywne: ${parkingPoint.likeCount}\nOceny negatywne: ${parkingPoint.dislikeCount}`,
     hasHorizontalScroll: true,
   };
+
+  if (!parkingPoint.isVerified) {
+    options.title = options.title + ' (niezweryfikowany)';
+  }
+
+  return options;
 };
 
 export const changingPoiPositionOptionsSheetConfig = (): MenuSheetData => {

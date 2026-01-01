@@ -318,7 +318,7 @@ export class MapService {
           lng: position.coords.longitude,
         };
       } catch (err) {
-        this._globalSpinnerService.hide(0);
+        this._globalSpinnerService.hide();
         this._sharedUtilsService.openSnackbar('Nie udało się pobrać lokalizacji GPS.', 'ERROR');
         return;
       }

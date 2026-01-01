@@ -7,11 +7,11 @@ import { GlobalSpinnerService } from '../../../../_services/_core/global-spinner
 import { ParkingPoint } from '../../../../_types/parking-point.type';
 import { Review } from '../../../../_types/review.type';
 import { ReviewComponent } from './review/review.component';
-import { ReviewsSummaryComponent } from './reviews-summary/reviews-summary.component';
+import { ReviewsVotesSummaryComponent } from './reviews-votes-summary/reviews-votes-summary.component';
 
 @Component({
   selector: 'app-reviews',
-  imports: [MatDialogModule, MatButtonModule, ReviewComponent, ReviewsSummaryComponent],
+  imports: [MatDialogModule, MatButtonModule, ReviewComponent, ReviewsVotesSummaryComponent],
   templateUrl: './reviews.component.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,

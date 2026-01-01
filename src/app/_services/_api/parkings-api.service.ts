@@ -42,27 +42,13 @@ export class ParkingsApiService {
   }
 
   postParking(body: ParkingPointSaveData): Observable<ParkingPoint> {
-    this._globalSpinnerService.show();
+    this._globalSpinnerService.show('Dodawanie nowego parkingu...');
     return this._httpClient.post<ParkingPoint>(`${environment.apiUrl}/parkings/`, body).pipe(
       tap((newParking: ParkingPoint) =>
         this.parkingsList.update((parkings: ParkingPoint[]) => [
           ...parkings,
           new ParkingPoint(newParking),
         ]),
-      ),
-      finalize(() => this._globalSpinnerService.hide()),
-    );
-  }
-
-  patchParking(id: number, body: ParkingPointSaveData): Observable<ParkingPoint> {
-    this._globalSpinnerService.show();
-    return this._httpClient.patch<ParkingPoint>(`${environment.apiUrl}/parkings/${id}/`, body).pipe(
-      tap((updatedParking: ParkingPoint) =>
-        this.parkingsList.update((parkings: ParkingPoint[]) =>
-          parkings.map((parking) =>
-            parking.id !== id ? parking : new ParkingPoint(updatedParking),
-          ),
-        ),
       ),
       finalize(() => this._globalSpinnerService.hide()),
     );

@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { filter, merge, Subject } from 'rxjs';
 import { PoiActionsEnum } from '../../_pages/main-page/_components/map-ui-overlay/_types/poi-actions.model';
+import { SheetRef } from '../../_types/sheet-ref.type';
 import { MenuSheetData, MenuSheetItem, MenuSheetResult } from './menu-sheet.model';
 
 @Component({
@@ -19,9 +20,9 @@ export class MenuSheetComponent {
   data: MenuSheetData = inject<MenuSheetData>(MAT_BOTTOM_SHEET_DATA);
   poiActionsEnum = PoiActionsEnum;
 
-  menuSheetRef = {
+  sheetComponentRef: SheetRef<MenuSheetResult> = {
     dismiss: () => this.sheetRef.dismiss(),
-    onClick: new Subject<MenuSheetResult>(),
+    onDismiss: new Subject<MenuSheetResult>(),
   };
 
   constructor() {
@@ -37,15 +38,15 @@ export class MenuSheetComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this.sheetRef.dismiss();
-        this.menuSheetRef.onClick.next(PoiActionsEnum.DISMISS);
+        this.sheetComponentRef.onDismiss.next(PoiActionsEnum.DISMISS);
       });
   }
 
   choose(menu: MenuSheetItem): void {
-    this.menuSheetRef.onClick.next(menu.result);
+    this.sheetComponentRef.onDismiss.next(menu.result);
   }
 
   ngOnDestroy() {
-    this.menuSheetRef.onClick.complete();
+    this.sheetComponentRef.onDismiss.complete();
   }
 }

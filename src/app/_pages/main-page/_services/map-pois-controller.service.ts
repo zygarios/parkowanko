@@ -4,13 +4,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { catchError, EMPTY, of, switchMap, tap } from 'rxjs';
 import { ParkingEditLocationApiService } from '../../../_services/_api/parking-edit-location-api.service';
 import { ParkingsApiService } from '../../../_services/_api/parkings-api.service';
+import { ParkingPointActionsSheetService } from '../../../_services/_core/parking-point-actions-sheet.service';
 import { SharedUtilsService } from '../../../_services/_core/shared-utils.service';
 import { ParkingPoint } from '../../../_types/parking-point.type';
 import { AddReviewComponent } from '../_components/add-review/add-review.component';
 import {
   addingPoiConfirmSheetConfig,
   changingPoiPositionOptionsSheetConfig,
-  selectedPoiOptionsSheetConfig,
 } from '../_components/map-ui-overlay/_data/poi-controller-sheet-configs.data';
 import { PoiActionsEnum } from '../_components/map-ui-overlay/_types/poi-actions.model';
 import { ReviewsComponent } from '../_components/reviews/reviews.component';
@@ -22,6 +22,7 @@ export class MapPoisControllerService {
   private readonly _parkingEditLocationApiService = inject(ParkingEditLocationApiService);
   private readonly _parkingsApiService = inject(ParkingsApiService);
   private readonly _sharedUtilsService = inject(SharedUtilsService);
+  private readonly _parkingPointActionsSheetService = inject(ParkingPointActionsSheetService);
   private readonly _matDialog = inject(MatDialog);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -38,17 +39,16 @@ export class MapPoisControllerService {
     this._mapService.removeMoveableMarker();
     this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    const sheetRef = this._sharedUtilsService.openSheet(
-      selectedPoiOptionsSheetConfig(
-        this._selectedParking()!.likeCount,
-        this._selectedParking()!.dislikeCount,
-      ),
+    const sheetRef = this._parkingPointActionsSheetService.openSheet(
+      {
+        parkingPoint: this._selectedParking()!,
+      },
       {
         hasBackdrop: true,
       },
     );
 
-    sheetRef.onClick
+    sheetRef.onDismiss
       .pipe(
         switchMap((result) => {
           switch (result) {
@@ -93,11 +93,14 @@ export class MapPoisControllerService {
     );
     this._mapService.jumpToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    const sheetRef = this._sharedUtilsService.openSheet(changingPoiPositionOptionsSheetConfig(), {
-      hasBackdrop: false,
-    });
+    const sheetRef = this._sharedUtilsService.openMenuSheet(
+      changingPoiPositionOptionsSheetConfig(),
+      {
+        hasBackdrop: false,
+      },
+    );
 
-    return sheetRef.onClick.pipe(
+    return sheetRef.onDismiss.pipe(
       switchMap((result) => {
         if (result === PoiActionsEnum.CONFIRM) {
           if (this._mapService.isMarkerInsideDisabledZone()) {
@@ -144,11 +147,11 @@ export class MapPoisControllerService {
   startAddingPoi() {
     this._mapService.renderMoveableMarkerWithRadiusAndLineToFixedPoint();
 
-    const sheetRef = this._sharedUtilsService.openSheet(addingPoiConfirmSheetConfig(), {
+    const sheetRef = this._sharedUtilsService.openMenuSheet(addingPoiConfirmSheetConfig(), {
       hasBackdrop: false,
     });
 
-    return sheetRef.onClick.pipe(
+    return sheetRef.onDismiss.pipe(
       switchMap((result) => {
         if (result === PoiActionsEnum.CONFIRM) {
           if (this._mapService.isMarkerInsideDisabledZone()) {

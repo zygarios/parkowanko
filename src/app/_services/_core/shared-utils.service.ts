@@ -1,3 +1,4 @@
+import { ComponentType } from '@angular/cdk/portal';
 import { inject, Injectable } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,6 +9,7 @@ import {
 } from '../../_components/info-dialog/info-dialog.component';
 import { MenuSheetComponent } from '../../_components/menu-sheet/menu-sheet.component';
 import { MenuSheetData } from '../../_components/menu-sheet/menu-sheet.model';
+import { SheetRef } from '../../_types/sheet-ref.type';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +19,12 @@ export class SharedUtilsService {
   private _snackBar = inject(MatSnackBar);
   private _sheet = inject(MatBottomSheet);
 
-  openSheet(data: MenuSheetData, config?: { disableClose?: boolean; hasBackdrop?: boolean }) {
-    const sheetRef = this._sheet.open<MenuSheetComponent, MenuSheetData>(MenuSheetComponent, {
+  openSheet<T extends { sheetComponentRef: SheetRef<any> }, D>(
+    component: ComponentType<T>,
+    data: D,
+    config?: { disableClose?: boolean; hasBackdrop?: boolean },
+  ) {
+    const sheetRef = this._sheet.open<T, D>(component, {
       data,
       autoFocus: false,
       backdropClass: 'backdrop-invisible',
@@ -26,7 +32,11 @@ export class SharedUtilsService {
       hasBackdrop: config?.hasBackdrop ?? true,
     });
 
-    return sheetRef.instance.menuSheetRef;
+    return sheetRef.instance.sheetComponentRef as T['sheetComponentRef'];
+  }
+
+  openMenuSheet(data: MenuSheetData, config?: { disableClose?: boolean; hasBackdrop?: boolean }) {
+    return this.openSheet(MenuSheetComponent, data, config);
   }
 
   openSnackbar(title: string, type?: 'ERROR' | 'SUCCESS') {
@@ -34,10 +44,12 @@ export class SharedUtilsService {
     if (type === 'ERROR') snackbarClass = 'snackbar-error';
     else if (type === 'SUCCESS') snackbarClass = 'snackbar-success';
 
-    this._snackBar.open(title, '', {
-      panelClass: snackbarClass,
-      verticalPosition: 'top',
-    });
+    // SetTimeout jest potrzebny aby wymusić renderowanie snackbara po aktualizacji DOM, dzięki czemu snackbar zawsze będzie nad innymi elementami
+    setTimeout(() => {
+      this._snackBar.open(title, '', {
+        panelClass: snackbarClass,
+      });
+    }, 0);
   }
 
   openInfoDialog(data: InfoDialogData, config?: { disableClose?: boolean }) {

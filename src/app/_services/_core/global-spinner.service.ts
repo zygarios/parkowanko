@@ -34,7 +34,7 @@ export class GlobalSpinnerService {
     this._isSpinnerActive.set(true);
   }
 
-  hide(delay: number = 300) {
+  hide(delay: number = 500) {
     setTimeout(() => {
       this._isSpinnerActive.set(false);
       this.message.set(null);

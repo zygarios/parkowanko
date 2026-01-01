@@ -1,7 +1,3 @@
-import { Subject } from 'rxjs';
-
-export type MenuSheetResult = string | 'DISMISS';
-
 export interface MenuSheetItem {
   result: MenuSheetResult;
   label: string;
@@ -17,7 +13,4 @@ export interface MenuSheetData {
   hasHorizontalScroll?: boolean;
 }
 
-export interface MenuSheetRef {
-  dismiss: () => void;
-  onClick: Subject<MenuSheetResult>;
-}
+export type MenuSheetResult = string | 'DISMISS';

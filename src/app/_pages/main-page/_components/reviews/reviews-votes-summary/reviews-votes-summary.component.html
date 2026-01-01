@@ -2,7 +2,7 @@
   <div
     class="h-full flex items-center px-2 gap-1 justify-start"
     style="background-color: var(--par-color-success)"
-    [style.flex]="positiveCount() || 0"
+    [style.flex]="positiveCount() + 1 || 1"
   >
     <div class="text-white font-medium">{{ positiveCount() }}</div>
     <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_up</mat-icon>
@@ -10,7 +10,7 @@
   <div
     class="h-full flex items-center px-2 gap-1 justify-end"
     style="background-color: var(--par-color-error)"
-    [style.flex]="negativeCount() || 0"
+    [style.flex]="negativeCount() + 1 || 1"
   >
     <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_down</mat-icon>
     <div class="text-white font-medium">{{ negativeCount() }}</div>

@@ -1,0 +1,50 @@
+<div class="flex flex-col py-4">
+  <div>
+    <div class="flex items-center">
+      <div>Parking {{ data.parkingPoint.isVerified ? '' : '(niezweryfikowany)' }}</div>
+      <button
+        matTooltip="Parking zostaje uznany za zweryfikowany, gdy uzyska odpowiednią liczbę pozytywnych opinii od innych kierowców."
+        matTooltipPosition="above"
+        class="ml-auto"
+        matIconButton
+        #tooltip="matTooltip"
+        (click)="tooltip.toggle()"
+      >
+        <mat-icon class="material-icons-outlined"> info </mat-icon>
+      </button>
+      <button matIconButton (click)="sheetComponentRef.onDismiss.next(poiActionsEnum.DISMISS)">
+        <mat-icon> close </mat-icon>
+      </button>
+    </div>
+    <hr class="mt-3 mb-5" />
+
+    <div class="font-small mb-10 leading-normal whitespace-pre-wrap">
+      <app-reviews-votes-summary
+        [positiveCount]="data.parkingPoint.likeCount"
+        [negativeCount]="data.parkingPoint.dislikeCount"
+      ></app-reviews-votes-summary>
+    </div>
+  </div>
+
+  <div class="relative -translate-x-1/2 left-1/2 w-dvw pb-2 overflow-auto">
+    <div class="flex flex-row gap-2 px-4 flex-nowrap w-fit">
+      @for (menu of menuItems; track menu) {
+        @if (menu.isPrimary) {
+          <button mat-flat-button class="flex justify-center!" (click)="choose(menu.result)">
+            @if (menu.icon) {
+              <mat-icon>{{ menu.icon }}</mat-icon>
+            }
+            <div>{{ menu.label }}</div>
+          </button>
+        } @else {
+          <button mat-stroked-button class="flex justify-center!" (click)="choose(menu.result)">
+            @if (menu.icon) {
+              <mat-icon>{{ menu.icon }}</mat-icon>
+            }
+            <div>{{ menu.label }}</div>
+          </button>
+        }
+      }
+    </div>
+  </div>
+</div>
