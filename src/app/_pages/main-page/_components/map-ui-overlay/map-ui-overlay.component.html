@@ -1,39 +1,38 @@
 <button
-  class="fixed! z-2 left-2.5 top-2.5 shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
   matMiniFab
-  [matMenuTriggerFor]="menu"
+  (click)="logout()"
+  class="fixed! z-2 left-[20px] top-[20px] shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
 >
-  <mat-icon>menu</mat-icon>
+  <mat-icon>logout</mat-icon>
+</button>
+<button
+  matMiniFab
+  (click)="openHelpDialog()"
+  class="fixed! z-2 left-[70px] top-[20px] shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
+>
+  <mat-icon>question_mark</mat-icon>
 </button>
 
-<mat-menu #menu="matMenu">
-  <button mat-menu-item (click)="openHelpDialog()">
-    <mat-icon>question_mark</mat-icon>
-    <span>Poradnik</span>
-  </button>
-  <button mat-menu-item (click)="logout()">
-    <mat-icon>logout</mat-icon>
-    <span>Wyloguj się</span>
-  </button>
-</mat-menu>
-
 @if (isMapLoaded()) {
-  <button
-    [disabled]="isAddingPoiActive()"
-    class="add-location-button fixed! z-2 right-2.5 top-37 shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
-    matMiniFab
-    (click)="startAddingPoi()"
-  >
-    <mat-icon>add_location_alt</mat-icon>
-  </button>
+  <div class="flex gap-2 fixed! z-2 right-[20px] top-[20px]">
+    <button
+      mat-flat-button
+      class="shadow-[0_0_2px_rgba(0,0,0,0.5)]! rounded-2xl! h-[40px]! px-4! bg-(--par-color-primary)! text-white!"
+      [disabled]="isAddingPoiActive()"
+      (click)="startAddingPoi()"
+    >
+      <mat-icon>add_location_alt</mat-icon>
+      <span>Dodaj</span>
+    </button>
 
-  <button
-    class="fixed! z-2 right-2.5 top-49 shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
-    matMiniFab
-    [matMenuTriggerFor]="menu"
-  >
-    <mat-icon>filter_alt</mat-icon>
-  </button>
+    <button
+      class="shadow-[0_0_2px_rgba(0,0,0,0.5)]! rounded-2xl! h-[40px]! px-4! bg-(--par-color-primary)! text-white!"
+      matMiniFab
+      [matMenuTriggerFor]="menu"
+    >
+      <mat-icon>tune</mat-icon>
+    </button>
+  </div>
 
   <mat-menu #menu="matMenu">
     <button
@@ -49,7 +48,7 @@
       (click)="setFilter(parkingsFilter.ALL)"
       [class.bg-(--par-color-primary-light)!]="activeFilter() === parkingsFilter.ALL"
     >
-      <mat-icon>done</mat-icon>
+      <mat-icon>thumbs_up_down</mat-icon>
       <span>Wszystkie</span>
     </button>
   </mat-menu>

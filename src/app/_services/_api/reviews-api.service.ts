@@ -14,13 +14,13 @@ export class ReviewsApiService {
 
   getReviews(parkingPointId: number): Observable<Review[]> {
     return this._httpClient
-      .get<Review[]>(`${environment.apiUrl}/parkings/${parkingPointId}/reviews/`)
+      .get<Review[]>(`${environment.apiUrl}/parking-points/${parkingPointId}/reviews/`)
       .pipe(map((reviews: Review[]) => reviews.map((review: Review) => new Review(review))));
   }
 
   postReview(parkingPointId: number, body: ReviewSaveData) {
     return this._httpClient
-      .post(`${environment.apiUrl}/parkings/${parkingPointId}/reviews/`, body)
+      .post(`${environment.apiUrl}/parking-points/${parkingPointId}/reviews/`, body)
       .pipe(switchMap(() => this._parkingsApiService.getParking(parkingPointId)));
   }
 }

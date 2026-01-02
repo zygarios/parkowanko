@@ -40,6 +40,7 @@ export class MapInitializerService {
         positionOptions: { enableHighAccuracy: true },
         showAccuracyCircle: false,
         trackUserLocation: true, // Tylko jednorazowe centrowanie, bez śledzenia kamery
+
         fitBoundsOptions: { maxZoom: 17, animate: false },
       });
 
@@ -49,9 +50,7 @@ export class MapInitializerService {
         maxBounds: mapConfigData.POLAND_MAX_BOUNDS, // Ograniczenie przesuwania poza Polskę (+3° margines)
         bounds: mapConfigData.POLAND_BOUNDS, // Początkowy widok: cała Polska
         style: style as any,
-      })
-        .addControl(new maplibregl.NavigationControl({ showCompass: false }))
-        .addControl(geolocate);
+      }).addControl(geolocate);
 
       // Wyłącz rotację mapy gestem dotykowym
       mapRef.touchZoomRotate.disableRotation();
@@ -83,10 +82,28 @@ export class MapInitializerService {
     size = 128,
   ): Promise<void> {
     try {
-      const image = new Image(size, size);
+      const image = new Image();
       image.src = url;
       await image.decode();
-      map.addImage(name, image);
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const ratio = image.width / image.height;
+      if (ratio > 1) {
+        // Obraz szeroki
+        canvas.width = size;
+        canvas.height = size / ratio;
+      } else {
+        // Obraz wysoki lub kwadrat
+        canvas.width = size * ratio;
+        canvas.height = size;
+      }
+
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      map.addImage(name, imageData);
     } catch (error) {
       console.error(`Failed to load image "${name}" from ${url}`, error);
     }
@@ -102,5 +119,6 @@ export class MapInitializerService {
     this._mapLayersService.prepareLayersForPoisRadius(map);
     this._mapLayersService.prepareLayersForPoiLines(map, this._mapRendererService.getLineGeoJson());
     this._mapLayersService.prepareLayersForTargetLocation(map);
+    this._mapLayersService.prepareLayersForEditArea(map);
   }
 }

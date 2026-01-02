@@ -10,6 +10,6 @@ export class ParkingEditLocationApiService {
   private _httpClient = inject(HttpClient);
 
   addEditLocationProposal(id: number, body: ParkingEditLocationProposalSaveData) {
-    return this._httpClient.post(`${environment.apiUrl}/parkings/${id}/edit-location/`, body);
+    return this._httpClient.post(`${environment.apiUrl}/parking-points/${id}/edit-location/`, body);
   }
 }

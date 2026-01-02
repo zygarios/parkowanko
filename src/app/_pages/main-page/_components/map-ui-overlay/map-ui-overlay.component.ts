@@ -25,11 +25,6 @@ import { AddressSearchBoxComponent } from './_components/address-search-box/addr
   templateUrl: './map-ui-overlay.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-    .add-location-button {
-      --mat-fab-small-container-color: var(--par-color-primary);
-      --mat-fab-small-foreground-color: white;
-    }
-
     .find-nearest-parking-button {
       --mat-fab-container-color: var(--par-color-primary);
       --mat-fab-foreground-color: white;

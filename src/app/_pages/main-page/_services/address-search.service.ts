@@ -1,6 +1,6 @@
 import { effect, inject, Injectable, signal, Signal, untracked } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { debounce, distinctUntilChanged, interval, of, switchMap } from 'rxjs';
+import { debounce, distinctUntilChanged, of, switchMap, timer } from 'rxjs';
 import { GeocodeApiService } from '../../../_services/_api/geocode-api.service';
 import { GeocodeFeature } from '../../../_types/geocode-api.type';
 import { MapService } from './map/map.service';
@@ -16,7 +16,7 @@ export class AddressSearchService {
     return toSignal<GeocodeFeature[]>(
       toObservable(searchTerm).pipe(
         distinctUntilChanged(),
-        debounce((searchTerm) => (!searchTerm ? interval() : interval(300))),
+        debounce((searchTerm) => timer(searchTerm ? 300 : 0)),
         switchMap((searchTerm) => {
           if (!searchTerm) return of([]);
           return this._geocodeApiService.getAddresses(searchTerm);

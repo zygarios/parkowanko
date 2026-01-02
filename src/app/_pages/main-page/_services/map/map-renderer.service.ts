@@ -6,6 +6,7 @@ import { LocationCoords } from '../../../../_types/location-coords.type';
 import { ParkingPoint } from '../../../../_types/parking-point.type';
 import { mapConfigData } from '../../_data/map-config-data';
 import {
+  PARKING_EDIT_AREA_SOURCE,
   PARKING_POI_LINE_SOURCE,
   PARKING_POI_RADIUS_SOURCE,
   PARKING_POI_SOURCE,
@@ -14,6 +15,37 @@ import {
 
 @Injectable()
 export class MapRendererService {
+  /**
+   * Renderuje zielony obszar dozwolonej edycji (100m)
+   * @param map - Instancja mapy
+   * @param coords - Współrzędne środka obszaru
+   */
+  renderEditArea(map: maplibregl.Map, coords?: LocationCoords) {
+    const editAreaSource = map.getSource(PARKING_EDIT_AREA_SOURCE) as maplibregl.GeoJSONSource;
+    if (!editAreaSource) return;
+
+    if (!coords) {
+      editAreaSource.setData({
+        type: 'FeatureCollection',
+        features: [],
+      });
+      return;
+    }
+
+    const circleFeature = circle(
+      [coords.lng, coords.lat],
+      mapConfigData.MAX_DISTANCE_TO_EDIT_LOCATION_METERS,
+      {
+        steps: 64,
+        units: 'meters',
+      },
+    );
+
+    editAreaSource.setData({
+      type: 'FeatureCollection',
+      features: [circleFeature],
+    });
+  }
   /**
    * Renderuje POI parkingów jako punkty GeoJSON z klastrowaniem
    * Parking jest serializowany do JSON w properties dla późniejszego odczytu przy kliknięciu

@@ -39,52 +39,67 @@ export class MapPoisControllerService {
     this._mapService.removeMoveableMarker();
     this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    const sheetRef = this._parkingPointActionsSheetService.openSheet(
-      {
-        parkingPoint: this._selectedParking()!,
-      },
-      {
-        hasBackdrop: true,
-      },
-    );
-
-    sheetRef.onDismiss
+    this._parkingPointActionsSheetService
+      .openSheet(
+        {
+          parkingPoint: this._selectedParking()!,
+        },
+        {
+          hasBackdrop: true,
+        },
+      )
       .pipe(
-        switchMap((result) => {
-          switch (result) {
-            case PoiActionsEnum.NAVIGATE:
-              const location = this._selectedParking()?.location;
-              setTimeout(() => {
-                if (location) {
-                  window.open(
-                    `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`,
-                    '_blank',
-                  );
-                }
-              }, 100);
-              break;
-            case PoiActionsEnum.ADD_REVIEW:
-              this._matDialog.open(AddReviewComponent, {
-                data: { parkingPointId: this._selectedParking()?.id },
-              });
-              break;
-            case PoiActionsEnum.VIEW_REVIEWS:
-              this._matDialog.open(ReviewsComponent, {
-                data: { parkingPoint: this._selectedParking() },
-              });
-              break;
-            case PoiActionsEnum.UPDATE_LOCATION:
-              sheetRef.dismiss();
-              return this.handleUpdateUserChoice();
-          }
+        switchMap((sheetRef) =>
+          sheetRef.onDismiss.pipe(
+            switchMap((result) => {
+              switch (result) {
+                case PoiActionsEnum.NAVIGATE:
+                  this._handleNavigate();
+                  break;
+                case PoiActionsEnum.ADD_REVIEW:
+                  this._handleAddReview();
+                  break;
+                case PoiActionsEnum.VIEW_REVIEWS:
+                  this._handleViewReviews();
+                  break;
+                case PoiActionsEnum.UPDATE_LOCATION:
+                  sheetRef.dismiss();
+                  return this.handleUpdateUserChoice();
+              }
 
-          sheetRef.dismiss();
-          this._selectedParking.set(null);
-          return of(null);
-        }),
+              sheetRef.dismiss();
+              this._selectedParking.set(null);
+              return of(null);
+            }),
+          ),
+        ),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
+  }
+
+  private _handleNavigate() {
+    const location = this._selectedParking()?.location;
+    setTimeout(() => {
+      if (location) {
+        window.open(
+          `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`,
+          '_blank',
+        );
+      }
+    }, 100);
+  }
+
+  private _handleAddReview() {
+    this._matDialog.open(AddReviewComponent, {
+      data: { parkingPointId: this._selectedParking()?.id },
+    });
+  }
+
+  private _handleViewReviews() {
+    this._matDialog.open(ReviewsComponent, {
+      data: { parkingPoint: this._selectedParking() },
+    });
   }
 
   handleUpdateUserChoice() {
@@ -105,7 +120,7 @@ export class MapPoisControllerService {
         if (result === PoiActionsEnum.CONFIRM) {
           if (this._mapService.isMarkerInsideDisabledZone()) {
             this._sharedUtilsService.openSnackbar(
-              'Twoje miejsce znajduje się zbyt blisko innych punktów parkingowych.',
+              'Punkt jest zbyt blisko innych parkingów lub zbyt daleko od oryginału (max 100m).',
               'ERROR',
             );
             return EMPTY;

@@ -5,6 +5,7 @@ import { mapConfigData } from '../../_data/map-config-data';
 export const PARKING_POI_SOURCE = 'parkingPoiSource';
 export const PARKING_POI_RADIUS_SOURCE = 'parkingMarkerRadiusSource';
 export const PARKING_POI_LINE_SOURCE = 'parkingPoiLineSource';
+export const PARKING_EDIT_AREA_SOURCE = 'parkingEditAreaSource';
 export const TARGET_LOCATION_SOURCE = 'targetLocationSource';
 
 @Injectable()
@@ -241,6 +242,44 @@ export class MapLayersService {
         'icon-image': 'target-location',
         'icon-size': 0.35,
         'icon-overlap': 'always',
+      },
+    });
+  }
+
+  /**
+   * Przygotowuje warstwy dla obszaru edycji (maksymalny dystans 100m)
+   * Pokazuje zielony promień wokół punktu startowego
+   */
+  prepareLayersForEditArea(map: maplibregl.Map) {
+    map.addSource(PARKING_EDIT_AREA_SOURCE, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    map.addLayer({
+      id: 'edit-area-fill',
+      type: 'fill',
+      source: PARKING_EDIT_AREA_SOURCE,
+      minzoom: mapConfigData.MIN_ZOOM_TO_SHOW_RADIUS,
+      paint: {
+        'fill-color': environment.colors.success,
+        'fill-opacity': 0.05,
+      },
+    });
+
+    map.addLayer({
+      id: 'edit-area-outline',
+      type: 'line',
+      source: PARKING_EDIT_AREA_SOURCE,
+      minzoom: mapConfigData.MIN_ZOOM_TO_SHOW_RADIUS,
+      paint: {
+        'line-color': environment.colors.success,
+        'line-width': 1,
+        'line-opacity': 0.5,
+        'line-dasharray': [4, 4],
       },
     });
   }

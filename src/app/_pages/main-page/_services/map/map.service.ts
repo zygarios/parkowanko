@@ -32,7 +32,7 @@ export class MapService {
   private _poiClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
   private _clusterClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
 
-  private _renderedParkingsCoordsList: LocationCoords[] = [];
+  private _renderedParkingsList: ParkingPoint[] = [];
   private _isMapLoaded = signal<boolean>(false);
 
   isMapLoaded = this._isMapLoaded.asReadonly();
@@ -100,7 +100,7 @@ export class MapService {
    * @param parkingsList - Lista parkingów do wyświetlenia na mapie
    */
   renderParkingsPois(parkingsList: ParkingPoint[]): void {
-    this._renderedParkingsCoordsList = parkingsList.map((parking) => parking.location);
+    this._renderedParkingsList = parkingsList;
     this._mapRendererService.renderPois(this._map!, parkingsList);
   }
 
@@ -117,7 +117,7 @@ export class MapService {
 
     // Ustaw marker w centrum mapy i dodaj do widoku
     this._markerRef!.setLngLat(this._map!.getCenter()).addTo(this._map!);
-    this._renderFeaturesForParkingPoi();
+    this._renderFeaturesForParkingPoi(fixedCoords);
 
     // Podłącz marker do ruchu mapy (marker podąża za centrum)
     this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
@@ -154,11 +154,20 @@ export class MapService {
     const markerCoords = this.getMarkerLatLng();
     const markerPoint = point([markerCoords.lng, markerCoords.lat]);
     const bounds = this._map!.getBounds();
+    const excludeId = this.selectedParking()?.id;
+
+    // 0. Renderowanie obszaru dozwolonej edycji (100m)
+    this._mapRendererService.renderEditArea(this._map!, oldLocationCoords);
 
     // 1. Renderowanie wszystkich promieni (niebieskie / czerwone)
-    const visiblePoints = this._renderedParkingsCoordsList.filter((p) =>
-      bounds.contains([p.lng, p.lat]),
-    );
+    // Wykluczamy aktualnie edytowany punkt z kolizji, aby móc go "przesunąć" o mały dystans
+    const parkingsToCheck = excludeId
+      ? this._renderedParkingsList.filter((p: ParkingPoint) => p.id !== excludeId)
+      : this._renderedParkingsList;
+
+    const visiblePoints = parkingsToCheck
+      .filter((p: ParkingPoint) => bounds.contains([p.location.lng, p.location.lat]))
+      .map((p: ParkingPoint) => p.location);
 
     const bufferPoi = buffer(markerPoint, mapConfigData.PARKING_POI_RADIUS_BOUND, {
       units: 'meters',
@@ -166,28 +175,37 @@ export class MapService {
 
     if (!bufferPoi) return;
 
-    // Sprawdzamy czy marker koliduje z JAKIMKOLWIEK parkingiem
-    const parkingPoiInRadius = this._renderedParkingsCoordsList.find((coords: LocationCoords) =>
-      booleanPointInPolygon([coords.lng, coords.lat], bufferPoi),
-    );
+    // Sprawdzamy czy marker koliduje z JAKIMKOLWIEK parkingiem (oprócz edytowanego)
+    const parkingPoiInRadius = parkingsToCheck.find((p: ParkingPoint) =>
+      booleanPointInPolygon([p.location.lng, p.location.lat], bufferPoi),
+    )?.location;
 
     this._mapRendererService.renderRadiiForPois(this._map!, visiblePoints, parkingPoiInRadius);
 
     // 2. Zarządzanie linią dystansu i stanem markera
     const markerElement = this._markerRef?.getElement();
 
-    if (parkingPoiInRadius) {
-      // KRYTYCZNE: Jeśli jest kolizja, linia MUSI pokazywać punkt kolidujący
+    // Sprawdzamy dystans od punktu startowego przy edycji
+    let isTooFarFromOriginal = false;
+    if (oldLocationCoords) {
+      const dist = distance(point([oldLocationCoords.lng, oldLocationCoords.lat]), markerPoint, {
+        units: 'meters',
+      });
+      isTooFarFromOriginal = dist > mapConfigData.MAX_DISTANCE_TO_EDIT_LOCATION_METERS;
+    }
+
+    if (parkingPoiInRadius || isTooFarFromOriginal) {
+      // KRYTYCZNE: Jeśli jest kolizja lub za daleko, linia MUSI pokazywać punkt problematyczny
       this.isMarkerInsideDisabledZone.set(true);
       markerElement?.classList.add('disabled');
 
       this.renderLineBetweenPoints({
-        fixedCoords: parkingPoiInRadius,
+        fixedCoords: parkingPoiInRadius || oldLocationCoords!,
         targetCoords: markerCoords,
         isColliding: true,
       });
     } else {
-      // Brak kolizji - czyścimy stan blokady
+      // Brak kolizji i w zasięgu - czyścimy stan blokady
       this.isMarkerInsideDisabledZone.set(false);
       markerElement?.classList.remove('disabled');
 
@@ -215,6 +233,7 @@ export class MapService {
 
     this.removeLineBetweenPoints();
     this._mapRendererService.renderRadiiForPois(this._map, []);
+    this._mapRendererService.renderEditArea(this._map);
     this.isMarkerInsideDisabledZone.set(false);
     this._map.off('move', this._moveMarkerFnRef!);
     this._map.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);
@@ -326,21 +345,24 @@ export class MapService {
 
     this._globalSpinnerService.hide();
 
-    if (this._renderedParkingsCoordsList.length === 0) {
+    if (this._renderedParkingsList.length === 0) {
       this._sharedUtilsService.openSnackbar('Brak parkingów do przeszukania.', 'ERROR');
       return;
     }
 
     const points = featureCollection(
-      this._renderedParkingsCoordsList.map((p) => point([p.lng, p.lat], { original: p })),
+      this._renderedParkingsList.map((p: ParkingPoint) =>
+        point([p.location.lng, p.location.lat], { original: p.location }),
+      ),
     );
 
-    const nearestFeature = nearestPoint([locationCoords.lng, locationCoords.lat], points);
+    const nearestFeature = nearestPoint(point([locationCoords.lng, locationCoords.lat]), points);
     const nearestParkingLocationCoords = nearestFeature.properties['original'] as LocationCoords;
 
     const dist = distance(
-      [locationCoords.lng, locationCoords.lat],
-      [nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat],
+      point([locationCoords.lng, locationCoords.lat]),
+      point([nearestParkingLocationCoords.lng, nearestParkingLocationCoords.lat]),
+      { units: 'kilometers' },
     );
 
     if (dist <= mapConfigData.MAX_DISTANCE_TO_NEAREST_PARKING_KM) {
@@ -394,17 +416,21 @@ export class MapService {
   private _cleanUpMapCore() {
     if (!this._map) return;
 
-    this.removeLineBetweenPoints();
-    this.removeTargetLocationPoi;
-    this._markerRef?.remove();
-    this._map?.remove();
+    try {
+      this.removeLineBetweenPoints();
+      this.removeTargetLocationPoi();
+      this._markerRef?.remove();
+      this._map?.remove();
+    } catch (e) {
+      console.warn('Error during map cleanup:', e);
+    }
 
     // Wyzeruj referencje (zapobiega wyciekowi pamięci)
     this.selectedParking.set(null);
     this.isMarkerInsideDisabledZone.set(false);
     this._map = null;
     this._markerRef = null;
-    this._renderedParkingsCoordsList = [];
+    this._renderedParkingsList = [];
     this._isMapLoaded.set(false);
   }
 }

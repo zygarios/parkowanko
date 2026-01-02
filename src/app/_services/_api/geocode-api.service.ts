@@ -7,12 +7,36 @@ import {
   GeocodeFeatureResponse,
   GeocodeResponse,
 } from '../../_types/geocode-api.type';
+import { LocationCoords } from '../../_types/location-coords.type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GeocodeApiService {
   private httpClient = inject(HttpClient);
+
+  getAddressByCoordinates(location: LocationCoords): Observable<string> {
+    return this.httpClient
+      .get<any>(
+        `${environment.geocodeApi}/?request=GetAddressReverse&location=POINT(${location.lng} ${location.lat})&srid=4326`,
+      )
+      .pipe(
+        map((res: any): string => {
+          const location = res.results?.[1];
+          if (!location) {
+            return '';
+          }
+
+          const city = location.city;
+          const street = location.street;
+          const number = location.number;
+          const code = location.code;
+
+          const streetAndNumber = street ? `ul. ${street} ${number}` : number;
+          return [city, streetAndNumber, code].filter(Boolean).join(', ');
+        }),
+      );
+  }
 
   getAddresses(searchTerm: string): Observable<GeocodeFeature[]> {
     return forkJoin([

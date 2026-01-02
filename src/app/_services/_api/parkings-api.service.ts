@@ -29,10 +29,12 @@ export class ParkingsApiService {
 
   getParkings(force = false): Signal<ParkingPoint[]> {
     if (!this._parkingsList().length || force) {
-      this._httpClient.get<ParkingPoint[]>(`${environment.apiUrl}/parkings/`).subscribe((res) => {
-        const parkings = res.map((parking) => new ParkingPoint(parking));
-        this._parkingsList.set(parkings);
-      });
+      this._httpClient
+        .get<ParkingPoint[]>(`${environment.apiUrl}/parking-points/`)
+        .subscribe((res) => {
+          const parkings = res.map((parking) => new ParkingPoint(parking));
+          this._parkingsList.set(parkings);
+        });
     }
 
     return this.filteredParkingsList;
@@ -40,7 +42,7 @@ export class ParkingsApiService {
 
   getParking(parkingPointId: number): Observable<ParkingPoint> {
     return this._httpClient
-      .get<ParkingPoint>(`${environment.apiUrl}/parkings/${parkingPointId}/`)
+      .get<ParkingPoint>(`${environment.apiUrl}/parking-points/${parkingPointId}/`)
       .pipe(
         tap((res) => {
           const parking = new ParkingPoint(res);
@@ -56,7 +58,7 @@ export class ParkingsApiService {
 
   postParking(body: ParkingPointSaveData): Observable<ParkingPoint> {
     this._globalSpinnerService.show('Dodawanie nowego parkingu...');
-    return this._httpClient.post<ParkingPoint>(`${environment.apiUrl}/parkings/`, body).pipe(
+    return this._httpClient.post<ParkingPoint>(`${environment.apiUrl}/parking-points/`, body).pipe(
       tap((newParking: ParkingPoint) =>
         this._parkingsList.update((parkings: ParkingPoint[]) => [
           ...parkings,

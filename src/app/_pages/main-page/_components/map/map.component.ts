@@ -24,6 +24,9 @@ import { MapService } from '../../_services/map/map.service';
       }
       .maplibregl-ctrl-group {
         border-radius: var(--mat-sys-corner-medium);
+        position: fixed;
+        bottom: 80px;
+        right: 5px;
         button {
           width: 40px;
           height: 40px;
@@ -41,7 +44,7 @@ import { MapService } from '../../_services/map/map.service';
     }
 
     .marker.disabled {
-      opacity: 0.5 !important;
+      opacity: 0.4 !important;
     }
   `,
   selector: 'app-map',

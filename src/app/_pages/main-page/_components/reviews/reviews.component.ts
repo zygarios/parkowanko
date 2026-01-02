@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
@@ -23,7 +23,10 @@ export class ReviewsComponent {
 
   dialogData = inject<{ parkingPoint: ParkingPoint }>(MAT_DIALOG_DATA);
 
-  reviews = signal<Review[]>([]);
+  private _reviews = signal<Review[]>([]);
+  reviews = computed(() =>
+    this._reviews().sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+  );
 
   constructor() {
     this._getReviews();
@@ -35,7 +38,7 @@ export class ReviewsComponent {
       const reviews = await firstValueFrom(
         this._reviewsApiService.getReviews(this.dialogData.parkingPoint.id),
       );
-      this.reviews.set(reviews);
+      this._reviews.set(reviews);
     } finally {
       this._globalSpinnerService.hide();
     }

@@ -25,16 +25,11 @@
   --mat-dialog-headline-padding: 20px 24px 15px;
 
   /* MAT-TOOLTIP */
-  --mat-tooltip-container-color: var(--par-color-primary);
-  --mat-tooltip-label-text-color: white;
+  --mat-tooltip-container-color: var(--mat-sys-surface);
+  --mat-tooltip-supporting-text-color: var(--par-color-black);
 
   /* MAT-OPTION */
   --mat-option-label-text-size: 14px;
-
-  /* STEPPER */
-  /* Dostosowanie kolorów aby pozostały takie same, niezależnie od aktualnego stanu w stepperze */
-  --mat-stepper-header-done-state-icon-background-color: var(--mat-sys-on-surface-variant);
-  --mat-stepper-header-done-state-icon-foreground-color: white;
 
   /* SNACKBAR */
   --mat-snack-bar-container-color: var(--mat-sys-primary);
@@ -121,7 +116,7 @@
 
   /* TOOLTIP */
   .mat-mdc-tooltip-surface {
-    border: 2px solid white;
+    border: 3px solid var(--par-color-primary);
     box-shadow: var(--mat-sys-level2);
   }
 }

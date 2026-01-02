@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -11,4 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
 export class ReviewsVotesSummaryComponent {
   positiveCount = input.required<number>();
   negativeCount = input.required<number>();
+
+  hasVotes = computed(() => this.positiveCount() || this.negativeCount());
 }

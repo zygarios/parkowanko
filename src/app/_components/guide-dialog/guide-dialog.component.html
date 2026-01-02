@@ -3,53 +3,79 @@
   <mat-icon mat-dialog-close>close</mat-icon>
 </div>
 
-<mat-stepper #stepper>
-  <mat-step>
-    <div>
-      To miejsce, gdzie możesz znaleźć i dodać
-      <strong>DARMOWE MIEJSCA PARKINGOWE</strong> w Twoim mieście!
-      <br />
-      <br />
-      Dzięki społeczności użytkowników łatwiej zaparkujesz
-      <strong>BEZ PŁACENIA</strong> za strefy parkingowe.
+<div class="relative flex-1 flex flex-col items-center overflow-hidden p-5 min-h-[50dvh]">
+  @if (currentStep() === 1) {
+    <div class="flex flex-col items-center text-center w-full animate-[fadeIn_0.4s_ease-in-out]">
+      <mat-icon class="text-6xl! size-16! mb-4 text-(--par-color-primary)!">info</mat-icon>
+      <div class="max-w-md">
+        <p>
+          To miejsce, gdzie możesz znaleźć i dodać
+          <strong>DARMOWE MIEJSCA PARKINGOWE</strong> w Twoim mieście!
+        </p>
+        <p class="mt-4">
+          Dzięki społeczności użytkowników łatwiej zaparkujesz
+          <strong>BEZ PŁACENIA</strong> za strefy parkingowe.
+        </p>
+      </div>
     </div>
-  </mat-step>
-  <mat-step>
-    <div>
-      <ul>
-        <li><strong>Wyszukuj</strong> darmowe miejsca parkingowe na mapie.</li>
-        <br />
-        <li><strong>Dodawaj</strong> nowe lokalizacje, które znasz.</li>
-        <br />
-        <li><strong>Edytuj</strong> i <strong>usuwaj</strong> punkty POI swoje i innych.</li>
-      </ul>
-    </div>
-  </mat-step>
-  <mat-step>
-    <div>
-      Im więcej osób dzieli się miejscami, tym łatwiej znaleźć darmowy parking.
-      <br />
-      <br />
-      <strong>Zacznij teraz</strong> - sprawdź mapę i dodaj swoje pierwsze miejsce!
-    </div>
-  </mat-step>
+  }
 
-  <ng-template matStepperIcon="edit" let-index="index">
-    {{ index + 1 }}
-  </ng-template>
-  <ng-template matStepperIcon="done" let-index="index">
-    {{ index + 1 }}
-  </ng-template>
-  <ng-template matStepperIcon="number" let-index="index">
-    {{ index + 1 }}
-  </ng-template>
-</mat-stepper>
+  @if (currentStep() === 2) {
+    <div class="flex flex-col items-center text-center w-full animate-[fadeIn_0.4s_ease-in-out]">
+      <mat-icon class="text-6xl! size-16! mb-4 text-(--par-color-primary)!">list</mat-icon>
+      <div class="text-left max-w-md">
+        <ul class="space-y-4">
+          <li class="flex gap-2">
+            <mat-icon class="text-(--par-color-primary)!">check_circle</mat-icon>
+            <div class="w-fit"><strong>Wyszukuj</strong> darmowe miejsca parkingowe na mapie.</div>
+          </li>
+          <li class="flex gap-2">
+            <mat-icon class="text-(--par-color-primary)!">check_circle</mat-icon>
+            <div class="w-fit"><strong>Dodawaj</strong> nowe lokalizacje, które znasz.</div>
+          </li>
+          <li class="flex gap-2">
+            <mat-icon class="text-(--par-color-primary)!">check_circle</mat-icon>
+            <div class="w-fit">
+              <strong>Edytuj</strong> i <strong>usuwaj</strong> punkty POI swoje i innych.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  }
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="stepper.previous()">Poprzednie</button>
-  @if (stepper.selectedIndex !== 2) {
-    <button mat-flat-button (click)="stepper.next()">Następne</button>
+  @if (currentStep() === 3) {
+    <div class="flex flex-col items-center text-center w-full animate-[fadeIn_0.4s_ease-in-out]">
+      <mat-icon class="text-6xl! size-16! mb-4 text-(--par-color-primary)!">rocket_launch</mat-icon>
+      <div class="max-w-md">
+        <p>Im więcej osób dzieli się miejscami, tym łatwiej znaleźć darmowy parking.</p>
+        <p class="mt-4 font-bold text-lg">
+          Zacznij teraz - sprawdź mapę i dodaj swoje pierwsze miejsce!
+        </p>
+      </div>
+    </div>
+  }
+</div>
+
+<div class="flex gap-3 justify-center py-4">
+  @for (step of [1, 2, 3]; track step) {
+    <div
+      class="w-2.5 h-2.5 rounded-full cursor-pointer transition-all bg-(--par-color-primary)/20"
+      [class.bg-(--par-color-primary)!]="currentStep() === step"
+      [class.scale-125]="currentStep() === step"
+      (click)="goToStep(step)"
+    ></div>
+  }
+</div>
+
+<mat-dialog-actions align="end" class="p-4 border-t">
+  @if (currentStep() !== 1) {
+    <button mat-button (click)="prev()">Poprzednie</button>
+  }
+
+  @if (currentStep() !== STEPS_LENGTH) {
+    <button mat-flat-button (click)="next()">Następne</button>
   } @else {
-    <button mat-flat-button mat-dialog-close>Zamknij</button>
+    <button mat-flat-button mat-dialog-close color="primary">Zacznij przygodę</button>
   }
 </mat-dialog-actions>

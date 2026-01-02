@@ -1,18 +1,27 @@
-<div class="flex h-6 overflow-hidden rounded-xl">
+<div class="flex h-6 overflow-hidden rounded-xl relative">
   <div
-    class="h-full flex items-center px-2 gap-1 justify-start"
-    style="background-color: var(--par-color-success)"
-    [style.flex]="positiveCount() + 1 || 1"
+    class="h-full flex items-center gap-1 justify-start relative"
+    [style.background]="hasVotes() ? 'var(--par-color-success)' : 'rgba(0,0,0,.2)'"
+    [style.flex]="hasVotes() ? positiveCount() : 1"
   >
-    <div class="text-white font-medium">{{ positiveCount() }}</div>
-    <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_up</mat-icon>
+    <div class="flex items-center gap-1 absolute left-0">
+      <div class="text-white font-medium ml-2">{{ positiveCount() }}</div>
+      <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_up</mat-icon>
+    </div>
   </div>
+  @if (!hasVotes()) {
+    <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white">
+      Brak ocen
+    </div>
+  }
   <div
-    class="h-full flex items-center px-2 gap-1 justify-end"
-    style="background-color: var(--par-color-error)"
-    [style.flex]="negativeCount() + 1 || 1"
+    class="h-full flex items-center gap-1 justify-end relative"
+    [style.flex]="hasVotes() ? negativeCount() : 0"
+    [style.background]="hasVotes() ? 'var(--par-color-error)' : 'rgba(0,0,0,.2)'"
   >
-    <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_down</mat-icon>
-    <div class="text-white font-medium">{{ negativeCount() }}</div>
+    <div class="flex items-center gap-1 absolute right-0">
+      <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_down</mat-icon>
+      <div class="text-white font-medium mr-2">{{ negativeCount() }}</div>
+    </div>
   </div>
 </div>
