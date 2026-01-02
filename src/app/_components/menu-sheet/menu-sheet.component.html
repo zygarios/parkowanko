@@ -20,16 +20,15 @@
   </div>
 
   <div class="relative -translate-x-1/2 left-1/2 w-dvw pb-2 overflow-auto">
-    <div class="flex flex-row gap-2 px-4 flex-nowrap" [class.w-fit]="data.hasHorizontalScroll">
+    <div class="flex flex-row gap-2 px-4 flex-nowrap">
       @for (menu of data.menuItems; track menu) {
         @if (menu.isPrimary || menu.isSuccess || menu.isError) {
           <button
             mat-flat-button
             [class.button-error]="menu.isError"
             [class.button-success]="menu.isSuccess"
-            [class]="data.hasHorizontalScroll ? 'w-auto' : 'w-1/2'"
-            class="flex justify-center!"
-            (click)="choose(menu)"
+            class="flex justify-center! flex-1"
+            (click)="choose(menu.result)"
           >
             @if (menu.icon) {
               <mat-icon>{{ menu.icon }}</mat-icon>
@@ -39,9 +38,8 @@
         } @else {
           <button
             mat-stroked-button
-            [class]="data.hasHorizontalScroll ? 'w-auto' : 'w-1/2'"
-            class="flex justify-center!"
-            (click)="choose(menu)"
+            class="flex justify-center! flex-1"
+            (click)="choose(menu.result)"
           >
             @if (menu.icon) {
               <mat-icon>{{ menu.icon }}</mat-icon>

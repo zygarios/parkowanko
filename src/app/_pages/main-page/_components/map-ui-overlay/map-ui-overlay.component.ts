@@ -5,8 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
+import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { AuthService } from '../../../../_services/_core/auth.service';
 import { GeocodeFeature } from '../../../../_types/geocode-api.type';
+import { ParkingsFilter } from '../../../../_types/parkings-filter.type';
 import { MapPoisControllerService } from '../../_services/map-pois-controller.service';
 import { MapService } from '../../_services/map/map.service';
 import { AddressSearchBoxComponent } from './_components/address-search-box/address-search-box.component';
@@ -37,6 +39,7 @@ import { AddressSearchBoxComponent } from './_components/address-search-box/addr
 export class MapUiOverlayComponent {
   private _authService = inject(AuthService);
   private _mapService = inject(MapService);
+  private _parkingsApiService = inject(ParkingsApiService);
   private _matDialog = inject(MatDialog);
   private _mapPoisControllerService = inject(MapPoisControllerService);
 
@@ -44,6 +47,9 @@ export class MapUiOverlayComponent {
 
   selectedAddress = signal<GeocodeFeature | null>(null);
   isAddingPoiActive = signal<boolean>(false);
+
+  activeFilter = this._parkingsApiService.parkingFilter;
+  parkingsFilter = ParkingsFilter;
 
   logout() {
     this._authService.logout();
@@ -65,5 +71,9 @@ export class MapUiOverlayComponent {
 
   async findNearestParking() {
     this._mapService.findNearestParking(this.selectedAddress()?.coords);
+  }
+
+  setFilter(filter: ParkingsFilter) {
+    this.activeFilter.set(filter);
   }
 }

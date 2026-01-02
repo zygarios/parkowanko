@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, Signal, signal } from '@angular/core';
+import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { finalize, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { GlobalSpinnerService } from '../../_services/_core/global-spinner.service';
 import { ParkingPoint, ParkingPointSaveData } from '../../_types/parking-point.type';
+import { ParkingsFilter } from '../../_types/parkings-filter.type';
 
 @Injectable({
   providedIn: 'root',
@@ -12,17 +13,29 @@ export class ParkingsApiService {
   private _httpClient = inject(HttpClient);
   private _globalSpinnerService = inject(GlobalSpinnerService);
 
-  private parkingsList = signal<ParkingPoint[]>([]);
+  private _parkingsList = signal<ParkingPoint[]>([]);
+  parkingFilter = signal<ParkingsFilter>(ParkingsFilter.ALL);
+
+  filteredParkingsList = computed(() => {
+    const list = this._parkingsList();
+    const filter = this.parkingFilter();
+
+    if (filter === ParkingsFilter.WELL_RATED) {
+      return list.filter((p) => p.likeCount > p.dislikeCount);
+    }
+
+    return list;
+  });
 
   getParkings(force = false): Signal<ParkingPoint[]> {
-    if (!this.parkingsList().length || force) {
+    if (!this._parkingsList().length || force) {
       this._httpClient.get<ParkingPoint[]>(`${environment.apiUrl}/parkings/`).subscribe((res) => {
         const parkings = res.map((parking) => new ParkingPoint(parking));
-        this.parkingsList.set(parkings);
+        this._parkingsList.set(parkings);
       });
     }
 
-    return this.parkingsList.asReadonly();
+    return this.filteredParkingsList;
   }
 
   getParking(parkingPointId: number): Observable<ParkingPoint> {
@@ -31,9 +44,9 @@ export class ParkingsApiService {
       .pipe(
         tap((res) => {
           const parking = new ParkingPoint(res);
-          const parkingIndex = this.parkingsList().findIndex((item) => item.id === parking.id);
+          const parkingIndex = this._parkingsList().findIndex((item) => item.id === parking.id);
           if (parkingIndex !== -1) {
-            this.parkingsList.update((parkings: ParkingPoint[]) =>
+            this._parkingsList.update((parkings: ParkingPoint[]) =>
               parkings.toSpliced(parkingIndex, 1, parking),
             );
           }
@@ -45,7 +58,7 @@ export class ParkingsApiService {
     this._globalSpinnerService.show('Dodawanie nowego parkingu...');
     return this._httpClient.post<ParkingPoint>(`${environment.apiUrl}/parkings/`, body).pipe(
       tap((newParking: ParkingPoint) =>
-        this.parkingsList.update((parkings: ParkingPoint[]) => [
+        this._parkingsList.update((parkings: ParkingPoint[]) => [
           ...parkings,
           new ParkingPoint(newParking),
         ]),

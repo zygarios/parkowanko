@@ -6,8 +6,8 @@
 :root {
   --par-color-primary: #00aab9;
   --par-color-primary-light: color-mix(in srgb, var(--par-color-primary), #ffffff 60%);
-  --par-color-error: #ba1a1a;
-  --par-color-success: #01922b;
+  --par-color-error: #e53935;
+  --par-color-success: #43a047;
   --par-color-black: #242424;
   --par-container-padding: 24px;
   --par-border-line: 1px solid rgba(0, 0, 0, 0.15);

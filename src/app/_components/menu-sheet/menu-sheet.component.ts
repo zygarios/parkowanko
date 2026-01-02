@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { filter, merge, Subject } from 'rxjs';
 import { PoiActionsEnum } from '../../_pages/main-page/_components/map-ui-overlay/_types/poi-actions.model';
 import { SheetRef } from '../../_types/sheet-ref.type';
-import { MenuSheetData, MenuSheetItem, MenuSheetResult } from './menu-sheet.model';
+import { MenuSheetData, MenuSheetResult } from './menu-sheet.model';
 
 @Component({
   selector: 'app-menu-sheet',
@@ -42,8 +42,8 @@ export class MenuSheetComponent {
       });
   }
 
-  choose(menu: MenuSheetItem): void {
-    this.sheetComponentRef.onDismiss.next(menu.result);
+  choose(result: MenuSheetResult): void {
+    this.sheetComponentRef.onDismiss.next(result);
   }
 
   ngOnDestroy() {
