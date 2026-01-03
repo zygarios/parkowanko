@@ -40,12 +40,7 @@ export class MapLayersService {
       source: PARKING_POI_SOURCE,
       filter: ['!', ['has', 'point_count']], // Pokaż tylko jeśli NIE ma point_count (nie jest klastrem)
       layout: {
-        'icon-image': [
-          'case',
-          ['get', 'isVerified'],
-          'parking-free-poi',
-          'parking-free-unverified-poi',
-        ],
+        'icon-image': 'parking-free-poi',
         'icon-size': 0.2,
         'icon-overlap': 'always',
         'text-field': [

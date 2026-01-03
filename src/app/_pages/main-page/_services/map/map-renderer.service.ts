@@ -73,7 +73,6 @@ export class MapRendererService {
               parking.likeCount - parking.dislikeCount > 0
                 ? `+${parking.likeCount - parking.dislikeCount}`
                 : `${parking.likeCount - parking.dislikeCount}`,
-            isVerified: parking.isVerified,
           },
         };
       }),

@@ -57,7 +57,6 @@ export class MapInitializerService {
 
       const icons = [
         { name: 'parking-free-poi', url: 'icons/parking-free-poi.svg' },
-        { name: 'parking-free-unverified-poi', url: 'icons/parking-free-unverified-poi.svg' },
         { name: 'target-location', url: 'icons/target-location.svg' },
       ];
 

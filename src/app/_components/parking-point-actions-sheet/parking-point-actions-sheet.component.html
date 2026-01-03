@@ -1,26 +1,9 @@
 <div class="flex flex-col py-4">
   <div>
-    <div class="flex items-center">
-      <div class="flex items-center gap-2">
-        <div>Parking</div>
-        @if (data.parkingPoint.isVerified) {
-          <mat-icon class="material-icons-outlined">verified_user</mat-icon>
-        } @else {
-          <div class="text-xs">(niezweryfikowany)</div>
-        }
-      </div>
-      <button
-        matTooltip="Parking zostaje uznany za zweryfikowany, gdy uzyska odpowiednią liczbę pozytywnych opinii od innych kierowców."
-        matTooltipPosition="above"
-        class="ml-auto"
-        matIconButton
-        #tooltip="matTooltip"
-        (click)="tooltip.toggle()"
-      >
-        <mat-icon class="material-icons-outlined"> info </mat-icon>
-      </button>
+    <div class="flex items-center justify-between">
+      <div class="text-xl font-medium">Parking</div>
       <button matIconButton (click)="sheetComponentRef.onDismiss.next(poiActionsEnum.DISMISS)">
-        <mat-icon> close </mat-icon>
+        <mat-icon>close</mat-icon>
       </button>
     </div>
     <hr class="mt-3 mb-5" />
