@@ -31,9 +31,6 @@
   /* MAT-OPTION */
   --mat-option-label-text-size: 14px;
 
-  /* SNACKBAR */
-  --mat-snack-bar-container-color: var(--mat-sys-primary);
-
   /* BUTTONS-ALL */
 
   .mdc-button {
@@ -61,20 +58,6 @@
     margin-top: auto;
     position: sticky;
     bottom: 0;
-  }
-
-  /* SNACKBAR */
-  --mat-snack-bar-container-color: var(--mat-sys-primary);
-  .mat-mdc-snackbar-surface {
-    box-shadow:
-      0 0 0 2px white,
-      0 0 0 3px var(--mat-snack-bar-container-color),
-      var(--mat-sys-level3);
-  }
-
-  .mat-mdc-snack-bar-handset {
-    margin-top: auto !important;
-    margin-bottom: auto !important;
   }
 
   /* BOTTOM SHEET */

@@ -1,0 +1,36 @@
+<div
+  class="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-(--mat-sys-level2) w-full max-w-[400px] border"
+  [style.background-color]="'color-mix(in srgb, ' + colorVar() + ', white 92%)'"
+  [style.color]="'color-mix(in srgb, ' + colorVar() + ', black 60%)'"
+  [style.border-color]="'color-mix(in srgb, ' + colorVar() + ', white 80%)'"
+>
+  <div
+    class="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
+    [style.background-color]="'color-mix(in srgb, ' + colorVar() + ', white 80%)'"
+  >
+    @switch (data.type) {
+      @case ('SUCCESS') {
+        <mat-icon [style.color]="colorVar()">task_alt</mat-icon>
+      }
+      @case ('ERROR') {
+        <mat-icon [style.color]="colorVar()">warning</mat-icon>
+      }
+      @default {
+        <mat-icon [style.color]="colorVar()">info</mat-icon>
+      }
+    }
+  </div>
+
+  <div class="grow text-sm font-medium leading-tight whitespace-pre-wrap">
+    {{ data.title }}
+  </div>
+
+  <button
+    mat-icon-button
+    class="shrink-0"
+    (click)="snackBarRef.dismiss()"
+    [style.color]="colorVar()"
+  >
+    <mat-icon class="text-[20px]! w-[20px]! h-[20px]!">close</mat-icon>
+  </button>
+</div>

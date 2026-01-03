@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { CustomSnackbarComponent } from '../../_components/custom-snackbar/custom-snackbar.component';
 import {
   InfoDialogComponent,
   InfoDialogData,
@@ -39,15 +40,15 @@ export class SharedUtilsService {
     return this.openSheet(MenuSheetComponent, data, config);
   }
 
-  openSnackbar(title: string, type?: 'ERROR' | 'SUCCESS') {
-    let snackbarClass = '';
-    if (type === 'ERROR') snackbarClass = 'snackbar-error';
-    else if (type === 'SUCCESS') snackbarClass = 'snackbar-success';
-
-    // SetTimeout jest potrzebny aby wymusić renderowanie snackbara po aktualizacji DOM, dzięki czemu snackbar zawsze będzie nad innymi elementami
+  openSnackbar(title: string, type: 'ERROR' | 'SUCCESS' | 'DEFAULT' = 'DEFAULT') {
+    // SetTimeout jest potrzebny aby wymusić renderowanie snackbara po aktualizacji DOM
     setTimeout(() => {
-      this._snackBar.open(title, '', {
-        panelClass: snackbarClass,
+      this._snackBar.openFromComponent(CustomSnackbarComponent, {
+        data: { title, type },
+        panelClass: 'custom-snackbar-container',
+        duration: 50000000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
       });
     }, 0);
   }

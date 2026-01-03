@@ -21,14 +21,22 @@ DIALOG
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* SNACKBAR */
-/* Klasa przekazywana jako panelClass przy otwieraniu snackbara */
-.snackbar-error {
-  --mat-snack-bar-container-color: var(--par-color-error);
-}
+/* SNACKBAR RESET */
+.custom-snackbar-container {
+  padding: 0 !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
 
-.snackbar-success {
-  --mat-snack-bar-container-color: var(--par-color-success);
+  .mat-mdc-snackbar-surface {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
 }
 
 /* ANIMATIONS */
