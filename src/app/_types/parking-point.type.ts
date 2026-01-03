@@ -1,6 +1,7 @@
 import { LocationCoords } from './location-coords.type';
 export interface ParkingPointSaveData {
   location: LocationCoords;
+  address: string;
 }
 
 export class ParkingPoint {
@@ -11,6 +12,7 @@ export class ParkingPoint {
   location!: LocationCoords;
   likeCount!: number;
   dislikeCount!: number;
+  address!: string;
 
   constructor(props: ParkingPoint) {
     if (props) {

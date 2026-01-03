@@ -2,6 +2,7 @@ import { DestroyRef, inject, Injectable, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, EMPTY, of, switchMap, tap } from 'rxjs';
+import { GeocodeApiService } from '../../../_services/_api/geocode-api.service';
 import { ParkingEditLocationApiService } from '../../../_services/_api/parking-edit-location-api.service';
 import { ParkingsApiService } from '../../../_services/_api/parkings-api.service';
 import { ParkingPointActionsSheetService } from '../../../_services/_core/parking-point-actions-sheet.service';
@@ -20,11 +21,12 @@ import { MapService } from './map/map.service';
 export class MapPoisControllerService {
   private readonly _mapService = inject(MapService);
   private readonly _parkingEditLocationApiService = inject(ParkingEditLocationApiService);
-  private readonly _parkingsApiService = inject(ParkingsApiService);
   private readonly _sharedUtilsService = inject(SharedUtilsService);
   private readonly _parkingPointActionsSheetService = inject(ParkingPointActionsSheetService);
   private readonly _matDialog = inject(MatDialog);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _parkingsApiService = inject(ParkingsApiService);
+  private readonly _geocodeApiService = inject(GeocodeApiService);
 
   private readonly _isMapLoaded = this._mapService.isMapLoaded;
   private readonly _selectedParking = this._mapService.selectedParking;
@@ -39,40 +41,37 @@ export class MapPoisControllerService {
     this._mapService.removeMoveableMarker();
     this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    this._parkingPointActionsSheetService
-      .openSheet(
-        {
-          parkingPoint: this._selectedParking()!,
-        },
-        {
-          hasBackdrop: true,
-        },
-      )
-      .pipe(
-        switchMap((sheetRef) =>
-          sheetRef.onDismiss.pipe(
-            switchMap((result) => {
-              switch (result) {
-                case PoiActionsEnum.NAVIGATE:
-                  this._handleNavigate();
-                  break;
-                case PoiActionsEnum.ADD_REVIEW:
-                  this._handleAddReview();
-                  break;
-                case PoiActionsEnum.VIEW_REVIEWS:
-                  this._handleViewReviews();
-                  break;
-                case PoiActionsEnum.UPDATE_LOCATION:
-                  sheetRef.dismiss();
-                  return this.handleUpdateUserChoice();
-              }
+    const sheetRef = this._parkingPointActionsSheetService.openSheet(
+      {
+        parkingPoint: this._selectedParking()!,
+      },
+      {
+        hasBackdrop: true,
+      },
+    );
 
+    sheetRef.onDismiss
+      .pipe(
+        switchMap((result) => {
+          switch (result) {
+            case PoiActionsEnum.NAVIGATE:
+              this._handleNavigate();
+              break;
+            case PoiActionsEnum.ADD_REVIEW:
+              this._handleAddReview();
+              break;
+            case PoiActionsEnum.VIEW_REVIEWS:
+              this._handleViewReviews();
+              break;
+            case PoiActionsEnum.UPDATE_LOCATION:
               sheetRef.dismiss();
-              this._selectedParking.set(null);
-              return of(null);
-            }),
-          ),
-        ),
+              return this.handleUpdateUserChoice();
+          }
+
+          sheetRef.dismiss();
+          this._selectedParking.set(null);
+          return of(null);
+        }),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
@@ -177,10 +176,12 @@ export class MapPoisControllerService {
             return EMPTY;
           }
           const location = this._mapService.getMarkerLatLng();
-          return this._parkingsApiService.postParking({ location }).pipe(
+
+          return this._geocodeApiService.getAddressByCoordinates(location).pipe(
+            switchMap((address) => this._parkingsApiService.postParking({ location, address })),
             tap((newParking: ParkingPoint) => {
               this._sharedUtilsService.openSnackbar(
-                'Gotowe!\nDodałeś/aś nowy punkt parkingowy.',
+                'Gotowe!\nDodano nowy punkt parkingowy.',
                 'SUCCESS',
               );
               this._matDialog.open(AddReviewComponent, {
