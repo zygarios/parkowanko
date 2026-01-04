@@ -13,10 +13,6 @@ export class ParkingPointActionsSheetService {
     data: ParkingPointActionsSheetData,
     config?: { disableClose?: boolean; hasBackdrop?: boolean },
   ) {
-    return this._sharedUtilsService.openSheet(
-      ParkingPointActionsSheetComponent,
-      { parkingPoint: data.parkingPoint },
-      config,
-    );
+    return this._sharedUtilsService.openSheet(ParkingPointActionsSheetComponent, data, config);
   }
 }

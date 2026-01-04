@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { finalize, Observable, tap } from 'rxjs';
+import { catchError, finalize, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import {
   AuthResponse,
@@ -10,6 +10,7 @@ import {
   RegisterSaveData,
 } from '../../_types/auth/auth.model';
 import { User } from '../../_types/auth/user.type';
+import { SharedUtilsService } from './shared-utils.service';
 
 interface JwtPayload {
   exp: number;
@@ -19,6 +20,7 @@ interface JwtPayload {
 export class AuthService {
   private _http = inject(HttpClient);
   private _router = inject(Router);
+  private _sharedUtilsService = inject(SharedUtilsService);
 
   private _tokenExpirationTimer?: ReturnType<typeof setTimeout>;
   private _currentUser = signal<User | null>(null);
@@ -36,6 +38,13 @@ export class AuthService {
     this._isAuthenticating.set(true);
     return this._http.post<AuthResponse>(`${environment.apiUrl}/auth/login/`, data).pipe(
       tap((res) => this._setAuthData(res)),
+      catchError((err: HttpErrorResponse) => {
+        this._isAuthenticating.set(false);
+        if (err.status === 401) {
+          this._sharedUtilsService.openSnackbar('Nieprawidłowy login lub hasło', 'ERROR');
+        }
+        return throwError(() => err);
+      }),
       finalize(() => this._isAuthenticating.set(false)),
     );
   }

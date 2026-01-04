@@ -23,4 +23,10 @@ export class ReviewsApiService {
       .post(`${environment.apiUrl}/parking-points/${parkingPointId}/reviews/`, body)
       .pipe(switchMap(() => this._parkingsApiService.getParking(parkingPointId)));
   }
+
+  putReview(parkingPointId: number, reviewId: number, body: ReviewSaveData) {
+    return this._httpClient
+      .put(`${environment.apiUrl}/parking-points/${parkingPointId}/reviews/${reviewId}/`, body)
+      .pipe(switchMap(() => this._parkingsApiService.getParking(parkingPointId)));
+  }
 }

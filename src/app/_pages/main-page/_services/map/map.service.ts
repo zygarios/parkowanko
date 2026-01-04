@@ -9,6 +9,7 @@ import {
 } from '@turf/turf';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import * as maplibregl from 'maplibre-gl';
+import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { GlobalSpinnerService } from '../../../../_services/_core/global-spinner.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { LocationCoords } from '../../../../_types/location-coords.type';
@@ -23,6 +24,7 @@ export class MapService {
   private _mapRendererService = inject(MapRendererService);
   private _sharedUtilsService = inject(SharedUtilsService);
   private _globalSpinnerService = inject(GlobalSpinnerService);
+  private _parkingsApiService = inject(ParkingsApiService);
 
   private _map: maplibregl.Map | null = null;
   private _markerRef: maplibregl.Marker | null = this._mapInitializerService.prepareMarker();
@@ -32,13 +34,14 @@ export class MapService {
   private _poiClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
   private _clusterClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
 
-  private _renderedParkingsList: ParkingPoint[] = [];
   private _isMapLoaded = signal<boolean>(false);
 
   isMapLoaded = this._isMapLoaded.asReadonly();
 
-  selectedParking = signal<null | ParkingPoint>(null);
+  private _renderedParkingIds = signal<number[]>([]);
   isMarkerInsideDisabledZone = signal(false);
+
+  selectedParkingId = signal<number | null>(null);
 
   /**
    * Inicjalizuje mapę MapLibre i przygotowuje wszystkie warstwy
@@ -69,15 +72,13 @@ export class MapService {
    */
   private listenForPoiClickToSetSelectedParking() {
     this._poiClickFnRef = (e: MapLayerMouseEvent) => {
-      const stringifiedData = e.features?.[0]?.properties as {
-        parking: string;
+      const properties = e.features?.[0]?.properties as {
+        parkingId: number;
       };
 
-      if (!stringifiedData) return;
+      if (!properties?.parkingId) return;
 
-      const parking: ParkingPoint = JSON.parse(stringifiedData.parking);
-
-      this.selectedParking.set(parking);
+      this.selectedParkingId.set(properties.parkingId);
     };
     this._map!.on('click', 'unclustered-point', this._poiClickFnRef);
   }
@@ -100,7 +101,7 @@ export class MapService {
    * @param parkingsList - Lista parkingów do wyświetlenia na mapie
    */
   renderParkingsPois(parkingsList: ParkingPoint[]): void {
-    this._renderedParkingsList = parkingsList;
+    this._renderedParkingIds.set(parkingsList.map((p) => p.id));
     this._mapRendererService.renderPois(this._map!, parkingsList);
   }
 
@@ -154,16 +155,19 @@ export class MapService {
     const markerCoords = this.getMarkerLatLng();
     const markerPoint = point([markerCoords.lng, markerCoords.lat]);
     const bounds = this._map!.getBounds();
-    const excludeId = this.selectedParking()?.id;
+    const excludeId = this.selectedParkingId();
 
     // 0. Renderowanie obszaru dozwolonej edycji (100m)
     this._mapRendererService.renderEditArea(this._map!, oldLocationCoords);
 
     // 1. Renderowanie wszystkich promieni (niebieskie / czerwone)
     // Wykluczamy aktualnie edytowany punkt z kolizji, aby móc go "przesunąć" o mały dystans
+    const allParkings = this._parkingsApiService.getParkings()();
+    const renderedIds = this._renderedParkingIds();
+
     const parkingsToCheck = excludeId
-      ? this._renderedParkingsList.filter((p: ParkingPoint) => p.id !== excludeId)
-      : this._renderedParkingsList;
+      ? allParkings.filter((p: ParkingPoint) => renderedIds.includes(p.id) && p.id !== excludeId)
+      : allParkings.filter((p: ParkingPoint) => renderedIds.includes(p.id));
 
     const visiblePoints = parkingsToCheck
       .filter((p: ParkingPoint) => bounds.contains([p.location.lng, p.location.lat]))
@@ -345,13 +349,17 @@ export class MapService {
 
     this._globalSpinnerService.hide();
 
-    if (this._renderedParkingsList.length === 0) {
+    const allParkings = this._parkingsApiService.getParkings()();
+    const renderedIds = this._renderedParkingIds();
+    const renderedParkings = allParkings.filter((p) => renderedIds.includes(p.id));
+
+    if (renderedParkings.length === 0) {
       this._sharedUtilsService.openSnackbar('Brak parkingów do przeszukania.', 'ERROR');
       return;
     }
 
     const points = featureCollection(
-      this._renderedParkingsList.map((p: ParkingPoint) =>
+      renderedParkings.map((p: ParkingPoint) =>
         point([p.location.lng, p.location.lat], { original: p.location }),
       ),
     );
@@ -426,11 +434,11 @@ export class MapService {
     }
 
     // Wyzeruj referencje (zapobiega wyciekowi pamięci)
-    this.selectedParking.set(null);
+    this.selectedParkingId.set(null);
     this.isMarkerInsideDisabledZone.set(false);
     this._map = null;
     this._markerRef = null;
-    this._renderedParkingsList = [];
+    this._renderedParkingIds.set([]);
     this._isMapLoaded.set(false);
   }
 }

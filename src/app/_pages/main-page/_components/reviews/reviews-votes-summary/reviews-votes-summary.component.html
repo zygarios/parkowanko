@@ -4,7 +4,10 @@
     [style.background]="hasVotes() ? 'var(--par-color-success)' : 'rgba(0,0,0,.2)'"
     [style.flex]="hasVotes() ? positiveCount() : 1"
   >
-    <div class="flex items-center gap-1 absolute left-0">
+    <div
+      class="flex items-center gap-1 absolute left-0 z-100"
+      [style.opacity]="positiveCount() === 0 ? 0.7 : 1"
+    >
       <div class="text-white font-medium ml-2">{{ positiveCount() }}</div>
       <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_up</mat-icon>
     </div>
@@ -19,7 +22,10 @@
     [style.flex]="hasVotes() ? negativeCount() : 0"
     [style.background]="hasVotes() ? 'var(--par-color-error)' : 'rgba(0,0,0,.2)'"
   >
-    <div class="flex items-center gap-1 absolute right-0">
+    <div
+      class="flex items-center gap-1 absolute right-0 z-100"
+      [style.opacity]="negativeCount() === 0 ? 0.7 : 1"
+    >
       <mat-icon class="text-white! text-[14px]! size-[14px]!">thumb_down</mat-icon>
       <div class="text-white font-medium mr-2">{{ negativeCount() }}</div>
     </div>

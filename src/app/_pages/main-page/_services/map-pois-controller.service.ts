@@ -1,13 +1,16 @@
-import { DestroyRef, inject, Injectable, untracked } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
-import { catchError, EMPTY, of, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, of, switchMap, take, tap } from 'rxjs';
 import { GeocodeApiService } from '../../../_services/_api/geocode-api.service';
 import { ParkingEditLocationApiService } from '../../../_services/_api/parking-edit-location-api.service';
 import { ParkingsApiService } from '../../../_services/_api/parkings-api.service';
+import { ReviewsApiService } from '../../../_services/_api/reviews-api.service';
+import { AuthService } from '../../../_services/_core/auth.service';
 import { ParkingPointActionsSheetService } from '../../../_services/_core/parking-point-actions-sheet.service';
 import { SharedUtilsService } from '../../../_services/_core/shared-utils.service';
 import { ParkingPoint } from '../../../_types/parking-point.type';
+import { Review } from '../../../_types/review.type';
 import { AddReviewComponent } from '../_components/add-review/add-review.component';
 import {
   addingPoiConfirmSheetConfig,
@@ -27,9 +30,20 @@ export class MapPoisControllerService {
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _parkingsApiService = inject(ParkingsApiService);
   private readonly _geocodeApiService = inject(GeocodeApiService);
+  private readonly _reviewsApiService = inject(ReviewsApiService);
+  private readonly _authService = inject(AuthService);
 
   private readonly _isMapLoaded = this._mapService.isMapLoaded;
-  private readonly _selectedParking = this._mapService.selectedParking;
+
+  // Ma pozostać computed. Do zmiany jest osobna metoda
+  private readonly _selectedParking = computed(() => {
+    const selectedParkingId = this._mapService.selectedParkingId();
+    const parkings = this._parkingsApiService.getParkings()();
+    if (selectedParkingId === null) return null;
+    return parkings.find((p) => p.id === selectedParkingId) ?? null;
+  });
+
+  private readonly _selectedParkingId = this._mapService.selectedParkingId;
 
   listenForSelectedPoiToStartEdit() {
     if (this._isMapLoaded() && this._selectedParking()) {
@@ -41,40 +55,50 @@ export class MapPoisControllerService {
     this._mapService.removeMoveableMarker();
     this._mapService.flyToPoi(this._selectedParking()!.location, 'CLOSE_ZOOM');
 
-    const sheetRef = this._parkingPointActionsSheetService.openSheet(
-      {
-        parkingPoint: this._selectedParking()!,
-      },
-      {
-        hasBackdrop: true,
-      },
-    );
+    const parking = this._selectedParking()!;
 
-    sheetRef.onDismiss
-      .pipe(
-        switchMap((result) => {
-          switch (result) {
-            case PoiActionsEnum.NAVIGATE:
-              this._handleNavigate();
-              break;
-            case PoiActionsEnum.ADD_REVIEW:
-              this._handleAddReview();
-              break;
-            case PoiActionsEnum.VIEW_REVIEWS:
-              this._handleViewReviews();
-              break;
-            case PoiActionsEnum.UPDATE_LOCATION:
+    this._reviewsApiService
+      .getReviews(parking.id)
+      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
+      .subscribe((reviews) => {
+        const sheetRef = this._parkingPointActionsSheetService.openSheet(
+          {
+            parkingPoint: parking,
+            reviews,
+          },
+          {
+            hasBackdrop: true,
+          },
+        );
+
+        sheetRef.onDismiss
+          .pipe(
+            switchMap((result) => {
+              switch (result) {
+                case PoiActionsEnum.NAVIGATE:
+                  this._handleNavigate();
+                  break;
+                case PoiActionsEnum.ADD_REVIEW:
+                  sheetRef.dismiss();
+                  return this._handleAddReview(reviews).pipe(tap(() => this.openDefaultPoiMenu()));
+                case PoiActionsEnum.VIEW_REVIEWS:
+                  sheetRef.dismiss();
+                  return this._handleViewReviews(reviews).pipe(
+                    tap(() => this.openDefaultPoiMenu()),
+                  );
+                case PoiActionsEnum.UPDATE_LOCATION:
+                  sheetRef.dismiss();
+                  return this.handleUpdateUserChoice().pipe(tap(() => this.openDefaultPoiMenu()));
+              }
+
               sheetRef.dismiss();
-              return this.handleUpdateUserChoice();
-          }
-
-          sheetRef.dismiss();
-          this._selectedParking.set(null);
-          return of(null);
-        }),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe();
+              this._selectedParkingId.set(null);
+              return of(null);
+            }),
+            takeUntilDestroyed(this._destroyRef),
+          )
+          .subscribe();
+      });
   }
 
   private _handleNavigate() {
@@ -89,16 +113,23 @@ export class MapPoisControllerService {
     }, 100);
   }
 
-  private _handleAddReview() {
-    this._matDialog.open(AddReviewComponent, {
-      data: { parkingPointId: this._selectedParking()?.id },
-    });
+  private _handleAddReview(reviews: Review[]) {
+    const userId = this._authService.currentUser()?.id;
+    const userReview = reviews.find((review) => review.user.id === userId);
+
+    return this._matDialog
+      .open(AddReviewComponent, {
+        data: { parkingPointId: this._selectedParking()?.id, userReview },
+      })
+      .afterClosed();
   }
 
-  private _handleViewReviews() {
-    this._matDialog.open(ReviewsComponent, {
-      data: { parkingPoint: this._selectedParking() },
-    });
+  private _handleViewReviews(reviews: Review[]) {
+    return this._matDialog
+      .open(ReviewsComponent, {
+        data: { parkingPoint: this._selectedParking(), reviews },
+      })
+      .afterClosed();
   }
 
   handleUpdateUserChoice() {
@@ -134,7 +165,7 @@ export class MapPoisControllerService {
             .pipe(
               tap(() => {
                 this._sharedUtilsService.openSnackbar(
-                  'Gotowe!\nPozycja bezpłatnego parkingu została poprawiona.',
+                  'Gotowe!\nWysłano propozycję zmiany lokalizacji parkingu.',
                   'SUCCESS',
                 );
               }),
@@ -150,11 +181,6 @@ export class MapPoisControllerService {
           return of(null);
         }
       }),
-      tap(() => {
-        sheetRef.dismiss();
-        this.openDefaultPoiMenu();
-      }),
-      takeUntilDestroyed(this._destroyRef),
     );
   }
 
@@ -177,17 +203,29 @@ export class MapPoisControllerService {
           }
           const location = this._mapService.getMarkerLatLng();
 
+          let newParking: ParkingPoint;
+
           return this._geocodeApiService.getAddressByCoordinates(location).pipe(
-            switchMap((address) => this._parkingsApiService.postParking({ location, address })),
-            tap((newParking: ParkingPoint) => {
+            switchMap((address) =>
+              this._parkingsApiService.postParking({ location, address: address || null }),
+            ),
+            tap((createdParking) => {
+              newParking = createdParking;
               this._sharedUtilsService.openSnackbar(
-                'Gotowe!\nDodano nowy punkt parkingowy.',
+                'Gotowe!\nNowy punkt parkingowy został dodany.',
                 'SUCCESS',
               );
-              this._matDialog.open(AddReviewComponent, {
-                data: { parkingPointId: newParking.id, skipVoteStep: true },
-              });
+              sheetRef.dismiss();
+              this._mapService.removeMoveableMarker();
             }),
+            switchMap(() =>
+              this._matDialog
+                .open(AddReviewComponent, {
+                  data: { parkingPointId: newParking.id, skipVoteStep: true },
+                })
+                .afterClosed(),
+            ),
+            tap(() => this._selectedParkingId.set(newParking.id)),
             catchError(() => {
               this._sharedUtilsService.openSnackbar(
                 'Wystąpił błąd podczas dodawania parkingu.',
@@ -197,13 +235,10 @@ export class MapPoisControllerService {
             }),
           );
         } else {
+          sheetRef.dismiss();
+          this._mapService.removeMoveableMarker();
           return of(null);
         }
-      }),
-      tap(() => {
-        sheetRef.dismiss();
-        this._mapService.removeMoveableMarker();
-        this._selectedParking.set(null);
       }),
       takeUntilDestroyed(this._destroyRef),
     );

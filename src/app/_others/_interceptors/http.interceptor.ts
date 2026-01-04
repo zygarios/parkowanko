@@ -11,7 +11,10 @@ export function httpInterceptor(
 
   return next(req).pipe(
     catchError((errorRes: HttpErrorResponse) => {
-      sharedUtilsService.openSnackbar('Ups, wystąpił błąd serwera', 'ERROR');
+      if (errorRes.status === 500) {
+        sharedUtilsService.openSnackbar('Ups, wystąpił błąd serwera', 'ERROR');
+      }
+
       return throwError(() => errorRes);
     }),
   );

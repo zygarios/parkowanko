@@ -11,7 +11,7 @@ export const addingPoiConfirmSheetConfig = (): MenuSheetData => {
       },
       {
         label: 'Zatwierdź',
-        icon: 'edit_location_alt',
+        icon: 'add_location_alt',
         result: PoiActionsEnum.CONFIRM,
         isPrimary: true,
         isSuccess: true,
@@ -39,6 +39,7 @@ export const changingPoiPositionOptionsSheetConfig = (): MenuSheetData => {
       },
     ],
     title: 'Poprawa lokalizacji',
+
     description: 'Poruszaj mapą lub markerem, aby poprawić lokalizację istniejącego parkingu.',
   };
 };

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter, merge, Subject } from 'rxjs';
 import { PoiActionsEnum } from '../../_pages/main-page/_components/map-ui-overlay/_types/poi-actions.model';
 import { ReviewsVotesSummaryComponent } from '../../_pages/main-page/_components/reviews/reviews-votes-summary/reviews-votes-summary.component';
+import { AuthService } from '../../_services/_core/auth.service';
 import { SheetRef } from '../../_types/sheet-ref.type';
 import {
   ParkingPointActionsSheetData,
@@ -27,33 +28,39 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ParkingPointActionsSheetComponent {
+  private _authService = inject(AuthService);
   private sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
   data: ParkingPointActionsSheetData = inject<ParkingPointActionsSheetData>(MAT_BOTTOM_SHEET_DATA);
   poiActionsEnum = PoiActionsEnum;
 
-  menuItems = [
-    {
-      label: 'Nawiguj',
-      icon: 'navigation',
-      result: PoiActionsEnum.NAVIGATE,
-      isPrimary: true,
-    },
-    {
-      label: 'Dodaj opinię',
-      icon: 'rate_review',
-      result: PoiActionsEnum.ADD_REVIEW,
-    },
-    {
-      label: 'Zobacz opinie',
-      icon: 'forum',
-      result: PoiActionsEnum.VIEW_REVIEWS,
-    },
-    {
-      label: 'Popraw lokalizację',
-      icon: 'edit_location_alt',
-      result: PoiActionsEnum.UPDATE_LOCATION,
-    },
-  ];
+  menuItems = computed(() => {
+    const userId = this._authService.currentUser()?.id;
+    const isUserReview = this.data.reviews.some((review) => review.user.id === userId);
+
+    return [
+      {
+        label: 'Nawiguj',
+        icon: 'navigation',
+        result: PoiActionsEnum.NAVIGATE,
+        isPrimary: true,
+      },
+      {
+        label: isUserReview ? 'Edytuj opinię' : 'Dodaj opinię',
+        icon: 'rate_review',
+        result: PoiActionsEnum.ADD_REVIEW,
+      },
+      {
+        label: `Zobacz opinie (${this.data.reviews.length})`,
+        icon: 'forum',
+        result: PoiActionsEnum.VIEW_REVIEWS,
+      },
+      {
+        label: 'Popraw lokalizację',
+        icon: 'edit_location_alt',
+        result: PoiActionsEnum.UPDATE_LOCATION,
+      },
+    ];
+  });
 
   sheetComponentRef: SheetRef<ParkingPointActionsSheetResult> = {
     dismiss: () => this.sheetRef.dismiss(),

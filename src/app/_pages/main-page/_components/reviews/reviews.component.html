@@ -1,16 +1,19 @@
 @if (!isSpinnerActive()) {
-  <div mat-dialog-title>Opinie {{ reviews().length ? '(' + reviews().length + ')' : '' }}</div>
+  <div mat-dialog-title>
+    <span>Opinie {{ reviews.length ? '(' + reviews.length + ')' : '' }}</span>
+    <mat-icon mat-dialog-close>close</mat-icon>
+  </div>
 
   <mat-dialog-content>
     <div class="py-5 flex flex-col gap-5">
-      @if (reviews().length) {
+      @if (reviews.length) {
         <app-reviews-votes-summary
           [positiveCount]="dialogData.parkingPoint.likeCount"
           [negativeCount]="dialogData.parkingPoint.dislikeCount"
         />
         <hr />
         <div class="flex flex-col gap-5">
-          @for (review of reviews(); track review.id) {
+          @for (review of reviews; track review.id) {
             <app-review [review]="review" />
           }
         </div>

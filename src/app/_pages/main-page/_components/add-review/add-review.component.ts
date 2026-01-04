@@ -17,7 +17,7 @@ import { firstValueFrom } from 'rxjs';
 import { validationMessages } from '../../../../_others/_helpers/validation-messages';
 import { ReviewsApiService } from '../../../../_services/_api/reviews-api.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
-import { ReviewSaveData } from '../../../../_types/review.type';
+import { Review, ReviewSaveData } from '../../../../_types/review.type';
 import { ReviewFormComponent } from './_components/review-form/review-form.component';
 import { Occupancy } from './_types/occupancy.model';
 
@@ -47,7 +47,11 @@ export class AddReviewComponent {
   private _dialogRef = inject(MatDialogRef);
   private _reviewsApiService = inject(ReviewsApiService);
   private _sharedUtilsService = inject(SharedUtilsService);
-  private _dialogData = inject<{ parkingPointId: number; skipVoteStep?: boolean }>(MAT_DIALOG_DATA);
+  private _dialogData = inject<{
+    parkingPointId: number;
+    skipVoteStep?: boolean;
+    userReview?: Review;
+  }>(MAT_DIALOG_DATA);
   private _stepsRef = viewChildren(MatTab);
 
   skipVoteStep = this._dialogData.skipVoteStep;
@@ -57,10 +61,10 @@ export class AddReviewComponent {
 
   review = signal<ReviewSaveData>({
     parkingPointId: this._dialogData.parkingPointId,
-    description: '',
-    attributes: [],
-    occupancy: '' as Occupancy,
-    isLike: true,
+    description: this._dialogData.userReview?.description || '',
+    attributes: this._dialogData.userReview?.attributes || [],
+    occupancy: this._dialogData.userReview?.occupancy || ('' as Occupancy),
+    isLike: this._dialogData.userReview?.isLike ?? true,
   });
 
   reviewForm = form(this.review, (path) => {
@@ -77,8 +81,8 @@ export class AddReviewComponent {
     if (this._dialogData.skipVoteStep) this.nextStep();
   }
 
-  addVote(isLiked: boolean) {
-    this.review.update((review) => ({ ...review, isLiked }));
+  addVote(isLike: boolean) {
+    this.review.update((review) => ({ ...review, isLike }));
     this.nextStep();
   }
 
@@ -100,17 +104,33 @@ export class AddReviewComponent {
   submitReview() {
     submit(this.reviewForm, async () => {
       try {
-        await firstValueFrom(
-          this._reviewsApiService.postReview(this._dialogData.parkingPointId, this.review()),
-        );
+        if (this._dialogData.userReview) {
+          await firstValueFrom(
+            this._reviewsApiService.putReview(
+              this._dialogData.parkingPointId,
+              this._dialogData.userReview.id,
+              this.review(),
+            ),
+          );
+        } else {
+          await firstValueFrom(
+            this._reviewsApiService.postReview(this._dialogData.parkingPointId, this.review()),
+          );
+        }
+
         this._sharedUtilsService.openSnackbar(
-          'Dodałeś/aś opinię! Przyszli kierowcy będą ci wdzięczni. ;)',
+          this._dialogData.userReview
+            ? 'Opinia zaktualizowana!'
+            : 'Opinia dodana! Przyszli kierowcy będą ci wdzięczni. ;)',
           'SUCCESS',
         );
         this._dialogRef.close();
         return;
       } catch (_) {
-        this._sharedUtilsService.openSnackbar('Wystąpił błąd podczas dodawania oceny', 'ERROR');
+        this._sharedUtilsService.openSnackbar(
+          `Wystąpił błąd podczas ${this._dialogData.userReview ? 'aktualizacji' : 'dodawania'} oceny`,
+          'ERROR',
+        );
         return;
       }
     });

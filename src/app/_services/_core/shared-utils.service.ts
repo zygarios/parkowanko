@@ -46,7 +46,7 @@ export class SharedUtilsService {
       this._snackBar.openFromComponent(CustomSnackbarComponent, {
         data: { title, type },
         panelClass: 'custom-snackbar-container',
-        duration: 50000000,
+        duration: 4000,
         horizontalPosition: 'center',
         verticalPosition: 'top',
       });

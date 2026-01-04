@@ -15,14 +15,14 @@
 
       <div class="flex gap-1">
         <mat-icon>location_on</mat-icon>
-        <div class="w-fit">{{ data.addressLabel || 'Nieznany adres' }}</div>
+        <div class="w-fit pt-[2px]">{{ data.parkingPoint.address || 'Brak adresu' }}</div>
       </div>
     </div>
   </div>
 
   <div class="relative -translate-x-1/2 left-1/2 w-dvw pb-2 overflow-auto">
     <div class="flex flex-row gap-2 px-4 flex-nowrap w-fit">
-      @for (menu of menuItems; track menu) {
+      @for (menu of menuItems(); track menu) {
         @if (menu.isPrimary) {
           <button mat-flat-button class="flex justify-center!" (click)="choose(menu.result)">
             @if (menu.icon) {

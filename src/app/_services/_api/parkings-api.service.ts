@@ -14,9 +14,10 @@ export class ParkingsApiService {
   private _globalSpinnerService = inject(GlobalSpinnerService);
 
   private _parkingsList = signal<ParkingPoint[]>([]);
+
   parkingFilter = signal<ParkingsFilter>(ParkingsFilter.ALL);
 
-  filteredParkingsList = computed(() => {
+  private _filteredParkingsList = computed(() => {
     const list = this._parkingsList();
     const filter = this.parkingFilter();
 
@@ -37,7 +38,7 @@ export class ParkingsApiService {
         });
     }
 
-    return this.filteredParkingsList;
+    return this._filteredParkingsList;
   }
 
   getParking(parkingPointId: number): Observable<ParkingPoint> {

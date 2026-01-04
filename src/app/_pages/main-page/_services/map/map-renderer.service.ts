@@ -59,7 +59,6 @@ export class MapRendererService {
     parkingPoiSource.setData({
       type: 'FeatureCollection',
       features: parkingsList.map((parking) => {
-        const copiedParking = structuredClone(parking);
         return {
           type: 'Feature',
           geometry: {
@@ -67,7 +66,7 @@ export class MapRendererService {
             coordinates: [parking.location.lng, parking.location.lat],
           },
           properties: {
-            parking: copiedParking,
+            parkingId: parking.id,
             score: parking.likeCount - parking.dislikeCount,
             scoreLabel:
               parking.likeCount - parking.dislikeCount > 0
