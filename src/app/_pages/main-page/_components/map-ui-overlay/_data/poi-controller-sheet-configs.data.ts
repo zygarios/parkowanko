@@ -1,5 +1,7 @@
-import { MenuSheetData } from '../../../../../_components/menu-sheet/menu-sheet.model';
-import { PoiActionsEnum } from '../_types/poi-actions.model';
+import {
+  MenuSheetData,
+  MenuSheetResult,
+} from '../../../../../_components/menu-sheet/menu-sheet.model';
 
 export const addingPoiConfirmSheetConfig = (): MenuSheetData => {
   return {
@@ -7,12 +9,12 @@ export const addingPoiConfirmSheetConfig = (): MenuSheetData => {
       {
         label: 'Anuluj',
         icon: 'close',
-        result: PoiActionsEnum.CANCEL,
+        result: MenuSheetResult.CANCEL,
       },
       {
         label: 'Zatwierdź',
         icon: 'add_location_alt',
-        result: PoiActionsEnum.CONFIRM,
+        result: MenuSheetResult.CONFIRM,
         isPrimary: true,
         isSuccess: true,
       },
@@ -28,18 +30,17 @@ export const changingPoiPositionOptionsSheetConfig = (): MenuSheetData => {
       {
         label: 'Anuluj',
         icon: 'close',
-        result: PoiActionsEnum.CANCEL,
+        result: MenuSheetResult.CANCEL,
       },
       {
         label: 'Zatwierdź',
         icon: 'edit_location_alt',
-        result: PoiActionsEnum.CONFIRM,
+        result: MenuSheetResult.CONFIRM,
         isPrimary: true,
         isSuccess: true,
       },
     ],
     title: 'Poprawa lokalizacji',
-
     description: 'Poruszaj mapą lub markerem, aby poprawić lokalizację istniejącego parkingu.',
   };
 };

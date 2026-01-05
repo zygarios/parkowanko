@@ -40,6 +40,13 @@ const routesList: Routes = [
         },
       ]),
   {
+    path: 'polityka-prywatnosci',
+    loadComponent: () =>
+      import('./_pages/privacy-policy/privacy-policy.component').then(
+        (c) => c.PrivacyPolicyComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

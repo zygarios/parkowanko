@@ -12,4 +12,8 @@ export interface MenuSheetData {
   description?: string;
 }
 
-export type MenuSheetResult = string | 'DISMISS';
+export enum MenuSheetResult {
+  DISMISS = 'DISMISS',
+  CANCEL = 'CANCEL',
+  CONFIRM = 'CONFIRM',
+}

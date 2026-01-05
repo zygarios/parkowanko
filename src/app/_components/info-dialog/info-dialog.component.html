@@ -1,7 +1,7 @@
 <div mat-dialog-title>{{ dialogData.title }}</div>
-<mat-dialog-content>
+<div class="p-(--par-container-padding)">
   {{ dialogData.content }}
-</mat-dialog-content>
+</div>
 <mat-dialog-actions>
   @if (!dialogData.hideCancelButton) {
     <button mat-button [mat-dialog-close]="false">

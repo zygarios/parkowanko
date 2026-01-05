@@ -6,14 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter, merge, Subject } from 'rxjs';
-import { PoiActionsEnum } from '../../_pages/main-page/_components/map-ui-overlay/_types/poi-actions.model';
 import { ReviewsVotesSummaryComponent } from '../../_pages/main-page/_components/reviews/reviews-votes-summary/reviews-votes-summary.component';
 import { AuthService } from '../../_services/_core/auth.service';
 import { SheetRef } from '../../_types/sheet-ref.type';
 import {
   ParkingPointActionsSheetData,
   ParkingPointActionsSheetResult,
-} from './parking-point-actions-sheet.model';
+} from './parking-point-actions-sheet.type';
 
 @Component({
   selector: 'app-parking-point-actions-sheet',
@@ -31,7 +30,7 @@ export class ParkingPointActionsSheetComponent {
   private _authService = inject(AuthService);
   private sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
   data: ParkingPointActionsSheetData = inject<ParkingPointActionsSheetData>(MAT_BOTTOM_SHEET_DATA);
-  poiActionsEnum = PoiActionsEnum;
+  poiActionsEnum = ParkingPointActionsSheetResult;
 
   menuItems = computed(() => {
     const userId = this._authService.currentUser()?.id;
@@ -41,23 +40,23 @@ export class ParkingPointActionsSheetComponent {
       {
         label: 'Nawiguj',
         icon: 'navigation',
-        result: PoiActionsEnum.NAVIGATE,
+        result: ParkingPointActionsSheetResult.NAVIGATE,
         isPrimary: true,
       },
       {
         label: isUserReview ? 'Edytuj opinię' : 'Dodaj opinię',
         icon: 'rate_review',
-        result: PoiActionsEnum.ADD_REVIEW,
+        result: ParkingPointActionsSheetResult.ADD_REVIEW,
       },
       {
         label: `Zobacz opinie (${this.data.reviews.length})`,
         icon: 'forum',
-        result: PoiActionsEnum.VIEW_REVIEWS,
+        result: ParkingPointActionsSheetResult.VIEW_REVIEWS,
       },
       {
         label: 'Popraw lokalizację',
         icon: 'edit_location_alt',
-        result: PoiActionsEnum.UPDATE_LOCATION,
+        result: ParkingPointActionsSheetResult.UPDATE_LOCATION,
       },
     ];
   });
@@ -80,7 +79,7 @@ export class ParkingPointActionsSheetComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this.sheetRef.dismiss();
-        this.sheetComponentRef.onDismiss.next(PoiActionsEnum.DISMISS);
+        this.sheetComponentRef.onDismiss.next(ParkingPointActionsSheetResult.DISMISS);
       });
   }
 

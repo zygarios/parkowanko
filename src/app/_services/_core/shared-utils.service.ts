@@ -54,7 +54,7 @@ export class SharedUtilsService {
   }
 
   openInfoDialog(data: InfoDialogData, config?: { disableClose?: boolean }) {
-    return this._matDialog.open<InfoDialogComponent, InfoDialogData>(InfoDialogComponent, {
+    return this._matDialog.open<InfoDialogComponent, InfoDialogData, boolean>(InfoDialogComponent, {
       data,
       autoFocus: false,
       disableClose: config?.disableClose ?? false,

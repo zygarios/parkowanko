@@ -2,12 +2,14 @@ import { computed, DestroyRef, inject, Injectable, untracked } from '@angular/co
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, EMPTY, of, switchMap, take, tap } from 'rxjs';
+import { MenuSheetResult } from '../../../_components/menu-sheet/menu-sheet.model';
+import { ParkingPointActionsSheetComponent } from '../../../_components/parking-point-actions-sheet/parking-point-actions-sheet.component';
+import { ParkingPointActionsSheetResult } from '../../../_components/parking-point-actions-sheet/parking-point-actions-sheet.type';
 import { GeocodeApiService } from '../../../_services/_api/geocode-api.service';
 import { ParkingEditLocationApiService } from '../../../_services/_api/parking-edit-location-api.service';
 import { ParkingsApiService } from '../../../_services/_api/parkings-api.service';
 import { ReviewsApiService } from '../../../_services/_api/reviews-api.service';
 import { AuthService } from '../../../_services/_core/auth.service';
-import { ParkingPointActionsSheetService } from '../../../_services/_core/parking-point-actions-sheet.service';
 import { SharedUtilsService } from '../../../_services/_core/shared-utils.service';
 import { ParkingPoint } from '../../../_types/parking-point.type';
 import { Review } from '../../../_types/review.type';
@@ -16,7 +18,6 @@ import {
   addingPoiConfirmSheetConfig,
   changingPoiPositionOptionsSheetConfig,
 } from '../_components/map-ui-overlay/_data/poi-controller-sheet-configs.data';
-import { PoiActionsEnum } from '../_components/map-ui-overlay/_types/poi-actions.model';
 import { ReviewsComponent } from '../_components/reviews/reviews.component';
 import { MapService } from './map/map.service';
 
@@ -25,7 +26,6 @@ export class MapPoisControllerService {
   private readonly _mapService = inject(MapService);
   private readonly _parkingEditLocationApiService = inject(ParkingEditLocationApiService);
   private readonly _sharedUtilsService = inject(SharedUtilsService);
-  private readonly _parkingPointActionsSheetService = inject(ParkingPointActionsSheetService);
   private readonly _matDialog = inject(MatDialog);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _parkingsApiService = inject(ParkingsApiService);
@@ -46,7 +46,7 @@ export class MapPoisControllerService {
   private readonly _selectedParkingId = this._mapService.selectedParkingId;
 
   listenForSelectedPoiToStartEdit() {
-    if (this._isMapLoaded() && this._selectedParking()) {
+    if (this._isMapLoaded() && this._selectedParkingId()) {
       untracked(() => this.openDefaultPoiMenu());
     }
   }
@@ -61,7 +61,8 @@ export class MapPoisControllerService {
       .getReviews(parking.id)
       .pipe(take(1), takeUntilDestroyed(this._destroyRef))
       .subscribe((reviews) => {
-        const sheetRef = this._parkingPointActionsSheetService.openSheet(
+        const sheetRef = this._sharedUtilsService.openSheet(
+          ParkingPointActionsSheetComponent,
           {
             parkingPoint: parking,
             reviews,
@@ -75,18 +76,18 @@ export class MapPoisControllerService {
           .pipe(
             switchMap((result) => {
               switch (result) {
-                case PoiActionsEnum.NAVIGATE:
+                case ParkingPointActionsSheetResult.NAVIGATE:
                   this._handleNavigate();
                   break;
-                case PoiActionsEnum.ADD_REVIEW:
+                case ParkingPointActionsSheetResult.ADD_REVIEW:
                   sheetRef.dismiss();
                   return this._handleAddReview(reviews).pipe(tap(() => this.openDefaultPoiMenu()));
-                case PoiActionsEnum.VIEW_REVIEWS:
+                case ParkingPointActionsSheetResult.VIEW_REVIEWS:
                   sheetRef.dismiss();
                   return this._handleViewReviews(reviews).pipe(
                     tap(() => this.openDefaultPoiMenu()),
                   );
-                case PoiActionsEnum.UPDATE_LOCATION:
+                case ParkingPointActionsSheetResult.UPDATE_LOCATION:
                   sheetRef.dismiss();
                   return this.handleUpdateUserChoice().pipe(tap(() => this.openDefaultPoiMenu()));
               }
@@ -147,7 +148,7 @@ export class MapPoisControllerService {
 
     return sheetRef.onDismiss.pipe(
       switchMap((result) => {
-        if (result === PoiActionsEnum.CONFIRM) {
+        if (result === MenuSheetResult.CONFIRM) {
           if (this._mapService.isMarkerInsideDisabledZone()) {
             this._sharedUtilsService.openSnackbar(
               'Punkt jest zbyt blisko innych parkingów lub zbyt daleko od oryginału (max 100m).',
@@ -193,7 +194,7 @@ export class MapPoisControllerService {
 
     return sheetRef.onDismiss.pipe(
       switchMap((result) => {
-        if (result === PoiActionsEnum.CONFIRM) {
+        if (result === MenuSheetResult.CONFIRM) {
           if (this._mapService.isMarkerInsideDisabledZone()) {
             this._sharedUtilsService.openSnackbar(
               'Twoje miejsce znajduje się zbyt blisko innych punktów parkingowych.',

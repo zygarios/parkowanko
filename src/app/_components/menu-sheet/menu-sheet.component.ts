@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { filter, merge, Subject } from 'rxjs';
-import { PoiActionsEnum } from '../../_pages/main-page/_components/map-ui-overlay/_types/poi-actions.model';
 import { SheetRef } from '../../_types/sheet-ref.type';
 import { MenuSheetData, MenuSheetResult } from './menu-sheet.model';
 
@@ -18,7 +17,7 @@ import { MenuSheetData, MenuSheetResult } from './menu-sheet.model';
 export class MenuSheetComponent {
   private sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
   data: MenuSheetData = inject<MenuSheetData>(MAT_BOTTOM_SHEET_DATA);
-  poiActionsEnum = PoiActionsEnum;
+  menuSheetResult = MenuSheetResult;
 
   sheetComponentRef: SheetRef<MenuSheetResult> = {
     dismiss: () => this.sheetRef.dismiss(),
@@ -38,7 +37,7 @@ export class MenuSheetComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this.sheetRef.dismiss();
-        this.sheetComponentRef.onDismiss.next(PoiActionsEnum.DISMISS);
+        this.sheetComponentRef.onDismiss.next(MenuSheetResult.CANCEL);
       });
   }
 

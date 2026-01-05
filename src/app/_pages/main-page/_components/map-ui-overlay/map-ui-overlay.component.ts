@@ -4,9 +4,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { filter } from 'rxjs';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { AuthService } from '../../../../_services/_core/auth.service';
+import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { GeocodeFeature } from '../../../../_types/geocode-api.type';
 import { ParkingsFilter } from '../../../../_types/parkings-filter.type';
 import { MapPoisControllerService } from '../../_services/map-pois-controller.service';
@@ -37,6 +39,7 @@ export class MapUiOverlayComponent {
   private _parkingsApiService = inject(ParkingsApiService);
   private _matDialog = inject(MatDialog);
   private _mapPoisControllerService = inject(MapPoisControllerService);
+  private _sharedUtilsService = inject(SharedUtilsService);
 
   isMapLoaded = this._mapService.isMapLoaded;
 
@@ -47,7 +50,14 @@ export class MapUiOverlayComponent {
   parkingsFilter = ParkingsFilter;
 
   logout() {
-    this._authService.logout();
+    this._sharedUtilsService
+      .openInfoDialog({
+        title: 'Wylogowanie',
+        content: 'Czy na pewno chcesz się wylogować?',
+      })
+      .afterClosed()
+      .pipe(filter((result) => !!result))
+      .subscribe(() => this._authService.logout());
   }
 
   openHelpDialog() {

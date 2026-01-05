@@ -27,7 +27,7 @@ export class MapService {
   private _parkingsApiService = inject(ParkingsApiService);
 
   private _map: maplibregl.Map | null = null;
-  private _markerRef: maplibregl.Marker | null = this._mapInitializerService.prepareMarker();
+  private _markerRef: maplibregl.Marker | null = null;
 
   private _moveMarkerFnRef: ((e: any) => void) | null = null;
   private _renderFeaturesForMarkerOnMoveFnRef: (() => void) | null = null;
@@ -48,6 +48,8 @@ export class MapService {
    * Czyści poprzednią instancję jeśli istnieje (zapobiega wyciekom pamięci)
    */
   async initRenderMap(): Promise<void> {
+    this._markerRef = this._mapInitializerService.prepareMarker();
+
     const { map } = await this._mapInitializerService.initRenderMap();
     this._map = map;
 

@@ -1,4 +1,4 @@
-DIALOG
+/* DIALOG */
 /* Klasa przekazywana jako panelClass przy otwieraniu dialoga */
 .dialog-fullscreen {
   height: 98dvh;

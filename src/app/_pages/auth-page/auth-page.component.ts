@@ -44,11 +44,6 @@ enum AuthModeType {
     NgOptimizedImage,
   ],
   templateUrl: './auth-page.component.html',
-  styles: `
-    .auth-container {
-      padding: var(--par-container-padding);
-    }
-  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthPageComponent {

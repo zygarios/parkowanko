@@ -35,7 +35,7 @@ export class GuideDialogComponent {
   STEPS_LENGTH = 3;
 
   constructor() {
-    this.dialogRef.addPanelClass('dialog-fullscreen');
+    // this.dialogRef.addPanelClass();
   }
 
   onTouchStart(e: TouchEvent) {

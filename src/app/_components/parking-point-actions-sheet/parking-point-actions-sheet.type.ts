@@ -6,4 +6,10 @@ export interface ParkingPointActionsSheetData {
   reviews: Review[];
 }
 
-export type ParkingPointActionsSheetResult = string | 'DISMISS';
+export enum ParkingPointActionsSheetResult {
+  UPDATE_LOCATION = 'UPDATE_LOCATION',
+  NAVIGATE = 'NAVIGATE',
+  VIEW_REVIEWS = 'VIEW_REVIEWS',
+  ADD_REVIEW = 'ADD_REVIEW',
+  DISMISS = 'DISMISS',
+}

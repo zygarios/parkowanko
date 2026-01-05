@@ -1,8 +1,8 @@
 export let mapConfigData = {
   POLAND_BOUNDS: [14, 48, 24.5, 56] as [number, number, number, number],
   POLAND_MAX_BOUNDS: [0, 0, 0, 0] as [number, number, number, number],
-  PARKING_POI_RADIUS_BOUND: 40,
-  MAX_DISTANCE_TO_EDIT_LOCATION_METERS: 100,
+  PARKING_POI_RADIUS_BOUND: 30,
+  MAX_DISTANCE_TO_EDIT_LOCATION_METERS: 50,
   CLOSE_ZOOM: 17,
   FAR_ZOOM: 13,
   FLY_SPEED: 2,

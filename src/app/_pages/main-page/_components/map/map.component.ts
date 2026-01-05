@@ -9,6 +9,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
+import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { MapPoisControllerService } from '../../_services/map-pois-controller.service';
 import { MapService } from '../../_services/map/map.service';
 
@@ -60,15 +61,34 @@ export class MapComponent {
   private _parkingsApiService = inject(ParkingsApiService);
   private _destroyRef = inject(DestroyRef);
   private _mapPoisControllerService = inject(MapPoisControllerService);
+  private _sharedUtilsService = inject(SharedUtilsService);
 
   parkingsList = this._parkingsApiService.getParkings();
 
   constructor() {
+    this.checkGpsStatus();
     afterNextRender(() => this._mapService.initRenderMap());
     afterRenderEffect(() => this.setParkingsPois());
     afterRenderEffect(() => this._mapPoisControllerService.listenForSelectedPoiToStartEdit());
 
     this._destroyRef.onDestroy(() => this._mapService.cleanUp());
+  }
+
+  async checkGpsStatus() {
+    const showErr = (msg: string) => this._sharedUtilsService.openSnackbar(msg, 'ERROR');
+
+    if (!('geolocation' in navigator))
+      return showErr('Twoje urządzenie nie obsługuje lokalizacji GPS.');
+
+    navigator.geolocation.getCurrentPosition(
+      () => console.log('GPS OK'),
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED || err.code === err.POSITION_UNAVAILABLE) {
+          showErr('GPS jest wyłączony lub nie ma uprawnień do GPS.');
+        }
+      },
+      { timeout: 3000, enableHighAccuracy: false },
+    );
   }
 
   setParkingsPois() {

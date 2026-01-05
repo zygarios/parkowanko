@@ -21,30 +21,30 @@ export class GlobalSpinnerService {
   private _spinnerPortal = new ComponentPortal(GlobalSpinnerComponent);
 
   private _isSpinnerActive = signal(false);
+  private _message = signal<string | null>(null);
 
   isSpinnerActive = this._isSpinnerActive.asReadonly();
-  message = signal<string | null>(null);
 
   constructor() {
     this.listenForSpinnerStateChange();
   }
 
   show(message?: string) {
-    this.message.set(message || null);
+    this._message.set(message || null);
     this._isSpinnerActive.set(true);
   }
 
   hide(delay: number = 500) {
     setTimeout(() => {
       this._isSpinnerActive.set(false);
-      this.message.set(null);
+      this._message.set(null);
     }, delay);
   }
 
   private listenForSpinnerStateChange() {
     effect(() => {
       const isOpen = this.isSpinnerActive();
-      const msg = this.message();
+      const msg = this._message();
       if (isOpen) {
         if (!this._overlayRef.hasAttached()) {
           this._componentRef = this._overlayRef.attach(this._spinnerPortal);
