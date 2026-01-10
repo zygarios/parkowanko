@@ -96,13 +96,6 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": { "buildTarget": ":build:development" }
-        },
-        "deploy": {
-          "builder": "angular-cli-ghpages:deploy",
-          "options": {
-            "baseHref": "/parkowanko/",
-            "buildTarget": "parkowanko:build:preproduction"
-          }
         }
       }
     }
