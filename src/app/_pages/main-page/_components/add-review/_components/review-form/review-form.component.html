@@ -5,7 +5,7 @@
     @if (reviewForm().occupancy().errors()[0]; as error) {
       <mat-error>{{ error.message }}</mat-error>
     }
-    <mat-select name="label" [field]="reviewForm().occupancy">
+    <mat-select name="label" [formField]="reviewForm().occupancy">
       @for (occupancy of occupancyOptions; track $index) {
         @if ($last) {
           <hr />
@@ -22,7 +22,7 @@
 
   <mat-form-field class="w-full" subscriptSizing="dynamic">
     <mat-label>Cechy szczególne</mat-label>
-    <mat-select multiple [field]="reviewForm().attributes">
+    <mat-select multiple [formField]="reviewForm().attributes">
       <mat-select-trigger> {{ attributeFormFieldLabel() }} </mat-select-trigger>
       @for (attribute of attributesOptions; track $index) {
         <mat-option [value]="attribute.value">{{ attribute.label }}</mat-option>
@@ -33,7 +33,7 @@
   <mat-form-field class="w-full" subscriptSizing="dynamic">
     <mat-label>Dodatkowy opis</mat-label>
     <textarea
-      [field]="reviewForm().description"
+      [formField]="reviewForm().description"
       rows="3"
       class="resize-none"
       matInput

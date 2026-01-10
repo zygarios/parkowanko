@@ -13,7 +13,7 @@
     @if (!authForm.username().hidden()) {
       <mat-form-field subscriptSizing="dynamic">
         <mat-label>Nazwa użytkownika</mat-label>
-        <input [field]="authForm.username" matInput type="text" />
+        <input [formField]="authForm.username" matInput type="text" />
         <mat-icon matSuffix> person </mat-icon>
         @if (authForm.username().errors()[0]; as error) {
           <mat-error>{{ error.message }}</mat-error>
@@ -22,7 +22,7 @@
     }
     <mat-form-field subscriptSizing="dynamic">
       <mat-label>Email</mat-label>
-      <input [field]="authForm.email" matInput type="email" />
+      <input [formField]="authForm.email" matInput type="email" />
       <mat-icon matSuffix> alternate_email </mat-icon>
       @if (authForm.email().errors()[0]; as error) {
         <mat-error>{{ error.message }}</mat-error>
@@ -32,7 +32,7 @@
       <mat-label>Hasło</mat-label>
       <input
         matInput
-        [field]="authForm.password"
+        [formField]="authForm.password"
         [type]="isPasswordHidden() ? 'password' : 'text'"
       />
       @if (authForm.password().errors()[0]; as error) {
@@ -53,7 +53,7 @@
       <mat-form-field subscriptSizing="dynamic">
         <mat-label>Powtórz hasło</mat-label>
         <input
-          [field]="authForm.repeatedPassword"
+          [formField]="authForm.repeatedPassword"
           matInput
           [type]="isRepeatedPasswordHidden() ? 'password' : 'text'"
         />

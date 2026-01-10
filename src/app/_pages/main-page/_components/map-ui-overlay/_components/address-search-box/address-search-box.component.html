@@ -5,7 +5,7 @@
     placeholder="Miasto, ulica numer"
     matInput
     [matAutocomplete]="auto"
-    [field]="$any(selectedAddressForm)"
+    [formField]="$any(selectedAddressForm)"
     (input)="addressSearchTerm.set($event.target.value)"
     (focus)="addressSearchTerm.set($event.target.value)"
     (blur)="addressSearchTerm.set($event.target.value)"

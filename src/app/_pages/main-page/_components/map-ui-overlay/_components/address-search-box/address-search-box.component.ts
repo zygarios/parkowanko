@@ -8,7 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Field, form } from '@angular/forms/signals';
+import { form, FormField } from '@angular/forms/signals';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormField } from '@angular/material/form-field';
@@ -26,9 +26,9 @@ import { MapService } from '../../../../_services/map/map.service';
     MatFormField,
     MatInputModule,
     MatAutocompleteModule,
-    Field,
     ComputedFuncPipe,
     MatButtonModule,
+    FormField,
   ],
   templateUrl: './address-search-box.component.html',
   styles: `

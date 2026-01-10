@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   email,
-  Field,
   form,
+  FormField,
   hidden,
   minLength,
   required,
@@ -40,8 +40,9 @@ enum AuthModeType {
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    Field,
+    FormField,
     NgOptimizedImage,
+    FormField,
   ],
   templateUrl: './auth-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

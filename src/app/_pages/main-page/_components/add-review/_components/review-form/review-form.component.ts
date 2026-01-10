@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Field, FieldTree } from '@angular/forms/signals';
+import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -16,10 +16,10 @@ import { occupancyOptionsData } from '../../_data/occupancy-options.data';
     MatSelect,
     MatSelectTrigger,
     MatOption,
-    Field,
     MatError,
     MatIcon,
     MatInputModule,
+    FormField,
   ],
   templateUrl: './review-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
