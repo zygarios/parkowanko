@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1766320094400,
+  "timestamp": 1769198561495,
   "index": "/parkowanko/index.html",
   "assetGroups": [
     {
@@ -21,9 +21,8 @@
         "ignoreVary": true
       },
       "urls": [
-        "/parkowanko/icons/logo-parkowanko.png",
+        "/parkowanko/icons/logo-parkowanko.svg",
         "/parkowanko/icons/parking-free-poi.svg",
-        "/parkowanko/icons/parking-free-unverified-poi.svg",
         "/parkowanko/icons/parking-marker.svg",
         "/parkowanko/icons/pwa/icon-128x128.png",
         "/parkowanko/icons/pwa/icon-144x144.png",
@@ -43,10 +42,9 @@
   ],
   "dataGroups": [],
   "hashTable": {
-    "/parkowanko/icons/logo-parkowanko.png": "4fbacbd1e32d3a9be43d01317bb230a395b32589",
-    "/parkowanko/icons/parking-free-poi.svg": "7cac7a67ed49427b2ecb84979afc3565d68f135b",
-    "/parkowanko/icons/parking-free-unverified-poi.svg": "71deb60a81c1ac883734cabfc1fea185ac272a2c",
-    "/parkowanko/icons/parking-marker.svg": "71cbc52b085e214209cbc0279dfc1538bc088daf",
+    "/parkowanko/icons/logo-parkowanko.svg": "5ef996a48b90ea2578a572af8b88e99c0c43769a",
+    "/parkowanko/icons/parking-free-poi.svg": "606673b2cddfdcbfd69af12be421265d129e0f04",
+    "/parkowanko/icons/parking-marker.svg": "e83a961106973808f23afbc2f5bafa0eebde18a5",
     "/parkowanko/icons/pwa/icon-128x128.png": "b0a5ca8f84fa22a5b96b9dacc81fb524fb6cead3",
     "/parkowanko/icons/pwa/icon-144x144.png": "6d5d163af8eeab3b568c11aa2870aaa01927b1c9",
     "/parkowanko/icons/pwa/icon-152x152.png": "4a233b000b173408b65c06cededd41e02f12f4eb",
@@ -57,7 +55,7 @@
     "/parkowanko/icons/pwa/icon-512x512.png": "18314adccb415b7b127c0296b4c1ca5b5aa7f15f",
     "/parkowanko/icons/pwa/icon-72x72.png": "24517e9434dceca886a991eee644e258e90fd440",
     "/parkowanko/icons/pwa/icon-96x96.png": "b3ece95e0f4f95993f3839ea980914a54e3eab0c",
-    "/parkowanko/icons/target-location.svg": "a5a5995aab05f9a70bd433957e7999cfc8bb039a",
+    "/parkowanko/icons/target-location.svg": "d8d9c7d1c47c7f9aa0267cae0a3a5a9a3a576776",
     "/parkowanko/images/banner-logo.png": "9c3bc936f6a68bffbb1a88d416f16fcf9476a572"
   },
   "navigationUrls": [

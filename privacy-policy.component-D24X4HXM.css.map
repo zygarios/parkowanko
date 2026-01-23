@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["privacy-policy.component.ts"],
+  "sourcesContent": ["\n      .privacy-container {\n        max-width: 800px;\n        margin: 0 auto;\n        padding: 20px;\n        line-height: 1.6;\n        color: #333;\n        font-family: 'Roboto', sans-serif;\n      }\n      .privacy-header {\n        display: flex;\n        align-items: center;\n        gap: 16px;\n        margin-bottom: 32px;\n        border-bottom: 1px solid #eee;\n        padding-bottom: 16px;\n      }\n      .privacy-header h1 {\n        margin: 0;\n        font-size: 24px;\n        font-weight: 500;\n      }\n      .privacy-content h2 {\n        margin-top: 24px;\n        font-size: 18px;\n        font-weight: 500;\n        color: #1976d2;\n      }\n      .privacy-content ul {\n        padding-left: 20px;\n      }\n      .last-update {\n        margin-top: 48px;\n        font-size: 14px;\n        color: #777;\n        font-style: italic;\n      }\n    "],
+  "mappings": "AACM,CAAA,kBACE,UAAA,aACA,EAAA,aACA,KACA,YAAA,IACA,MAAA,KACA,YAAA,MAAA,CAAA,UACF,CACA,CAAA,eACE,QAAA,KACA,YAAA,OACA,IAAA,KACA,cAAA,KACA,cAAA,IAAA,MAAA,KACA,eAAA,IACF,CACA,CARA,eAQA,UACE,EACA,UAAA,KACA,YAAA,GACF,CACA,CAAA,gBAAA,GACE,WAAA,KACA,UAAA,KACA,YAAA,IACA,MAAA,OACF,CACA,CANA,gBAMA,GACE,aAAA,IACF,CACA,CAAA,YACE,WAAA,KACA,UAAA,KACA,MAAA,KACA,WAAA,MACF",
+  "names": []
+}

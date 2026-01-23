@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["map-ui-overlay.component.ts"],
+  "sourcesContent": ["\n    .find-nearest-parking-button {\n      --mat-fab-container-color: var(--par-color-primary);\n      --mat-fab-foreground-color: white;\n    }\n  "],
+  "mappings": "AACI,CAAA,4BACE,2BAAA,IAAA,qBACA,4BAAA,KACF",
+  "names": []
+}

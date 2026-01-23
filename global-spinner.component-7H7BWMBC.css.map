@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/_components/global-spinner/global-spinner.component.ts", "global-spinner.component.ts"],
-  "sourcesContent": ["\n    :host {\n      display: flex;\n      justify-content: center;\n      align-items: center;\n      width: 100%;\n      height: 100%;\n      background-color: color-mix(in srgb, var(--par-color-primary) 10%, transparent);\n    }\n  ", ":host {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  width: 100%;\n  height: 100%;\n  background-color: color-mix(in srgb, var(--par-color-primary) 10%, transparent);\n}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJmaWxlOi8vL0Q6L1Byb2dyYW1vd2FuaWUvcGFya293YW5rby1hcHAvc3JjL2FwcC9fY29tcG9uZW50cy9nbG9iYWwtc3Bpbm5lci9nbG9iYWwtc3Bpbm5lci5jb21wb25lbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQ0k7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0EiLCJzb3VyY2VzQ29udGVudCI6WyJcbiAgICA6aG9zdCB7XG4gICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAganVzdGlmeS1jb250ZW50OiBjZW50ZXI7XG4gICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgd2lkdGg6IDEwMCU7XG4gICAgICBoZWlnaHQ6IDEwMCU7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiBjb2xvci1taXgoaW4gc3JnYiwgdmFyKC0tcGFyLWNvbG9yLXByaW1hcnkpIDEwJSwgdHJhbnNwYXJlbnQpO1xuICAgIH1cbiAgIl19 */"],
-  "mappings": "AACI,MACE,QAAA,KACA,gBAAA,OACA,YAAA,OACA,MAAA,KACA,OAAA,KACA,iBAAA,UAAA,GAAA,IAAA,CAAA,IAAA,qBAAA,GAAA,CAAA,YCAN",
-  "names": []
-}

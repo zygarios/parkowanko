@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.parkowanko.app",
+      "sha256_cert_fingerprints": [
+        "TWOJ_SHA256_CERTIFICATE_FINGERPRINT_Z_GOOGLE_PLAY_CONSOLE"
+      ]
+    }
+  }
+]

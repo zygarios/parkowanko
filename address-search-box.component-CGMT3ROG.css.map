@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["address-search-box.component.ts"],
+  "sourcesContent": ["\n    :host {\n      --mat-form-field-container-text-size: 14px;\n      --mat-form-field-outlined-outline-color: var(--par-color-primary);\n      --mat-form-field-outlined-outline-width: 2px;\n      --mat-form-field-outlined-container-shape: var(--mat-sys-corner-large);\n      --mat-fab-container-elevation-shadow: none;\n\n      flex: 1;\n\n      ::ng-deep {\n        .mat-mdc-text-field-wrapper {\n          border-radius: var(--mat-form-field-outlined-container-shape) !important;\n        }\n        mat-form-field {\n          margin-bottom: 0 !important;\n        }\n      }\n    }\n  "],
+  "mappings": "AACI,MACE,sCAAA,KACA,yCAAA,IAAA,qBACA,yCAAA,IACA,2CAAA,IAAA,wBACA,sCAAA,KAEA,KAAA,CAUF",
+  "names": []
+}

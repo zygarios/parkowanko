@@ -1,7 +1,12 @@
 {
   "name": "Parkowanko",
-  "short_name": "PW",
+  "short_name": "Parkowanko",
+  "description": "Znajdź najbliższy darmowy parking w Twojej okolicy. Aplikacja ułatwiająca parkowanie w polskich miastach.",
+  "categories": ["travel", "navigation", "maps"],
   "display": "standalone",
+  "theme_color": "#1098f7",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
   "scope": "./",
   "start_url": "./",
   "icons": [
