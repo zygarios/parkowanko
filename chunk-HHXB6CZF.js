@@ -7,4 +7,4 @@ import{a as li,b as Re,f as K,g as si,h as ci,i as mi,j as gi,k as fi,l as bi,m 
 /*! tailwindcss v4.1.18 | MIT License | https://tailwindcss.com */
 /*# sourceMappingURL=map.component-DGTKFBQI.css.map */
 `],encapsulation:2,changeDetection:0})}return a})();var b1=(()=>{class a{_sharedUtilsService=n(X);constructor(){n(se).onDestroy(()=>this._sharedUtilsService.cleanUp())}static \u0275fac=function(t){return new(t||a)};static \u0275cmp=b({type:a,selectors:[["app-main-page"]],decls:2,vars:0,template:function(t,i){t&1&&te(0,"app-map-ui-overlay")(1,"app-map")},dependencies:[Di,Ti],encapsulation:2,changeDetection:0})}return a})();export{b1 as MainPageComponent};
-//# sourceMappingURL=chunk-DDL4PM4G.js.map
+//# sourceMappingURL=chunk-HHXB6CZF.js.map
