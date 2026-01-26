@@ -5,7 +5,7 @@
     @if (reviewForm().occupancy().errors()[0]; as error) {
       <mat-error>{{ error.message }}</mat-error>
     }
-    <mat-select name="label" [formField]="reviewForm().occupancy">
+    <mat-select [formField]="reviewForm().occupancy">
       @for (occupancy of occupancyOptions; track $index) {
         @if ($last) {
           <hr />

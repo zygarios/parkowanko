@@ -65,7 +65,6 @@
                 }
               ],
               "outputHashing": "all",
-
               "serviceWorker": "ngsw-config.json"
             },
             "preproduction": {
