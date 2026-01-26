@@ -1,4 +1,6 @@
-export const envShared = {
+import { EnvironmentType } from '../app/_types/environment-type.type';
+
+export const environment = {
   geocodeApi: 'https://services.gugik.gov.pl/uug',
   geoStatApi: 'https://geo.stat.gov.pl/api/fts/ref/qq',
   colors: {
@@ -8,4 +10,6 @@ export const envShared = {
   },
   sentryDsn:
     'https://069cf899b4e34bae773e06ff484ff274@o4510541561462784.ingest.de.sentry.io/4510541566246992',
+  environmentType: 'PROD' as EnvironmentType,
+  apiUrl: 'https://parkowanko.onrender.com/api',
 };

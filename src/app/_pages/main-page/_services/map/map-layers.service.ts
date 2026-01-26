@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../environments/environment.development';
+import { environment } from '../../../../../environments/environment';
 import { mapConfigData } from '../../_data/map-config-data';
 
 export const PARKING_POI_SOURCE = 'parkingPoiSource';

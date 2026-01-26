@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SwUpdate, VersionEvent } from '@angular/service-worker';
-import { environment } from '../environments/environment.development';
+import { environment } from '../environments/environment';
 import { PwaService } from './_services/_core/pwa.service';
 
 @Component({

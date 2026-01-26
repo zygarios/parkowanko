@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { finalize, Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { GlobalSpinnerService } from '../../_services/_core/global-spinner.service';
 import { ParkingPoint, ParkingPointSaveData } from '../../_types/parking-point.type';
 import { ParkingsFilter } from '../../_types/parkings-filter.type';
