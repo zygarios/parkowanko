@@ -7,7 +7,7 @@
     "start:remote": "ng serve --host 0.0.0.0 --ssl",
     "build": "ng build",
     "build:prod": "npm i --force && ng build --configuration production",
-    "deploy:prod": "npx wrangler pages deploy dist/browser"
+    "deploy:prod": "npx wrangler pages deploy dist/browser --project-name=parkowanko"
   },
   "prettier": {
     "printWidth": 100,
