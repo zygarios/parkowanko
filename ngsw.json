@@ -1,7 +1,7 @@
 {
   "configVersion": 1,
-  "timestamp": 1769198702070,
-  "index": "/parkowanko/index.html",
+  "timestamp": 1769899731917,
+  "index": "/parkowanko/index.preproduction.html",
   "assetGroups": [
     {
       "name": "app",
@@ -21,6 +21,7 @@
         "ignoreVary": true
       },
       "urls": [
+        "/parkowanko/icons/logo-parkowanko.png",
         "/parkowanko/icons/logo-parkowanko.svg",
         "/parkowanko/icons/parking-free-poi.svg",
         "/parkowanko/icons/parking-marker.svg",
@@ -35,14 +36,48 @@
         "/parkowanko/icons/pwa/icon-72x72.png",
         "/parkowanko/icons/pwa/icon-96x96.png",
         "/parkowanko/icons/target-location.svg",
-        "/parkowanko/images/banner-logo.png"
+        "/parkowanko/images/screenshots/screenshot-1-map.png",
+        "/parkowanko/images/screenshots/screenshot-2-details.png",
+        "/parkowanko/images/screenshots/screenshot-3-search.png",
+        "/parkowanko/images/screenshots/screenshot-4-review.png",
+        "/parkowanko/osm_bright.json"
       ],
       "patterns": []
     }
   ],
-  "dataGroups": [],
+  "dataGroups": [
+    {
+      "name": "google-fonts",
+      "patterns": [
+        "https:\\/\\/fonts\\.googleapis\\.com\\/.*",
+        "https:\\/\\/fonts\\.gstatic\\.com\\/.*"
+      ],
+      "strategy": "performance",
+      "maxSize": 20,
+      "maxAge": 31536000000,
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "version": 1
+    },
+    {
+      "name": "api-cache",
+      "patterns": [
+        "https:\\/\\/parkowanko-api\\.onrender\\.com\\/.*"
+      ],
+      "strategy": "freshness",
+      "maxSize": 100,
+      "maxAge": 3600000,
+      "timeoutMs": 10000,
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "version": 1
+    }
+  ],
   "hashTable": {
-    "/parkowanko/icons/logo-parkowanko.svg": "5ef996a48b90ea2578a572af8b88e99c0c43769a",
+    "/parkowanko/icons/logo-parkowanko.png": "48f739e859d2cfd65cc6c5a96bea62eeeccdd0f5",
+    "/parkowanko/icons/logo-parkowanko.svg": "e3ab83ec1a7924e7fe91368b34371a1a378417e5",
     "/parkowanko/icons/parking-free-poi.svg": "606673b2cddfdcbfd69af12be421265d129e0f04",
     "/parkowanko/icons/parking-marker.svg": "e83a961106973808f23afbc2f5bafa0eebde18a5",
     "/parkowanko/icons/pwa/icon-128x128.png": "b0a5ca8f84fa22a5b96b9dacc81fb524fb6cead3",
@@ -56,7 +91,11 @@
     "/parkowanko/icons/pwa/icon-72x72.png": "24517e9434dceca886a991eee644e258e90fd440",
     "/parkowanko/icons/pwa/icon-96x96.png": "b3ece95e0f4f95993f3839ea980914a54e3eab0c",
     "/parkowanko/icons/target-location.svg": "d8d9c7d1c47c7f9aa0267cae0a3a5a9a3a576776",
-    "/parkowanko/images/banner-logo.png": "9c3bc936f6a68bffbb1a88d416f16fcf9476a572"
+    "/parkowanko/images/screenshots/screenshot-1-map.png": "7daed672b384ec7eff2f72171a779fd04fcf907e",
+    "/parkowanko/images/screenshots/screenshot-2-details.png": "3c4e13172dacb35509ecc86ba63f84faa47f1ca8",
+    "/parkowanko/images/screenshots/screenshot-3-search.png": "58f28d64f5d139a2d687a1363820bdb59c591206",
+    "/parkowanko/images/screenshots/screenshot-4-review.png": "3ec6e1ca9aaa23855c22add5e7c8944522dbad75",
+    "/parkowanko/osm_bright.json": "8bc9fd7df605fd8d7a8b304bf56804c4b46bcecd"
   },
   "navigationUrls": [
     {
