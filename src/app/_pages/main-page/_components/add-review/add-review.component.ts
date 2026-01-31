@@ -49,11 +49,13 @@ export class AddReviewComponent {
   private _sharedUtilsService = inject(SharedUtilsService);
   private _dialogData = inject<{
     parkingPointId: number;
+    parkingAddress?: string | null;
     skipVoteStep?: boolean;
     userReview?: Review;
   }>(MAT_DIALOG_DATA);
   private _stepsRef = viewChildren(MatTab);
 
+  parkingAddress = this._dialogData.parkingAddress;
   skipVoteStep = this._dialogData.skipVoteStep;
   activeStep = signal(0);
   isFirstStep = computed(() => this.activeStep() === 0);

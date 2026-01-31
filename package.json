@@ -40,8 +40,8 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^21.1.1",
-    "@angular/cli": "^21.1.1",
+    "@angular/build": "^21.1.2",
+    "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^21.2.0-next.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/geojson": "^7946.0.16",

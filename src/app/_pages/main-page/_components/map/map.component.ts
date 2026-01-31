@@ -3,7 +3,6 @@ import {
   afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   inject,
   untracked,
   ViewEncapsulation,
@@ -59,19 +58,18 @@ import { MapService } from '../../_services/map/map.service';
 export class MapComponent {
   private _mapService = inject(MapService);
   private _parkingsApiService = inject(ParkingsApiService);
-  private _destroyRef = inject(DestroyRef);
   private _mapPoisControllerService = inject(MapPoisControllerService);
   private _sharedUtilsService = inject(SharedUtilsService);
 
   parkingsList = this._parkingsApiService.getParkings();
 
   constructor() {
-    this.checkGpsStatus();
-    afterNextRender(() => this._mapService.initRenderMap());
+    afterNextRender(() => {
+      this.checkGpsStatus();
+      this._mapService.initRenderMap();
+    });
     afterRenderEffect(() => this.setParkingsPois());
     afterRenderEffect(() => this._mapPoisControllerService.listenForSelectedPoiToStartEdit());
-
-    this._destroyRef.onDestroy(() => this._mapService.cleanUp());
   }
 
   async checkGpsStatus() {

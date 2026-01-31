@@ -52,6 +52,7 @@
           },
           "configurations": {
             "production": {
+              "optimization": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -71,9 +72,12 @@
                 }
               ],
               "outputHashing": "all",
-              "serviceWorker": "ngsw-config.json"
+              "sourceMap": false,
+              "serviceWorker": "ngsw-config.json",
+              "index": "src/index.production.html"
             },
             "preproduction": {
+              "optimization": true,
               "outputHashing": "all",
               "sourceMap": true,
               "fileReplacements": [
@@ -82,7 +86,8 @@
                   "with": "src/environments/environment.preproduction.ts"
                 }
               ],
-              "serviceWorker": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json",
+              "index": "src/index.preproduction.html"
             },
             "development": {
               "optimization": false,

@@ -1,7 +1,8 @@
+import { DOCUMENT } from '@angular/common';
 import { computed, DestroyRef, inject, Injectable, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
-import { catchError, EMPTY, of, switchMap, take, tap } from 'rxjs';
+import { catchError, EMPTY, fromEvent, map, of, switchMap, take, tap } from 'rxjs';
 import { MenuSheetResult } from '../../../_components/menu-sheet/menu-sheet.model';
 import { ParkingPointActionsSheetComponent } from '../../../_components/parking-point-actions-sheet/parking-point-actions-sheet.component';
 import { ParkingPointActionsSheetResult } from '../../../_components/parking-point-actions-sheet/parking-point-actions-sheet.type';
@@ -21,6 +22,8 @@ import {
 import { ReviewsComponent } from '../_components/reviews/reviews.component';
 import { MapService } from './map/map.service';
 
+const LAST_NAVIGATED_PARKING_ID = 'par_last_navigated_parking_id';
+
 @Injectable()
 export class MapPoisControllerService {
   private readonly _mapService = inject(MapService);
@@ -32,6 +35,11 @@ export class MapPoisControllerService {
   private readonly _geocodeApiService = inject(GeocodeApiService);
   private readonly _reviewsApiService = inject(ReviewsApiService);
   private readonly _authService = inject(AuthService);
+  private readonly _document = inject(DOCUMENT);
+
+  constructor() {
+    this._initNavigationTracker();
+  }
 
   private readonly _isMapLoaded = this._mapService.isMapLoaded;
 
@@ -103,24 +111,71 @@ export class MapPoisControllerService {
   }
 
   private _handleNavigate() {
-    const location = this._selectedParking()?.location;
-    setTimeout(() => {
-      if (location) {
+    const { id, location } = this._selectedParking() ?? {};
+    if (id) {
+      localStorage.setItem(LAST_NAVIGATED_PARKING_ID, id.toString());
+    }
+    setTimeout(
+      () =>
+        location &&
         window.open(
           `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`,
           '_blank',
-        );
-      }
-    }, 100);
+        ),
+
+      100,
+    );
   }
 
-  private _handleAddReview(reviews: Review[]) {
+  private _initNavigationTracker() {
+    this._checkAndPromptForReview();
+
+    fromEvent(this._document, 'visibilitychange')
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        if (this._document.visibilityState === 'visible') {
+          this._checkAndPromptForReview();
+        }
+      });
+  }
+
+  private _checkAndPromptForReview() {
+    const lastNavigatedId = localStorage.getItem(LAST_NAVIGATED_PARKING_ID);
+    if (!lastNavigatedId) return;
+
+    localStorage.removeItem(LAST_NAVIGATED_PARKING_ID);
+    const parkingId = parseInt(lastNavigatedId, 10);
+
+    this._parkingsApiService
+      .getParking(parkingId)
+      .pipe(
+        switchMap((parking) =>
+          this._reviewsApiService
+            .getReviews(parkingId)
+            .pipe(map((reviews) => ({ parking, reviews }))),
+        ),
+        take(1),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(({ parking, reviews }) => {
+        this._handleAddReview(reviews, parking).subscribe();
+      });
+  }
+
+  private _handleAddReview(reviews: Review[], parking?: ParkingPoint) {
+    const p = parking ?? this._selectedParking();
+    if (!p) return of(null);
+
     const userId = this._authService.currentUser()?.id;
     const userReview = reviews.find((review) => review.user.id === userId);
 
     return this._matDialog
       .open(AddReviewComponent, {
-        data: { parkingPointId: this._selectedParking()?.id, userReview },
+        data: {
+          parkingPointId: p.id,
+          parkingAddress: p.address,
+          userReview,
+        },
       })
       .afterClosed();
   }

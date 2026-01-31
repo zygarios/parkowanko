@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import {
   booleanPointInPolygon,
   buffer,
@@ -25,6 +25,7 @@ export class MapService {
   private _sharedUtilsService = inject(SharedUtilsService);
   private _globalSpinnerService = inject(GlobalSpinnerService);
   private _parkingsApiService = inject(ParkingsApiService);
+  private _destroyRef = inject(DestroyRef);
 
   private _map: maplibregl.Map | null = null;
   private _markerRef: maplibregl.Marker | null = null;
@@ -42,6 +43,13 @@ export class MapService {
   isMarkerInsideDisabledZone = signal(false);
 
   selectedParkingId = signal<number | null>(null);
+
+  constructor() {
+    this._destroyRef.onDestroy(() => {
+      this._cleanUpListeners();
+      this._cleanUpMapCore();
+    });
+  }
 
   /**
    * Inicjalizuje mapę MapLibre i przygotowuje wszystkie warstwy
@@ -388,16 +396,6 @@ export class MapService {
         `Nie znaleziono najbliższego parkingu w zasięgu ${mapConfigData.MAX_DISTANCE_TO_NEAREST_PARKING_KM} km.`,
       );
     }
-  }
-
-  /**
-   * Czyści wszystkie zasoby mapy, event listenery i referencje
-   * KRYTYCZNE: Zapobiega wyciekom pamięci przy nawigacji między widokami
-   * Wywołuje się automatycznie przez DestroyRef w komponencie
-   */
-  cleanUp() {
-    this._cleanUpListeners();
-    this._cleanUpMapCore();
   }
 
   private _cleanUpListeners() {
