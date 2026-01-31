@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { computed, DestroyRef, inject, Injectable, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
-import { catchError, EMPTY, fromEvent, map, of, switchMap, take, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, fromEvent, map, of, switchMap, take, tap } from 'rxjs';
 import { MenuSheetResult } from '../../../_components/menu-sheet/menu-sheet.model';
 import { ParkingPointActionsSheetComponent } from '../../../_components/parking-point-actions-sheet/parking-point-actions-sheet.component';
 import { ParkingPointActionsSheetResult } from '../../../_components/parking-point-actions-sheet/parking-point-actions-sheet.type';
@@ -11,6 +11,7 @@ import { ParkingEditLocationApiService } from '../../../_services/_api/parking-e
 import { ParkingsApiService } from '../../../_services/_api/parkings-api.service';
 import { ReviewsApiService } from '../../../_services/_api/reviews-api.service';
 import { AuthService } from '../../../_services/_core/auth.service';
+import { GlobalSpinnerService } from '../../../_services/_core/global-spinner.service';
 import { SharedUtilsService } from '../../../_services/_core/shared-utils.service';
 import { ParkingPoint } from '../../../_types/parking-point.type';
 import { Review } from '../../../_types/review.type';
@@ -36,6 +37,7 @@ export class MapPoisControllerService {
   private readonly _reviewsApiService = inject(ReviewsApiService);
   private readonly _authService = inject(AuthService);
   private readonly _document = inject(DOCUMENT);
+  private readonly _globalSpinnerService = inject(GlobalSpinnerService);
 
   constructor() {
     this._initNavigationTracker();
@@ -260,11 +262,13 @@ export class MapPoisControllerService {
           const location = this._mapService.getMarkerLatLng();
 
           let newParking: ParkingPoint;
+          this._globalSpinnerService.show('Dodawanie nowego parkingu...');
 
           return this._geocodeApiService.getAddressByCoordinates(location).pipe(
             switchMap((address) =>
               this._parkingsApiService.postParking({ location, address: address || null }),
             ),
+            finalize(() => this._globalSpinnerService.hide()),
             tap((createdParking) => {
               newParking = createdParking;
               this._sharedUtilsService.openSnackbar(

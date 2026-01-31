@@ -74,7 +74,10 @@
               "outputHashing": "all",
               "sourceMap": false,
               "serviceWorker": "ngsw-config.json",
-              "index": "src/index.production.html"
+              "index": {
+                "input": "src/index.production.html",
+                "output": "index.html"
+              }
             },
             "preproduction": {
               "optimization": true,
@@ -87,7 +90,10 @@
                 }
               ],
               "serviceWorker": "ngsw-config.json",
-              "index": "src/index.preproduction.html"
+              "index": {
+                "input": "src/index.preproduction.html",
+                "output": "index.html"
+              }
             },
             "development": {
               "optimization": false,
@@ -100,13 +106,6 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": { "buildTarget": ":build:development" }
-        },
-        "deploy": {
-          "builder": "angular-cli-ghpages:deploy",
-          "options": {
-            "baseHref": "/parkowanko/",
-            "buildTarget": "parkowanko:build:preproduction"
-          }
         }
       }
     }

@@ -13,10 +13,10 @@ import { LocationCoords } from '../../_types/location-coords.type';
   providedIn: 'root',
 })
 export class GeocodeApiService {
-  private httpClient = inject(HttpClient);
+  private _httpClient = inject(HttpClient);
 
   getAddressByCoordinates(location: LocationCoords): Observable<string> {
-    return this.httpClient
+    return this._httpClient
       .get<any>(
         `${environment.geocodeApi}/?request=GetAddressReverse&location=POINT(${location.lng} ${location.lat})&srid=4326`,
       )
@@ -40,10 +40,10 @@ export class GeocodeApiService {
 
   getAddresses(searchTerm: string): Observable<GeocodeFeature[]> {
     return forkJoin([
-      this.httpClient.get<GeocodeResponse>(environment.geoStatApi, {
+      this._httpClient.get<GeocodeResponse>(environment.geoStatApi, {
         params: { cnt: 5, idx: 'prngjo', tag: 'miejscowość', q: searchTerm, useExtSvc: true },
       }),
-      this.httpClient.get<GeocodeResponse>(environment.geoStatApi, {
+      this._httpClient.get<GeocodeResponse>(environment.geoStatApi, {
         params: { cnt: 20, idx: 'pkt', q: searchTerm, useExtSvc: true },
       }),
     ]).pipe(

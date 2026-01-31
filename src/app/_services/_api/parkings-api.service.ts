@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import { finalize, Observable, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { GlobalSpinnerService } from '../../_services/_core/global-spinner.service';
 import { ParkingPoint, ParkingPointSaveData } from '../../_types/parking-point.type';
 import { ParkingsFilter } from '../../_types/parkings-filter.type';
 
@@ -11,7 +10,6 @@ import { ParkingsFilter } from '../../_types/parkings-filter.type';
 })
 export class ParkingsApiService {
   private _httpClient = inject(HttpClient);
-  private _globalSpinnerService = inject(GlobalSpinnerService);
 
   private _parkingsList = signal<ParkingPoint[]>([]);
 
@@ -58,15 +56,15 @@ export class ParkingsApiService {
   }
 
   postParking(body: ParkingPointSaveData): Observable<ParkingPoint> {
-    this._globalSpinnerService.show('Dodawanie nowego parkingu...');
-    return this._httpClient.post<ParkingPoint>(`${environment.apiUrl}/parking-points/`, body).pipe(
-      tap((newParking: ParkingPoint) =>
-        this._parkingsList.update((parkings: ParkingPoint[]) => [
-          ...parkings,
-          new ParkingPoint(newParking),
-        ]),
-      ),
-      finalize(() => this._globalSpinnerService.hide()),
-    );
+    return this._httpClient
+      .post<ParkingPoint>(`${environment.apiUrl}/parking-points/`, body)
+      .pipe(
+        tap((newParking: ParkingPoint) =>
+          this._parkingsList.update((parkings: ParkingPoint[]) => [
+            ...parkings,
+            new ParkingPoint(newParking),
+          ]),
+        ),
+      );
   }
 }
