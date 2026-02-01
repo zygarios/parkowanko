@@ -1,8 +1,12 @@
 @if (!skipVoteStep) {
   <div mat-dialog-title>
     @if (isFirstStep()) {
-      <div class="flex ml-auto mr-auto gap-2 relative text-center">
-        Czy udało Ci się tu zaparkować?
+      <div>
+        @if (isReviewForLastNavigatedParking) {
+          Czy oceniasz ostatnie miejsce?
+        } @else {
+          Jak oceniasz to miejsce?
+        }
       </div>
       <button mat-dialog-close matIconButton>
         <mat-icon>close</mat-icon>
@@ -27,7 +31,7 @@
       class="px-6 pb-2 pt-2 text-sm opacity-60 font-medium flex justify-start items-center gap-1"
     >
       <mat-icon class="text-[18px]! w-[18px]! h-[18px]!">location_on</mat-icon>
-      <div>{{ parkingAddress || 'Wybrany parking' }}</div>
+      <div>{{ parkingAddress || 'Brak informacji o adresie' }}</div>
     </div>
     <div class="p-6">
       <div class="flex gap-2 justify-center">

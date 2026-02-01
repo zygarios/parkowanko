@@ -52,10 +52,12 @@ export class AddReviewComponent {
     parkingAddress?: string | null;
     skipVoteStep?: boolean;
     userReview?: Review;
+    isReviewForLastNavigatedParking?: boolean;
   }>(MAT_DIALOG_DATA);
   private _stepsRef = viewChildren(MatTab);
 
   parkingAddress = this._dialogData.parkingAddress;
+  isReviewForLastNavigatedParking = this._dialogData.isReviewForLastNavigatedParking;
   skipVoteStep = this._dialogData.skipVoteStep;
   activeStep = signal(0);
   isFirstStep = computed(() => this.activeStep() === 0);

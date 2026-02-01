@@ -40,7 +40,8 @@ export class MapService {
   isMapLoaded = this._isMapLoaded.asReadonly();
 
   private _renderedParkingIds = signal<number[]>([]);
-  isMarkerInsideDisabledZone = signal(false);
+  isMarkerInRadiusOfOtherParking = signal(false);
+  isMarkerInRadiusOfOriginalParking = signal(true);
 
   selectedParkingId = signal<number | null>(null);
 
@@ -199,18 +200,22 @@ export class MapService {
     // 2. Zarządzanie linią dystansu i stanem markera
     const markerElement = this._markerRef?.getElement();
 
-    // Sprawdzamy dystans od punktu startowego przy edycji
-    let isTooFarFromOriginal = false;
+    // Sprawdzamy czy marker jest w zasięgu oryginału (przy edycji)
+    let isWithinRangeOfOriginal = true;
     if (oldLocationCoords) {
       const dist = distance(point([oldLocationCoords.lng, oldLocationCoords.lat]), markerPoint, {
         units: 'meters',
       });
-      isTooFarFromOriginal = dist > mapConfigData.MAX_DISTANCE_TO_EDIT_LOCATION_METERS;
+      isWithinRangeOfOriginal = dist <= mapConfigData.MAX_DISTANCE_TO_EDIT_LOCATION_METERS;
     }
 
-    if (parkingPoiInRadius || isTooFarFromOriginal) {
-      // KRYTYCZNE: Jeśli jest kolizja lub za daleko, linia MUSI pokazywać punkt problematyczny
-      this.isMarkerInsideDisabledZone.set(true);
+    const isInRadiusOfOriginal = oldLocationCoords ? isWithinRangeOfOriginal : true;
+    const isInRadiusOfOther = !!parkingPoiInRadius;
+
+    this.isMarkerInRadiusOfOtherParking.set(isInRadiusOfOther);
+    this.isMarkerInRadiusOfOriginalParking.set(isInRadiusOfOriginal);
+
+    if (isInRadiusOfOther || !isInRadiusOfOriginal) {
       markerElement?.classList.add('disabled');
 
       this.renderLineBetweenPoints({
@@ -219,8 +224,6 @@ export class MapService {
         isColliding: true,
       });
     } else {
-      // Brak kolizji i w zasięgu - czyścimy stan blokady
-      this.isMarkerInsideDisabledZone.set(false);
       markerElement?.classList.remove('disabled');
 
       if (oldLocationCoords) {
@@ -248,7 +251,8 @@ export class MapService {
     this.removeLineBetweenPoints();
     this._mapRendererService.renderRadiiForPois(this._map, []);
     this._mapRendererService.renderEditArea(this._map);
-    this.isMarkerInsideDisabledZone.set(false);
+    this.isMarkerInRadiusOfOtherParking.set(false);
+    this.isMarkerInRadiusOfOriginalParking.set(true);
     this._map.off('move', this._moveMarkerFnRef!);
     this._map.off('move', this._renderFeaturesForMarkerOnMoveFnRef!);
     this._markerRef?.off('drag', this._renderFeaturesForMarkerOnMoveFnRef!);
@@ -435,7 +439,8 @@ export class MapService {
 
     // Wyzeruj referencje (zapobiega wyciekowi pamięci)
     this.selectedParkingId.set(null);
-    this.isMarkerInsideDisabledZone.set(false);
+    this.isMarkerInRadiusOfOtherParking.set(false);
+    this.isMarkerInRadiusOfOriginalParking.set(true);
     this._map = null;
     this._markerRef = null;
     this._renderedParkingIds.set([]);

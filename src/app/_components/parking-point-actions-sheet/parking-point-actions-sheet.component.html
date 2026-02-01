@@ -15,7 +15,9 @@
 
       <div class="flex gap-1">
         <mat-icon>location_on</mat-icon>
-        <div class="w-fit pt-[2px]">{{ data.parkingPoint.address || 'Brak adresu' }}</div>
+        <div class="w-fit pt-[2px]">
+          {{ data.parkingPoint.address || 'Brak informacji o adresie' }}
+        </div>
       </div>
     </div>
   </div>
