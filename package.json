@@ -6,7 +6,7 @@
     "start": "ng serve",
     "start:remote": "ng serve --host 0.0.0.0 --ssl",
     "deploy:branch:preproduction": "npm i --force && ng build --configuration preproduction --base-href /parkowanko/ && npx angular-cli-ghpages --dir dist/browser",
-    "build:branch:production": "npm i --force && ng build --configuration production"
+    "deploy:branch:production": "git push"
   },
   "prettier": {
     "printWidth": 100,
