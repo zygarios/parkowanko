@@ -244,7 +244,6 @@ export class MapPoisControllerService {
 
   startAddingPoi() {
     this._mapService.renderMoveableMarkerWithRadiusAndLineToFixedPoint();
-
     const sheetRef = this._sharedUtilsService.openMenuSheet(addingPoiConfirmSheetConfig(), {
       hasBackdrop: false,
     });
