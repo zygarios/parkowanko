@@ -39,6 +39,7 @@
     <!-- Preload critical resources -->
     <link rel="preload" href="osm_bright.json" as="fetch" crossorigin>
     <link rel="preload" href="icons/pwa/icon-192x192.png" as="image">
+    <link rel="preload" href="icons/logo-parkowanko.svg" as="image">
     <link rel="preload" href="icons/parking-free-poi.svg" as="image">
 
     <!-- Fonts - Async loading to prevent render blocking -->
@@ -46,16 +47,10 @@
         this.onload = null;
         this.rel = 'stylesheet';
       ">
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&amp;display=swap" rel="stylesheet">
-    </noscript>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined&amp;display=swap" rel="preload" as="style" onload="
         this.onload = null;
         this.rel = 'stylesheet';
       ">
-    <noscript>
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined&amp;display=swap" rel="stylesheet">
-    </noscript>
 
     <!-- Manifest -->
     <link rel="manifest" href="manifest.webmanifest">
