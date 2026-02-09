@@ -6,6 +6,8 @@ import {
 } from '@angular/router';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { MAT_BOTTOM_SHEET_DEFAULT_OPTIONS } from '@angular/material/bottom-sheet';
+import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -25,6 +27,8 @@ export const appConfig: ApplicationConfig = {
       useValue: { appearance: 'outline' },
     },
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 3000 } },
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { autoFocus: false } },
+    { provide: MAT_BOTTOM_SHEET_DEFAULT_OPTIONS, useValue: { autoFocus: false } },
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: `registerWhenStable:${20000}`,

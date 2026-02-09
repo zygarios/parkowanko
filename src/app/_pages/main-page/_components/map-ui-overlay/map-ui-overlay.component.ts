@@ -8,6 +8,7 @@ import { filter } from 'rxjs';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { AuthService } from '../../../../_services/_core/auth.service';
+import { GlobalSpinnerService } from '../../../../_services/_core/global-spinner.service';
 import { SharedUtilsService } from '../../../../_services/_core/shared-utils.service';
 import { GeocodeFeature } from '../../../../_types/geocode-api.type';
 import { ParkingsFilter } from '../../../../_types/parkings-filter.type';
@@ -40,11 +41,13 @@ export class MapUiOverlayComponent {
   private _matDialog = inject(MatDialog);
   private _mapPoisControllerService = inject(MapPoisControllerService);
   private _sharedUtilsService = inject(SharedUtilsService);
+  private _globalSpinnerService = inject(GlobalSpinnerService);
 
   isMapLoaded = this._mapService.isMapLoaded;
 
   selectedAddress = signal<GeocodeFeature | null>(null);
   isAddingPoiActive = signal<boolean>(false);
+  isSpinnerActive = this._globalSpinnerService.isSpinnerActive;
 
   activeFilter = this._parkingsApiService.parkingFilter;
   parkingsFilter = ParkingsFilter;

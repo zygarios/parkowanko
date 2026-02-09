@@ -35,6 +35,11 @@
   }
 }
 
+/* GLOBAL SPINNER OVERLAY */
+.global-spinner-overlay {
+  pointer-events: all !important;
+}
+
 /* ANIMATIONS */
 @keyframes fadeIn {
   from {

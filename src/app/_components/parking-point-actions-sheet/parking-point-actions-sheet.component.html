@@ -33,7 +33,11 @@
             <div>{{ menu.label }}</div>
           </button>
         } @else {
-          <button mat-stroked-button class="flex justify-center!" (click)="choose(menu.result)">
+          <button
+            mat-stroked-button
+            class="flex justify-center! items-center!"
+            (click)="choose(menu.result)"
+          >
             @if (menu.icon) {
               <mat-icon>{{ menu.icon }}</mat-icon>
             }

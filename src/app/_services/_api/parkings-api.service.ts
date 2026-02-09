@@ -1,15 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ParkingPoint, ParkingPointSaveData } from '../../_types/parking-point.type';
 import { ParkingsFilter } from '../../_types/parkings-filter.type';
+import { GlobalSpinnerService } from '../_core/global-spinner.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ParkingsApiService {
   private _httpClient = inject(HttpClient);
+  private _globalSpinnerService = inject(GlobalSpinnerService);
 
   private _parkingsList = signal<ParkingPoint[]>([]);
 
@@ -28,8 +30,10 @@ export class ParkingsApiService {
 
   getParkings(force = false): Signal<ParkingPoint[]> {
     if (!this._parkingsList().length || force) {
+      this._globalSpinnerService.show({ hasBackdrop: false, message: 'Pobieranie danych...' });
       this._httpClient
         .get<ParkingPoint[]>(`${environment.apiUrl}/parking-points/`)
+        .pipe(finalize(() => this._globalSpinnerService.hide()))
         .subscribe((res) => {
           const parkings = res.map((parking) => new ParkingPoint(parking));
           this._parkingsList.set(parkings);

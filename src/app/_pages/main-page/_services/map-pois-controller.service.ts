@@ -24,6 +24,7 @@ import { ReviewsComponent } from '../_components/reviews/reviews.component';
 import { MapService } from './map/map.service';
 
 const LAST_NAVIGATED_PARKING_ID = 'par_last_navigated_parking_id';
+const LAST_NAVIGATED_TIMESTAMP = 'par_last_navigated_timestamp';
 
 @Injectable()
 export class MapPoisControllerService {
@@ -67,57 +68,56 @@ export class MapPoisControllerService {
 
     const parking = this._selectedParking()!;
 
-    this._reviewsApiService
-      .getReviews(parking.id)
-      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
-      .subscribe((reviews) => {
-        const sheetRef = this._sharedUtilsService.openSheet(
-          ParkingPointActionsSheetComponent,
-          {
-            parkingPoint: parking,
-            reviews,
-          },
-          {
-            hasBackdrop: true,
-          },
-        );
+    const sheetRef = this._sharedUtilsService.openSheet(
+      ParkingPointActionsSheetComponent,
+      {
+        parkingPoint: parking,
+      },
+      {
+        hasBackdrop: true,
+      },
+    );
 
-        sheetRef.onDismiss
-          .pipe(
-            switchMap((result) => {
-              switch (result) {
-                case ParkingPointActionsSheetResult.NAVIGATE:
-                  this._handleNavigate();
-                  break;
-                case ParkingPointActionsSheetResult.ADD_REVIEW:
-                  sheetRef.dismiss();
-                  return this._handleAddReview(reviews, this._selectedParking()).pipe(
-                    tap(() => this.openDefaultPoiMenu()),
-                  );
-                case ParkingPointActionsSheetResult.VIEW_REVIEWS:
-                  sheetRef.dismiss();
-                  return this._handleViewReviews(reviews).pipe(
-                    tap(() => this.openDefaultPoiMenu()),
-                  );
-                case ParkingPointActionsSheetResult.UPDATE_LOCATION:
-                  sheetRef.dismiss();
-                  return this.handleUpdateUserChoice().pipe(tap(() => this.openDefaultPoiMenu()));
-              }
-
+    sheetRef.onDismiss
+      .pipe(
+        switchMap((result) => {
+          switch (result) {
+            case ParkingPointActionsSheetResult.NAVIGATE:
+              this._handleNavigate();
+              break;
+            case ParkingPointActionsSheetResult.ADD_REVIEW:
               sheetRef.dismiss();
-              this._selectedParkingId.set(null);
-              return of(null);
-            }),
-            takeUntilDestroyed(this._destroyRef),
-          )
-          .subscribe();
-      });
+              return this._reviewsApiService.getReviews(parking.id).pipe(
+                take(1),
+                switchMap((reviews) => this._handleAddReview(reviews, this._selectedParking())),
+                tap(() => this.openDefaultPoiMenu()),
+              );
+            case ParkingPointActionsSheetResult.VIEW_REVIEWS:
+              sheetRef.dismiss();
+              return this._reviewsApiService.getReviews(parking.id).pipe(
+                take(1),
+                switchMap((reviews) => this._handleViewReviews(reviews)),
+                tap(() => this.openDefaultPoiMenu()),
+              );
+            case ParkingPointActionsSheetResult.UPDATE_LOCATION:
+              sheetRef.dismiss();
+              return this.handleUpdateUserChoice().pipe(tap(() => this.openDefaultPoiMenu()));
+          }
+
+          sheetRef.dismiss();
+          this._selectedParkingId.set(null);
+          return of(null);
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe();
   }
 
   private _handleNavigate() {
     const { id, location } = this._selectedParking() ?? {};
     if (id) {
       localStorage.setItem(LAST_NAVIGATED_PARKING_ID, id.toString());
+      localStorage.setItem(LAST_NAVIGATED_TIMESTAMP, Date.now().toString());
     }
     setTimeout(
       () =>
@@ -145,9 +145,22 @@ export class MapPoisControllerService {
 
   private _checkAndPromptForReview() {
     const lastNavigatedId = localStorage.getItem(LAST_NAVIGATED_PARKING_ID);
+    const lastNavigatedTimestamp = localStorage.getItem(LAST_NAVIGATED_TIMESTAMP);
+
     if (!lastNavigatedId) return;
 
+    if (lastNavigatedTimestamp) {
+      const now = Date.now();
+      const diff = now - parseInt(lastNavigatedTimestamp, 10);
+
+      // Jeżeli od kliknięcia "Nawiguj" minęło mniej niż 10 sekund,
+      // to prawdopodobnie właśnie wychodzimy z aplikacji, a nie wracamy.
+      if (diff < 10000) return;
+    }
+
     localStorage.removeItem(LAST_NAVIGATED_PARKING_ID);
+    localStorage.removeItem(LAST_NAVIGATED_TIMESTAMP);
+
     const parkingId = parseInt(lastNavigatedId, 10);
 
     this._parkingsApiService
@@ -229,7 +242,10 @@ export class MapPoisControllerService {
 
           const selectedPoi: ParkingPoint | null = this._selectedParking();
           const location = this._mapService.getMarkerLatLng();
-          this._globalSpinnerService.show('Wysyłanie propozycji zmiany lokalizacji parkingu...');
+          this._globalSpinnerService.show({
+            message: 'Zapisywanie...',
+            hasBackdrop: true,
+          });
 
           return this._parkingEditLocationApiService
             .addEditLocationProposal(selectedPoi!.id, {
@@ -278,7 +294,10 @@ export class MapPoisControllerService {
           const location = this._mapService.getMarkerLatLng();
 
           let newParking: ParkingPoint;
-          this._globalSpinnerService.show('Dodawanie nowego parkingu...');
+          this._globalSpinnerService.show({
+            message: 'Zapisywanie...',
+            hasBackdrop: true,
+          });
 
           return this._geocodeApiService.getAddressByCoordinates(location).pipe(
             switchMap((address) =>

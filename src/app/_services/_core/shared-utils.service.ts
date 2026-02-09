@@ -27,7 +27,6 @@ export class SharedUtilsService {
   ) {
     const sheetRef = this._sheet.open<T, D>(component, {
       data,
-      autoFocus: false,
       backdropClass: 'backdrop-invisible',
       disableClose: config?.disableClose ?? false,
       hasBackdrop: config?.hasBackdrop ?? true,
@@ -56,7 +55,6 @@ export class SharedUtilsService {
   openInfoDialog(data: InfoDialogData, config?: { disableClose?: boolean }) {
     return this._matDialog.open<InfoDialogComponent, InfoDialogData, boolean>(InfoDialogComponent, {
       data,
-      autoFocus: false,
       disableClose: config?.disableClose ?? false,
     });
   }

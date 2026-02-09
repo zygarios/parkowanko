@@ -14,7 +14,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormField } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ComputedFuncPipe } from '../../../../../../_others/_helpers/computed-func.pipe';
 import { GeocodeFeature } from '../../../../../../_types/geocode-api.type';
 import { AddressSearchService } from '../../../../_services/address-search.service';
 import { MapService } from '../../../../_services/map/map.service';
@@ -26,7 +25,6 @@ import { MapService } from '../../../../_services/map/map.service';
     MatFormField,
     MatInputModule,
     MatAutocompleteModule,
-    ComputedFuncPipe,
     MatButtonModule,
     FormField,
   ],
@@ -76,8 +74,7 @@ export class AddressSearchBoxComponent {
     this._searchInputRef()!.nativeElement.value = '';
   }
 
-  parseAddressToString(address: GeocodeFeature | null) {
-    if (!address) return '';
-    return address.details.name;
-  }
+  displayFn = (address: GeocodeFeature | null) => {
+    return address?.details.name || '';
+  };
 }

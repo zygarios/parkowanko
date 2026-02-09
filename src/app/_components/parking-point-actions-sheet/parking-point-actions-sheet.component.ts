@@ -1,13 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter, merge, Subject } from 'rxjs';
 import { ReviewsVotesSummaryComponent } from '../../_pages/main-page/_components/reviews/reviews-votes-summary/reviews-votes-summary.component';
+import { ReviewsApiService } from '../../_services/_api/reviews-api.service';
 import { AuthService } from '../../_services/_core/auth.service';
+import { Review } from '../../_types/review.type';
 import { SheetRef } from '../../_types/sheet-ref.type';
 import {
   ParkingPointActionsSheetData,
@@ -22,19 +25,28 @@ import {
     MatButtonModule,
     ReviewsVotesSummaryComponent,
     MatTooltipModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './parking-point-actions-sheet.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ParkingPointActionsSheetComponent {
   private _authService = inject(AuthService);
-  private sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
+  private _reviewsApiService = inject(ReviewsApiService);
+  private _sheetRef: MatBottomSheetRef = inject(MatBottomSheetRef);
   data: ParkingPointActionsSheetData = inject<ParkingPointActionsSheetData>(MAT_BOTTOM_SHEET_DATA);
   poiActionsEnum = ParkingPointActionsSheetResult;
 
+  private _reviews$ = this._reviewsApiService.getReviews(this.data.parkingPoint.id);
+  reviews = toSignal<Review[] | null>(this._reviews$, { initialValue: null });
+
   menuItems = computed(() => {
     const userId = this._authService.currentUser()?.id;
-    const isUserReview = this.data.reviews.some((review) => review.user.id === userId);
+    const currentReviews = this.reviews() || [];
+    const isUserReview = currentReviews.some((review) => review.user.id === userId);
+    const totalReviews = this.data.parkingPoint.likeCount + this.data.parkingPoint.dislikeCount;
+
+    const reviewLabel = isUserReview ? 'Edytuj opinię' : 'Dodaj opinię';
 
     return [
       {
@@ -44,12 +56,12 @@ export class ParkingPointActionsSheetComponent {
         isPrimary: true,
       },
       {
-        label: isUserReview ? 'Edytuj opinię' : 'Dodaj opinię',
+        label: reviewLabel,
         icon: 'rate_review',
         result: ParkingPointActionsSheetResult.ADD_REVIEW,
       },
       {
-        label: `Zobacz opinie (${this.data.reviews.length})`,
+        label: `Opinie (${totalReviews})`,
         icon: 'forum',
         result: ParkingPointActionsSheetResult.VIEW_REVIEWS,
       },
@@ -62,7 +74,7 @@ export class ParkingPointActionsSheetComponent {
   });
 
   sheetComponentRef: SheetRef<ParkingPointActionsSheetResult> = {
-    dismiss: () => this.sheetRef.dismiss(),
+    dismiss: () => this._sheetRef.dismiss(),
     onDismiss: new Subject<ParkingPointActionsSheetResult>(),
   };
 
@@ -73,12 +85,12 @@ export class ParkingPointActionsSheetComponent {
   handleCancelSheet() {
     // Obsługa zamykania menu po kliknięciu w tło lub wciśnięciu klawisza Escape
     merge(
-      this.sheetRef.backdropClick(),
-      this.sheetRef.keydownEvents().pipe(filter((event) => event.key === 'Escape')),
+      this._sheetRef.backdropClick(),
+      this._sheetRef.keydownEvents().pipe(filter((event) => event.key === 'Escape')),
     )
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this.sheetRef.dismiss();
+        this._sheetRef.dismiss();
         this.sheetComponentRef.onDismiss.next(ParkingPointActionsSheetResult.DISMISS);
       });
   }

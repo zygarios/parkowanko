@@ -1,52 +1,30 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-global-spinner',
-  styles: `
-    .lds-ring div {
-      border: 8px solid var(--par-color-primary);
-      animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-      border-color: var(--par-color-primary) transparent transparent transparent;
-    }
-    .lds-ring div:nth-child(1) {
-      animation-delay: -0.45s;
-    }
-    .lds-ring div:nth-child(2) {
-      animation-delay: -0.3s;
-    }
-    .lds-ring div:nth-child(3) {
-      animation-delay: -0.15s;
-    }
-    @keyframes lds-ring {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-  `,
+  standalone: true, // Zakładam, że używasz standalone (wersje 17+)
+  imports: [MatProgressSpinnerModule],
   template: `
-    <div class="lds-ring inline-block relative w-20 h-20 text-(--par-color-primary)">
-      <div class="box-border w-16 h-16 m-2 absolute block rounded-full"></div>
-      <div class="box-border w-16 h-16 m-2 absolute block rounded-full"></div>
-      <div class="box-border w-16 h-16 m-2 absolute block rounded-full"></div>
-      <div class="box-border w-16 h-16 m-2 absolute block rounded-full"></div>
+    <div
+      class="bg-white/50 backdrop-blur-sm rounded-full py-4 px-8 shadow-2xl flex items-center justify-center border border-(--par-color-primary)/20 gap-4 max-w-[90%]"
+    >
+      <mat-spinner diameter="28" strokeWidth="3" />
+      @if (message()) {
+        <span class="text-base font-medium text-gray-800 text-center">
+          {{ message() }}
+        </span>
+      }
     </div>
-    @if (message()) {
-      <div
-        class="text-(--par-color-primary) rounded-2xl bg-(--mat-sys-surface) px-6 py-3 shadow-lg border-3! border-(--par-color-primary)"
-      >
-        {{ message() }}
-      </div>
-    }
   `,
   host: {
-    class:
-      'flex flex-col gap-[50px] justify-center items-center w-full h-full bg-[color-mix(in_srgb,var(--par-color-primary)_10%,transparent)]',
+    class: 'fixed inset-0 z-[9999] flex flex-col justify-center items-center pointer-events-none',
+    // TODO zdjac sztywne true
+    '[class.bg-white/50]': 'hasBackdrop()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalSpinnerComponent {
   message = input<string>('');
+  hasBackdrop = input<boolean>(false);
 }

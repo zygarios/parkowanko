@@ -18,12 +18,19 @@
       <mat-icon>close</mat-icon>
     </button>
   }
-  <mat-autocomplete requireSelection #auto="matAutocomplete" [displayWith]="parseAddressToString">
+  <mat-autocomplete requireSelection #auto="matAutocomplete" [displayWith]="displayFn">
     @for (address of addressesList(); track address) {
-      <mat-option [value]="address">
-        <mat-icon class="text-gray-700!">location_on</mat-icon>
-        <div class="whitespace-pre-line leading-snug">
-          {{ parseAddressToString | computedFunc: address }}
+      <mat-option [value]="address" class="py-2! h-auto!">
+        <div class="flex items-center">
+          <mat-icon class="text-gray-700! mr-2! scale-90 shrink-0">
+            {{ addressSearchTerm() ? 'location_on' : 'history' }}
+          </mat-icon>
+          <div class="flex flex-col whitespace-normal leading-tight py-1">
+            <span>{{ address.details.name }}</span>
+            @if (address.details.subname) {
+              <span class="text-xs text-gray-500">({{ address.details.subname }})</span>
+            }
+          </div>
         </div>
       </mat-option>
     }

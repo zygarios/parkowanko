@@ -3,7 +3,7 @@
     @if (isFirstStep()) {
       <div>
         @if (isReviewForLastNavigatedParking) {
-          Czy oceniasz ostatnie miejsce?
+          Czy oceniasz ostatnio wybrany parking?
         } @else {
           Jak oceniasz to miejsce?
         }
@@ -28,7 +28,7 @@
 <mat-tab-group [selectedIndex]="activeStep()" dynamicHeight>
   <mat-tab>
     <div
-      class="px-6 pb-2 pt-2 text-sm opacity-60 font-medium flex justify-start items-center gap-1"
+      class="px-6 pb-2 pt-4 text-sm opacity-60 font-medium flex justify-start items-center gap-1"
     >
       <mat-icon class="text-[18px]! w-[18px]! h-[18px]!">location_on</mat-icon>
       <div>{{ parkingAddress || 'Brak informacji o adresie' }}</div>
@@ -36,10 +36,10 @@
     <div class="p-6">
       <div class="flex gap-2 justify-center">
         <button mat-flat-button class="button-error w-1/2!" (click)="addVote(false)">
-          <mat-icon>thumb_down</mat-icon>Nie
+          <mat-icon>thumb_down</mat-icon>Źle...
         </button>
         <button mat-flat-button class="button-success w-1/2!" (click)="addVote(true)">
-          <mat-icon>thumb_up</mat-icon>Tak
+          <mat-icon>thumb_up</mat-icon>Dobrze!
         </button>
       </div>
     </div>
@@ -60,17 +60,17 @@
   </mat-tab>
 </mat-tab-group>
 
-@if (!isFirstStep()) {
-  <mat-dialog-actions align="end">
-    @if (!isLastStep()) {
-      @if (skipVoteStep) {
-        <button mat-button mat-dialog-close>Pomiń</button>
-      } @else {
-        <button mat-button (click)="previousStep()">Wróć</button>
-      }
-      <button mat-flat-button (click)="submitReview()">Wyślij</button>
-    } @else {
-      <button mat-flat-button mat-dialog-close>Pomiń</button>
+<mat-dialog-actions align="end">
+  @if (isFirstStep()) {
+    <button mat-button mat-dialog-close>
+      {{ isReviewForLastNavigatedParking ? 'Pomiń' : 'Zamknij' }}
+    </button>
+  } @else if (!isLastStep()) {
+    @if (!skipVoteStep) {
+      <button mat-button (click)="previousStep()">Wróć</button>
     }
-  </mat-dialog-actions>
-}
+    <button mat-flat-button (click)="submitReview()">Wyślij</button>
+  } @else {
+    <button mat-flat-button mat-dialog-close>Zamknij</button>
+  }
+</mat-dialog-actions>

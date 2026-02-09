@@ -77,8 +77,17 @@ export class GeocodeApiService {
 
     let constructedName = name;
 
-    if (KLASA === 'miejscowość') {
-      constructedName += `\n(${RODZAJ})`;
+    const formattedWoj = woj_nazwa ? this._capitalizeFirstLetter(woj_nazwa) : null;
+    const formattedGm = gm_nazwa ? this._capitalizeFirstLetter(gm_nazwa) : null;
+    const formattedRodzaj = RODZAJ ? this._capitalizeFirstLetter(RODZAJ) : null;
+
+    let subname = null;
+    if (formattedWoj && formattedGm) {
+      subname = `${formattedWoj}, gm. ${formattedGm}`;
+    }
+
+    if (KLASA === 'miejscowość' && formattedRodzaj) {
+      subname = subname ? `${formattedRodzaj}, ${subname}` : formattedRodzaj;
     }
 
     if (ul_nazwa_glowna) {
@@ -88,10 +97,6 @@ export class GeocodeApiService {
       constructedName = `${miejsc_nazwa} ${pkt_numer}`;
     } else if (woj_nazwa && miejsc_nazwa) {
       constructedName = `${miejsc_nazwa}`;
-    }
-
-    if (woj_nazwa && gm_nazwa) {
-      constructedName += `\n (woj. ${woj_nazwa.toLowerCase()}, gm. ${gm_nazwa.toLowerCase()})`;
     }
 
     let lat: number;
@@ -110,14 +115,21 @@ export class GeocodeApiService {
       details: {
         desc,
         name: constructedName,
-        woj_nazwa: woj_nazwa?.toLowerCase(),
+        subname: subname,
+        woj_nazwa: formattedWoj || undefined,
         pow_nazwa,
-        gm_nazwa,
+        gm_nazwa: formattedGm || undefined,
         miejsc_nazwa,
         ul_nazwa_glowna,
         pkt_numer,
         pkt_kodPocztowy,
       },
     };
+  }
+
+  private _capitalizeFirstLetter(text: string): string {
+    if (!text) return text;
+    const lower = text.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
   }
 }

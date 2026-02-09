@@ -1,9 +1,11 @@
 import { effect, inject, Injectable, signal, Signal, untracked } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { debounce, distinctUntilChanged, of, switchMap, timer } from 'rxjs';
+import { debounce, distinctUntilChanged, forkJoin, map, of, switchMap, take, timer } from 'rxjs';
 import { GeocodeApiService } from '../../../_services/_api/geocode-api.service';
 import { GeocodeFeature } from '../../../_types/geocode-api.type';
 import { MapService } from './map/map.service';
+
+const RECENT_ADDRESSES_KEY = 'par_recent_addresses';
 
 @Injectable()
 export class AddressSearchService {
@@ -18,7 +20,14 @@ export class AddressSearchService {
         distinctUntilChanged(),
         debounce((searchTerm) => timer(searchTerm ? 300 : 0)),
         switchMap((searchTerm) => {
-          if (!searchTerm) return of([]);
+          if (!searchTerm) {
+            const historyNames = this.getHistoryFromStorage();
+            if (historyNames.length === 0) return of([]);
+
+            return forkJoin(
+              historyNames.map((name) => this._geocodeApiService.getAddresses(name).pipe(take(1))),
+            ).pipe(map((results) => results.map((res) => res[0]).filter(Boolean)));
+          }
           return this._geocodeApiService.getAddresses(searchTerm);
         }),
       ),
@@ -32,11 +41,12 @@ export class AddressSearchService {
   listenForAddressChange() {
     effect(() => {
       if (!this._mapService.isMapLoaded()) return;
-      this.selectedAddress();
+      const selected = this.selectedAddress();
 
       untracked(() => {
-        if (this.selectedAddress()) {
-          this._mapService.renderTargetLocationPoi(this.selectedAddress()!.coords);
+        if (selected) {
+          this.saveAddressToHistory(selected);
+          this._mapService.renderTargetLocationPoi(selected.coords);
           this.flyToSelectedAddress();
         } else {
           this._mapService.removeTargetLocationPoi();
@@ -44,6 +54,23 @@ export class AddressSearchService {
         }
       });
     });
+  }
+
+  saveAddressToHistory(address: GeocodeFeature) {
+    const history = this.getHistoryFromStorage();
+    const addressName = address.details.name;
+
+    const updatedHistory = [addressName, ...history.filter((name) => name !== addressName)].slice(
+      0,
+      5,
+    );
+
+    localStorage.setItem(RECENT_ADDRESSES_KEY, JSON.stringify(updatedHistory));
+  }
+
+  getHistoryFromStorage(): string[] {
+    const history = localStorage.getItem(RECENT_ADDRESSES_KEY);
+    return history ? JSON.parse(history) : [];
   }
 
   flyToSelectedAddress() {

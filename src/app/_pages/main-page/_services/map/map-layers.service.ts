@@ -79,11 +79,13 @@ export class MapLayersService {
       filter: ['has', 'point_count'], // Pokaż tylko jeśli MA point_count (jest klastrem)
       paint: {
         'circle-color': environment.colors.primary,
+        'circle-opacity': 0.8,
         // Rozmiar okręgu zależy od liczby POI:
         // <100 parkingów = 20px, 100-750 = 30px, >750 = 40px
         'circle-radius': ['step', ['get', 'point_count'], 20, 100, 30, 750, 40],
         'circle-stroke-color': '#FFFFFF',
         'circle-stroke-width': 2,
+        'circle-stroke-opacity': 0.9,
       },
     });
 

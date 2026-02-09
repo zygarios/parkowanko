@@ -27,6 +27,7 @@ export interface GeocodeFeature {
   details: {
     name: string;
     desc: string;
+    subname: string | null;
     woj_nazwa?: string;
     pow_nazwa?: string;
     gm_nazwa?: string;

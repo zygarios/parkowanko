@@ -1689,45 +1689,6 @@
       }
     },
     {
-      "id": "poi_r20",
-      "type": "symbol",
-      "source": "openmaptiles",
-      "source-layer": "poi",
-      "minzoom": 12,
-      "filter": [
-        "all",
-        ["match", ["geometry-type"], ["MultiPoint", "Point"], true, false],
-        ["==", ["get", "class"], "parking"]
-      ],
-      "layout": {
-        "icon-image": [
-          "match",
-          ["get", "subclass"],
-          ["florist", "furniture"],
-          ["get", "subclass"],
-          ["get", "class"]
-        ],
-        "text-anchor": "top",
-        "text-field": [
-          "case",
-          ["has", "name:nonlatin"],
-          ["concat", ["get", "name:latin"], "\n", ["get", "name:nonlatin"]],
-          ["coalesce", ["get", "name_en"], ["get", "name"]]
-        ],
-        "text-font": ["Noto Sans Italic"],
-        "text-max-width": 9,
-        "text-offset": [0, 0.6],
-        "text-size": 12
-      },
-      "paint": {
-        "text-color": "#666",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1,
-        "icon-opacity": 0.3
-      }
-    },
-    {
       "id": "highway-name-path",
       "type": "symbol",
       "source": "openmaptiles",

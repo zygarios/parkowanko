@@ -102,4 +102,9 @@
     border: 3px solid var(--par-color-primary);
     box-shadow: var(--mat-sys-level2);
   }
+
+  /* MENU */
+  .mat-mdc-option {
+    padding: 8px !important;
+  }
 }

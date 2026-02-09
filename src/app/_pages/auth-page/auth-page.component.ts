@@ -112,7 +112,7 @@ export class AuthPageComponent {
           : this._authService.register({ username, email, password });
 
       try {
-        this._globalSpinnerService.show();
+        this._globalSpinnerService.show({ hasBackdrop: true });
         await firstValueFrom(request$);
       } catch (err) {
         console.error(err);
