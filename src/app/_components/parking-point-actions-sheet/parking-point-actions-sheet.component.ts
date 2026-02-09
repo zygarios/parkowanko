@@ -96,7 +96,23 @@ export class ParkingPointActionsSheetComponent {
   }
 
   choose(result: ParkingPointActionsSheetResult): void {
-    this.sheetComponentRef.onDismiss.next(result);
+    switch (result) {
+      case ParkingPointActionsSheetResult.NAVIGATE:
+        this._sheetRef.dismiss();
+        this.sheetComponentRef.onDismiss.next(result);
+        break;
+      case ParkingPointActionsSheetResult.ADD_REVIEW:
+        this._sheetRef.dismiss();
+        this.sheetComponentRef.onDismiss.next(result);
+        break;
+      case ParkingPointActionsSheetResult.VIEW_REVIEWS:
+        this._sheetRef.dismiss();
+        this.sheetComponentRef.onDismiss.next(result);
+        break;
+      case ParkingPointActionsSheetResult.UPDATE_LOCATION:
+        this.sheetComponentRef.onDismiss.next(result);
+        break;
+    }
   }
 
   ngOnDestroy() {

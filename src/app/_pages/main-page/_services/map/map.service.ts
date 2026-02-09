@@ -34,6 +34,7 @@ export class MapService {
   private _renderFeaturesForMarkerOnMoveFnRef: (() => void) | null = null;
   private _poiClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
   private _clusterClickFnRef: ((e: MapLayerMouseEvent) => void) | null = null;
+  private _saveMapPosFnRef: (() => void) | null = null;
 
   private _isMapLoaded = signal<boolean>(false);
 
@@ -57,20 +58,29 @@ export class MapService {
    * Czyści poprzednią instancję jeśli istnieje (zapobiega wyciekom pamięci)
    */
   async initRenderMap(): Promise<void> {
-<<<<<<< Updated upstream
-=======
-    this._globalSpinnerService.show({ hasBackdrop: false, message: 'Pobieranie danych...' });
+    this._globalSpinnerService.show();
     this._cleanUpMapCore();
->>>>>>> Stashed changes
     this._markerRef = this._mapInitializerService.prepareMarker();
 
     const { map } = await this._mapInitializerService.initRenderMap();
     this._map = map;
 
+    this._saveMapPosFnRef = () => {
+      if (!this._map) return;
+      localStorage.setItem(
+        mapConfigData.MAP_LAST_CENTER_KEY,
+        JSON.stringify(this._map.getCenter()),
+      );
+      localStorage.setItem(mapConfigData.MAP_LAST_ZOOM_KEY, this._map.getZoom().toString());
+    };
+
+    this._map.on('moveend', this._saveMapPosFnRef);
+
     this._map.on('load', () => {
       this.listenForPoiClickToSetSelectedParking();
       this.listenForClusterClickToFlyCloser();
       this._isMapLoaded.set(true);
+      this._globalSpinnerService.hide();
     });
   }
 
@@ -139,16 +149,12 @@ export class MapService {
     // Podłącz marker do ruchu mapy (marker podąża za centrum)
     this._moveMarkerFnRef = (e: any) => this._moveMarker(e);
 
-    // Podłącz marker do ruchu mapy (marker podąża za centrum)
-    this._moveMarkerFnRef = (e: any) => this._moveMarker(e, fixedCoords);
-
     // Renderuj dodatkowe features po zakończeniu ruchu mapy lub przeciągnięcia markera
     this._renderFeaturesForMarkerOnMoveFnRef = () =>
       this._renderFeaturesForMarkerOnMove(fixedCoords);
 
     this._map!.on('move', this._moveMarkerFnRef);
     this._map!.on('moveend', this._renderFeaturesForMarkerOnMoveFnRef);
-    this._markerRef!.on('drag', this._renderFeaturesForMarkerOnMoveFnRef);
     this._markerRef!.on('dragend', this._renderFeaturesForMarkerOnMoveFnRef);
   }
 
@@ -162,9 +168,8 @@ export class MapService {
   /**
    * Przesuwa marker do centrum mapy podczas ruchu
    */
-  private _moveMarker = (e: any, fixedCoords?: LocationCoords) => {
+  private _moveMarker = (e: any) => {
     this._markerRef!.setLngLat(e.target.getCenter());
-    this._renderFeaturesForParkingPoi(fixedCoords);
   };
 
   /**
@@ -265,7 +270,6 @@ export class MapService {
     this.isMarkerInRadiusOfOriginalParking.set(true);
     this._map.off('move', this._moveMarkerFnRef!);
     this._map.off('moveend', this._renderFeaturesForMarkerOnMoveFnRef!);
-    this._markerRef?.off('drag', this._renderFeaturesForMarkerOnMoveFnRef!);
     this._markerRef?.off('dragend', this._renderFeaturesForMarkerOnMoveFnRef!);
     this._markerRef?.remove();
   }
@@ -352,10 +356,7 @@ export class MapService {
   }
 
   async findNearestParking(coords?: LocationCoords) {
-    this._globalSpinnerService.show({
-      message: 'Szukanie najbliższego parkingu...',
-      hasBackdrop: true,
-    });
+    this._globalSpinnerService.show();
 
     // Jeśli nie podano współrzędnych, pobierz aktualną lokalizację
     let locationCoords: LocationCoords;
@@ -433,9 +434,14 @@ export class MapService {
       this._moveMarkerFnRef = null;
     }
     if (this._renderFeaturesForMarkerOnMoveFnRef) {
-      this._map?.off('move', this._renderFeaturesForMarkerOnMoveFnRef);
-      this._markerRef?.off('drag', this._renderFeaturesForMarkerOnMoveFnRef);
+      this._map?.off('moveend', this._renderFeaturesForMarkerOnMoveFnRef);
+      this._markerRef?.off('dragend', this._renderFeaturesForMarkerOnMoveFnRef);
       this._renderFeaturesForMarkerOnMoveFnRef = null;
+    }
+
+    if (this._saveMapPosFnRef) {
+      this._map?.off('moveend', this._saveMapPosFnRef);
+      this._saveMapPosFnRef = null;
     }
   }
 

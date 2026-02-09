@@ -30,7 +30,7 @@ export class ParkingsApiService {
 
   getParkings(force = false): Signal<ParkingPoint[]> {
     if (!this._parkingsList().length || force) {
-      this._globalSpinnerService.show({ hasBackdrop: false, message: 'Pobieranie danych...' });
+      this._globalSpinnerService.show();
       this._httpClient
         .get<ParkingPoint[]>(`${environment.apiUrl}/parking-points/`)
         .pipe(finalize(() => this._globalSpinnerService.hide()))

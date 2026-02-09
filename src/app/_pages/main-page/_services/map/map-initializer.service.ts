@@ -39,8 +39,7 @@ export class MapInitializerService {
       const geolocate = new maplibregl.GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         showAccuracyCircle: false,
-        trackUserLocation: true, // Tylko jednorazowe centrowanie, bez śledzenia kamery
-
+        trackUserLocation: false, // Tylko jednorazowe centrowanie, bez śledzenia kamery
         fitBoundsOptions: { maxZoom: 17, animate: false },
       });
 
@@ -51,6 +50,15 @@ export class MapInitializerService {
         bounds: mapConfigData.POLAND_BOUNDS, // Początkowy widok: cała Polska
         style: style as any,
       }).addControl(geolocate);
+
+      // Przywróć zapisaną pozycję mapy
+      const savedCenter = localStorage.getItem(mapConfigData.MAP_LAST_CENTER_KEY);
+      const savedZoom = localStorage.getItem(mapConfigData.MAP_LAST_ZOOM_KEY);
+
+      if (savedCenter && savedZoom) {
+        mapRef.setZoom(parseFloat(savedZoom));
+        mapRef.setCenter(JSON.parse(savedCenter));
+      }
 
       // Wyłącz rotację mapy gestem dotykowym
       mapRef.touchZoomRotate.disableRotation();
@@ -63,7 +71,6 @@ export class MapInitializerService {
       await Promise.all(icons.map((i) => this.loadMapImage(mapRef, i.name, i.url)));
 
       mapRef.on('load', () => {
-        geolocate.trigger();
         this.prepareLayersForRender(mapRef);
       });
 

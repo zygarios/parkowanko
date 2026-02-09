@@ -242,10 +242,7 @@ export class MapPoisControllerService {
 
           const selectedPoi: ParkingPoint | null = this._selectedParking();
           const location = this._mapService.getMarkerLatLng();
-          this._globalSpinnerService.show({
-            message: 'Zapisywanie...',
-            hasBackdrop: true,
-          });
+          this._globalSpinnerService.show();
 
           return this._parkingEditLocationApiService
             .addEditLocationProposal(selectedPoi!.id, {
@@ -294,10 +291,7 @@ export class MapPoisControllerService {
           const location = this._mapService.getMarkerLatLng();
 
           let newParking: ParkingPoint;
-          this._globalSpinnerService.show({
-            message: 'Zapisywanie...',
-            hasBackdrop: true,
-          });
+          this._globalSpinnerService.show();
 
           return this._geocodeApiService.getAddressByCoordinates(location).pipe(
             switchMap((address) =>

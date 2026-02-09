@@ -8,6 +8,8 @@ export let mapConfigData = {
   FLY_SPEED: 2,
   MAX_DISTANCE_TO_NEAREST_PARKING_KM: 10,
   MIN_ZOOM_TO_SHOW_RADIUS: 15,
+  MAP_LAST_CENTER_KEY: 'par_map_last_center',
+  MAP_LAST_ZOOM_KEY: 'par_map_last_zoom',
 };
 mapConfigData.POLAND_MAX_BOUNDS = [
   mapConfigData.POLAND_BOUNDS[0] - 3,
