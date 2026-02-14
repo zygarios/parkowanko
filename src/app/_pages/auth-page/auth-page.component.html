@@ -7,94 +7,186 @@
     height="120"
   />
 
-  <h1 class="font-large">{{ authMode() === authModeType.LOGIN ? 'Logowanie' : 'Rejestracja' }}</h1>
-
-  <form class="flex-1 flex flex-col pt-5 pb-5" (submit)="$event.preventDefault(); submit()">
-    @if (!authForm.username().hidden()) {
-      <mat-form-field subscriptSizing="dynamic">
-        <mat-label>Nazwa użytkownika</mat-label>
-        <input [formField]="authForm.username" matInput type="text" />
-        <mat-icon matSuffix> person </mat-icon>
-        @if (authForm.username().errors()[0]; as error) {
-          <mat-error>{{ error.message }}</mat-error>
+  @if (authMode() !== authModeType.TOKEN_ERROR) {
+    <h1 class="font-large mt-5">
+      @switch (authMode()) {
+        @case (authModeType.LOGIN) {
+          Logowanie
         }
-      </mat-form-field>
-    }
-    <mat-form-field subscriptSizing="dynamic">
-      <mat-label>Email</mat-label>
-      <input [formField]="authForm.email" matInput type="email" />
-      <mat-icon matSuffix> alternate_email </mat-icon>
-      @if (authForm.email().errors()[0]; as error) {
-        <mat-error>{{ error.message }}</mat-error>
+        @case (authModeType.REGISTER) {
+          Rejestracja
+        }
+        @case (authModeType.FORGOT_PASSWORD) {
+          Przypomnienie hasła
+        }
+        @case (authModeType.RESET_PASSWORD) {
+          Resetowanie hasła
+        }
+        @case (authModeType.EMAIL_SENT) {
+          Sprawdź skrzynkę
+        }
       }
-    </mat-form-field>
-    <mat-form-field subscriptSizing="dynamic">
-      <mat-label>Hasło</mat-label>
-      <input
-        matInput
-        [formField]="authForm.password"
-        [type]="isPasswordHidden() ? 'password' : 'text'"
-      />
-      @if (authForm.password().errors()[0]; as error) {
-        <mat-error>{{ error.message }}</mat-error>
-      }
-      <button
-        type="button"
-        mat-icon-button
-        matSuffix
-        (click)="togglePasswordVisibility('password')"
+    </h1>
+  }
+
+  @if (authMode() === authModeType.TOKEN_ERROR) {
+    <div class="flex-1 flex flex-col items-center justify-center pt-5 pb-5 animate-fade-in">
+      <mat-icon class="text-[64px]! w-[64px]! h-[64px]! text-(--par-color-error)! mb-5"
+        >error_outline</mat-icon
       >
-        <mat-icon>
-          {{ isPasswordHidden() ? 'visibility_off' : 'visibility' }}
-        </mat-icon>
-      </button>
-    </mat-form-field>
-    @if (!authForm.repeatedPassword().hidden()) {
-      <mat-form-field subscriptSizing="dynamic">
-        <mat-label>Powtórz hasło</mat-label>
-        <input
-          [formField]="authForm.repeatedPassword"
-          matInput
-          [type]="isRepeatedPasswordHidden() ? 'password' : 'text'"
-        />
-        @if (authForm.repeatedPassword().errors()[0]; as error) {
-          <mat-error>{{ error.message }}</mat-error>
-        }
-        <button
-          type="button"
-          mat-icon-button
-          matSuffix
-          (click)="togglePasswordVisibility('repeatedPassword')"
-        >
-          <mat-icon>
-            {{ isRepeatedPasswordHidden() ? 'visibility_off' : 'visibility' }}
-          </mat-icon>
-        </button>
-      </mat-form-field>
-    }
-
-    <hr class="mt-5 mb-5" />
-
-    <div class="flex flex-col gap-4 mt-auto">
-      <button type="submit" mat-flat-button [disabled]="authForm().submitting()">
-        {{ authMode() === authModeType.LOGIN ? 'Zaloguj' : 'Zarejestruj' }}
-      </button>
-
-      <div class="text-xs text-slate-500 mt-2 mb-2">
-        Kontynuując, akceptujesz naszą
-        <a
-          routerLink="/polityka-prywatnosci"
-          class="text-par-color-primary font-medium underline cursor-pointer"
-          >Politykę Prywatności</a
-        >
+      <div class="text-sm text-slate-500 max-w-[300px]">
+        {{ validationError() }}
       </div>
-
-      <div class="flex gap-5 items-center justify-between font-small">
-        {{ authMode() === authModeType.LOGIN ? 'Nie masz jeszcze konta?' : 'Masz już konto?' }}
-        <button type="button" mat-button (click)="changeAuthMode()">
-          {{ authMode() === authModeType.LOGIN ? 'Zarejestruj się' : 'Zaloguj się' }}
-        </button>
-      </div>
+      <button mat-flat-button class="w-full mt-8" (click)="changeAuthMode(authModeType.LOGIN)">
+        Wróć do logowania
+      </button>
     </div>
-  </form>
+  } @else if (authMode() !== authModeType.EMAIL_SENT) {
+    <form class="flex-1 flex flex-col pt-5 pb-5" (submit)="$event.preventDefault(); submit()">
+      @if (!authForm.username().hidden()) {
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>Nazwa użytkownika</mat-label>
+          <input [formField]="authForm.username" matInput type="text" />
+          <mat-icon matSuffix> person </mat-icon>
+          @if (authForm.username().errors()[0]; as error) {
+            <mat-error>{{ error.message }}</mat-error>
+          }
+        </mat-form-field>
+      }
+      @if (!authForm.email().hidden()) {
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>Email</mat-label>
+          <input [formField]="authForm.email" matInput type="email" />
+          <mat-icon matSuffix> alternate_email </mat-icon>
+          @if (authForm.email().errors()[0]; as error) {
+            <mat-error>{{ error.message }}</mat-error>
+          }
+        </mat-form-field>
+      }
+      @if (!authForm.password().hidden()) {
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>Hasło</mat-label>
+          <input
+            matInput
+            [formField]="authForm.password"
+            [type]="isPasswordHidden() ? 'password' : 'text'"
+          />
+          @if (authForm.password().errors()[0]; as error) {
+            <mat-error>{{ error.message }}</mat-error>
+          }
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="togglePasswordVisibility('password')"
+          >
+            <mat-icon>
+              {{ isPasswordHidden() ? 'visibility_off' : 'visibility' }}
+            </mat-icon>
+          </button>
+        </mat-form-field>
+      }
+      @if (!authForm.repeatedPassword().hidden()) {
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>Powtórz hasło</mat-label>
+          <input
+            [formField]="authForm.repeatedPassword"
+            matInput
+            [type]="isRepeatedPasswordHidden() ? 'password' : 'text'"
+          />
+          @if (authForm.repeatedPassword().errors()[0]; as error) {
+            <mat-error>{{ error.message }}</mat-error>
+          }
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="togglePasswordVisibility('repeatedPassword')"
+          >
+            <mat-icon>
+              {{ isRepeatedPasswordHidden() ? 'visibility_off' : 'visibility' }}
+            </mat-icon>
+          </button>
+        </mat-form-field>
+      }
+
+      <div class="flex flex-col gap-4 mt-[15px]">
+        <button type="submit" mat-flat-button [disabled]="authForm().submitting()">
+          @switch (authMode()) {
+            @case (authModeType.LOGIN) {
+              Zaloguj
+            }
+            @case (authModeType.REGISTER) {
+              Zarejestruj
+            }
+            @case (authModeType.FORGOT_PASSWORD) {
+              Wyślij link
+            }
+            @case (authModeType.RESET_PASSWORD) {
+              Zmień hasło
+            }
+          }
+        </button>
+
+        @if (
+          authMode() !== authModeType.RESET_PASSWORD && authMode() !== authModeType.FORGOT_PASSWORD
+        ) {
+          <app-social-auth-buttons />
+
+          @if (authMode() === authModeType.REGISTER) {
+            <div class="text-xs text-slate-500 mt-2 mb-2">
+              Kontynuując, akceptujesz naszą
+              <a
+                routerLink="/polityka-prywatnosci"
+                class="text-par-color-primary font-medium underline cursor-pointer"
+                >Politykę Prywatności</a
+              >
+            </div>
+          }
+        }
+
+        <div class="flex gap-5 items-center justify-between font-small">
+          @if (authMode() === authModeType.LOGIN || authMode() === authModeType.REGISTER) {
+            <button type="button" mat-button (click)="changeAuthMode(authModeType.FORGOT_PASSWORD)">
+              Przypomnij hasło
+            </button>
+            <div class="h-5 w-0.5 bg-(--par-color-primary)"></div>
+            <button
+              type="button"
+              mat-button
+              (click)="
+                changeAuthMode(
+                  authMode() === authModeType.LOGIN ? authModeType.REGISTER : authModeType.LOGIN
+                )
+              "
+            >
+              {{ authMode() === authModeType.LOGIN ? 'Zarejestruj się' : 'Zaloguj się' }}
+            </button>
+          } @else {
+            <button
+              type="button"
+              mat-button
+              class="w-full mt-5"
+              (click)="changeAuthMode(authModeType.LOGIN)"
+            >
+              Wróć do logowania
+            </button>
+          }
+        </div>
+      </div>
+    </form>
+  } @else {
+    <div class="flex-1 flex flex-col items-center justify-center pt-5 pb-5 animate-fade-in">
+      <mat-icon class="text-[64px]! w-[64px]! h-[64px]! text-(--par-color-primary)! mb-5"
+        >mark_email_read</mat-icon
+      >
+      <div class="text-lg font-medium mb-2">Link został wysłany!</div>
+      <div class="text-sm text-slate-500 mb-8 max-w-[300px]">
+        Sprawdź swoją skrzynkę mailową. Wysłaliśmy link umożliwiający reset hasła.
+      </div>
+      <button mat-flat-button class="w-full" (click)="changeAuthMode(authModeType.LOGIN)">
+        Wróć do logowania
+      </button>
+    </div>
+  }
 </div>

@@ -43,8 +43,6 @@ export class MapUiOverlayComponent {
   private _sharedUtilsService = inject(SharedUtilsService);
   private _globalSpinnerService = inject(GlobalSpinnerService);
 
-  isMapLoaded = this._mapService.isMapLoaded;
-
   selectedAddress = signal<GeocodeFeature | null>(null);
   isAddingPoiActive = signal<boolean>(false);
   isSpinnerActive = this._globalSpinnerService.isSpinnerActive;

@@ -79,7 +79,7 @@ export class MapComponent {
       return showErr('Twoje urządzenie nie obsługuje lokalizacji GPS.');
 
     navigator.geolocation.getCurrentPosition(
-      () => console.log('GPS OK'),
+      () => {},
       (err) => {
         if (err.code === err.PERMISSION_DENIED || err.code === err.POSITION_UNAVAILABLE) {
           showErr('GPS jest wyłączony lub nie ma uprawnień do GPS.');

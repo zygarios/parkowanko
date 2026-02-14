@@ -22,3 +22,8 @@ export interface AuthResponseAfterRefresh {
   refresh: string;
   expiresIn: number;
 }
+
+export interface PasswordResetConfirmData {
+  token: string;
+  password: string;
+}

@@ -26,6 +26,10 @@ const routesList: Routes = [
   },
   {
     path: 'auth',
+    redirectTo: 'auth/login',
+  },
+  {
+    path: 'auth/:mode',
     loadComponent: () =>
       import('./_pages/auth-page/auth-page.component').then((c) => c.AuthPageComponent),
     canMatch: [authGuard('FOR_NOT_LOGGED')],

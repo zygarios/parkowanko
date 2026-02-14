@@ -13,57 +13,55 @@
   <mat-icon>question_mark</mat-icon>
 </button>
 
-@if (isMapLoaded()) {
-  <div class="flex gap-2 fixed! z-2 right-[20px] top-[20px]">
-    <button
-      mat-flat-button
-      class="shadow-[0_0_2px_rgba(0,0,0,0.5)]! rounded-xl! h-[40px]! px-4! bg-(--par-color-primary)! text-white!"
-      [disabled]="isAddingPoiActive()"
-      (click)="startAddingPoi()"
-    >
-      <mat-icon>add_location_alt</mat-icon>
-      <span>Dodaj</span>
-    </button>
-
-    <button
-      class="shadow-[0_0_2px_rgba(0,0,0,0.5)]! rounded-xl! h-[40px]! px-4! bg-(--par-color-primary)! text-white!"
-      matMiniFab
-      [matMenuTriggerFor]="menu"
-    >
-      <mat-icon>tune</mat-icon>
-    </button>
-  </div>
-
-  <mat-menu #menu="matMenu">
-    <button
-      mat-menu-item
-      (click)="setFilter(parkingsFilter.WELL_RATED)"
-      [class.bg-(--par-color-primary-light)!]="activeFilter() === parkingsFilter.WELL_RATED"
-    >
-      <mat-icon>thumb_up</mat-icon>
-      <span>Dobrze oceniane</span>
-    </button>
-    <button
-      mat-menu-item
-      (click)="setFilter(parkingsFilter.ALL)"
-      [class.bg-(--par-color-primary-light)!]="activeFilter() === parkingsFilter.ALL"
-    >
-      <mat-icon>thumbs_up_down</mat-icon>
-      <span>Wszystkie</span>
-    </button>
-  </mat-menu>
-
-  <div
-    class="flex justify-between gap-1 w-full fixed bottom-0 left-0 right-0 z-10 whitespace-nowrap p-3"
+<div class="flex gap-2 fixed! z-2 right-[20px] top-[20px]">
+  <button
+    mat-flat-button
+    class="shadow-[0_0_2px_rgba(0,0,0,0.5)]! rounded-xl! h-[40px]! px-4! bg-(--par-color-primary)! text-white!"
+    [disabled]="isAddingPoiActive()"
+    (click)="startAddingPoi()"
   >
-    <app-address-search-box (selectedAddressEmitter)="selectedAddress.set($event)" />
-    <button
-      matTooltip="Znajdź najbliższy parking"
-      class="find-nearest-parking-button anim-fade-in shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
-      matFab
-      (click)="findNearestParking()"
-    >
-      <mat-icon>explore</mat-icon>
-    </button>
-  </div>
-}
+    <mat-icon>add_location_alt</mat-icon>
+    <span>Dodaj</span>
+  </button>
+
+  <button
+    class="shadow-[0_0_2px_rgba(0,0,0,0.5)]! rounded-xl! h-[40px]! px-4! bg-(--par-color-primary)! text-white!"
+    matMiniFab
+    [matMenuTriggerFor]="menu"
+  >
+    <mat-icon>tune</mat-icon>
+  </button>
+</div>
+
+<mat-menu #menu="matMenu">
+  <button
+    mat-menu-item
+    (click)="setFilter(parkingsFilter.WELL_RATED)"
+    [class.bg-(--par-color-primary-light)!]="activeFilter() === parkingsFilter.WELL_RATED"
+  >
+    <mat-icon>thumb_up</mat-icon>
+    <span>Dobrze oceniane</span>
+  </button>
+  <button
+    mat-menu-item
+    (click)="setFilter(parkingsFilter.ALL)"
+    [class.bg-(--par-color-primary-light)!]="activeFilter() === parkingsFilter.ALL"
+  >
+    <mat-icon>thumbs_up_down</mat-icon>
+    <span>Wszystkie</span>
+  </button>
+</mat-menu>
+
+<div
+  class="flex justify-between gap-1 w-full fixed bottom-0 left-0 right-0 z-10 whitespace-nowrap p-3"
+>
+  <app-address-search-box (selectedAddressEmitter)="selectedAddress.set($event)" />
+  <button
+    matTooltip="Znajdź najbliższy parking"
+    class="find-nearest-parking-button anim-fade-in shadow-[0_0_2px_rgba(0,0,0,0.5)]!"
+    matFab
+    (click)="findNearestParking()"
+  >
+    <mat-icon>explore</mat-icon>
+  </button>
+</div>

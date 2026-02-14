@@ -3,7 +3,7 @@
     @if (isFirstStep()) {
       <div>
         @if (isReviewForLastNavigatedParking) {
-          Czy oceniasz ostatnio wybrany parking?
+          Jak oceniasz ostatnio wybrany parking?
         } @else {
           Jak oceniasz to miejsce?
         }
@@ -60,17 +60,15 @@
   </mat-tab>
 </mat-tab-group>
 
-<mat-dialog-actions align="end">
-  @if (isFirstStep()) {
-    <button mat-button mat-dialog-close>
-      {{ isReviewForLastNavigatedParking ? 'Pomiń' : 'Zamknij' }}
-    </button>
-  } @else if (!isLastStep()) {
-    @if (!skipVoteStep) {
-      <button mat-button (click)="previousStep()">Wróć</button>
+@if (!isFirstStep()) {
+  <mat-dialog-actions align="end">
+    @if (!isLastStep()) {
+      @if (!skipVoteStep) {
+        <button mat-button (click)="previousStep()">Wróć</button>
+      }
+      <button mat-flat-button (click)="submitReview()">Wyślij</button>
+    } @else {
+      <button mat-flat-button mat-dialog-close>Zamknij</button>
     }
-    <button mat-flat-button (click)="submitReview()">Wyślij</button>
-  } @else {
-    <button mat-flat-button mat-dialog-close>Zamknij</button>
-  }
-</mat-dialog-actions>
+  </mat-dialog-actions>
+}

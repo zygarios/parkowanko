@@ -3,10 +3,12 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { extractFirstError } from '../../_others/_helpers/error-extractor';
 import {
   AuthResponse,
   AuthResponseAfterRefresh,
   LoginSaveData,
+  PasswordResetConfirmData,
   RegisterSaveData,
 } from '../../_types/auth/auth.model';
 import { User } from '../../_types/auth/user.type';
@@ -14,6 +16,8 @@ import { SharedUtilsService } from './shared-utils.service';
 
 interface JwtPayload {
   exp: number;
+  sub: string;
+  email: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -40,9 +44,8 @@ export class AuthService {
       tap((res) => this._setAuthData(res)),
       catchError((err: HttpErrorResponse) => {
         this._isAuthenticating.set(false);
-        if (err.status === 401) {
-          this._sharedUtilsService.openSnackbar('Nieprawidłowy login lub hasło', 'ERROR');
-        }
+        const errorMsg = extractFirstError(err.error);
+        this._sharedUtilsService.openSnackbar(errorMsg || 'Nieprawidłowy login lub hasło', 'ERROR');
         return throwError(() => err);
       }),
       finalize(() => this._isAuthenticating.set(false)),
@@ -53,14 +56,62 @@ export class AuthService {
     this._isAuthenticating.set(true);
     return this._http.post<AuthResponse>(`${environment.apiUrl}/auth/register/`, data).pipe(
       tap((res) => this._setAuthData(res)),
+      catchError((err: HttpErrorResponse) => {
+        this._isAuthenticating.set(false);
+        if (err.status === 400) {
+          const errorMsg = extractFirstError(err.error);
+          this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
+        }
+        return throwError(() => err);
+      }),
       finalize(() => this._isAuthenticating.set(false)),
     );
   }
 
-  refreshToken(refresh: string): Observable<AuthResponse> {
+  refreshToken(refresh: string): Observable<AuthResponseAfterRefresh> {
     return this._http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/refresh/`, { refresh })
+      .post<AuthResponseAfterRefresh>(`${environment.apiUrl}/auth/refresh/`, { refresh })
       .pipe(tap((res) => this._setAuthAfterRefreshTokens(res)));
+  }
+
+  requestPasswordReset(email: string): Observable<void> {
+    return this._http.post<void>(`${environment.apiUrl}/auth/password-reset/`, { email }).pipe(
+      catchError((err: HttpErrorResponse) => {
+        const errorMsg = extractFirstError(err.error);
+        this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  validatePasswordResetToken(token: string): Observable<{ status: string }> {
+    return this._http
+      .post<{ status: string }>(`${environment.apiUrl}/auth/password-reset/validate_token/`, {
+        token,
+      })
+      .pipe(
+        catchError((err: HttpErrorResponse) => {
+          const errorMsg = extractFirstError(err.error);
+          this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
+          return throwError(() => err);
+        }),
+      );
+  }
+
+  confirmPasswordReset(data: PasswordResetConfirmData): Observable<{ status: string }> {
+    return this._http
+      .post<{ status: string }>(`${environment.apiUrl}/auth/password-reset/confirm/`, data)
+      .pipe(
+        catchError((err: HttpErrorResponse) => {
+          const errorMsg = extractFirstError(err.error);
+          this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
+          return throwError(() => err);
+        }),
+      );
+  }
+
+  handleSocialAuthSuccess(res: AuthResponse): void {
+    this._setAuthData(res);
   }
 
   logout(): void {

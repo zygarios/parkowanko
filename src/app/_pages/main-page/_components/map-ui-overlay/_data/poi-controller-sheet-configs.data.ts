@@ -41,6 +41,6 @@ export const changingPoiPositionOptionsSheetConfig = (): MenuSheetData => {
       },
     ],
     title: 'Poprawa lokalizacji',
-    description: 'Poruszaj mapą lub markerem, aby poprawić lokalizację istniejącego parkingu.',
+    description: 'Poruszaj mapą lub markerem, aby ustawić proponowaną nową lokalizację.',
   };
 };

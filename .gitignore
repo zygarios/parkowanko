@@ -41,3 +41,16 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Android / Bubblewrap
+**/build/
+**/.gradle/
+**/local.properties
+**/capture_*.png
+*.keystore
+*.jks
+gradle-wrapper.jar
+
+# Sensitive Android files
+android-twa/android.keystore
+android-twa/gradle.properties

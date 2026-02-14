@@ -16,7 +16,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { GeocodeFeature } from '../../../../../../_types/geocode-api.type';
 import { AddressSearchService } from '../../../../_services/address-search.service';
-import { MapService } from '../../../../_services/map/map.service';
 
 @Component({
   selector: 'app-address-search-box',
@@ -53,7 +52,6 @@ import { MapService } from '../../../../_services/map/map.service';
 })
 export class AddressSearchBoxComponent {
   private readonly _addressSearchService = inject(AddressSearchService);
-  private readonly _mapService = inject(MapService);
   private readonly _searchInputRef = viewChild<ElementRef<HTMLInputElement>>('searchInputRef');
 
   selectedAddressEmitter = output<GeocodeFeature | null>();
