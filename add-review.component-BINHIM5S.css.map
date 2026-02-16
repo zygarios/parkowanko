@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["add-review.component.ts"],
-  "sourcesContent": ["\n    ::ng-deep mat-tab-header {\n      display: none !important;\n    }\n    .success-icon {\n      color: var(--par-color-primary);\n    }\n  "],
-  "mappings": "AACI,UAAA,eACE,QAAA,cACF,CACA,CAAA,aACE,MAAA,IAAA,oBACF",
-  "names": []
-}

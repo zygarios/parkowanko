@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["social-auth-buttons.component.ts"],
+  "sourcesContent": ["\n    .social-btn {\n      flex: 1;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      gap: 0.625rem;\n      padding: 0.625rem 0.75rem;\n      min-height: 44px;\n      border: 1px solid #dadce0;\n      border-radius: 0.75rem;\n      background: white;\n      cursor: pointer;\n      transition: all 0.2s ease;\n      font-family: inherit;\n      font-size: 0.875rem;\n      font-weight: 500;\n      color: #3c4043;\n    }\n\n    .social-btn:hover:not(:disabled) {\n      background: #f8fafc;\n      box-shadow: 0 1px 4px rgb(0 0 0 / 0.08);\n    }\n\n    .social-btn:active:not(:disabled) {\n      transform: scale(0.98);\n    }\n\n    .social-btn:focus-visible {\n      outline: 2px solid var(--par-color-primary);\n      outline-offset: 2px;\n    }\n\n    .social-btn:disabled {\n      opacity: 0.5;\n      cursor: not-allowed;\n    }\n  "],
+  "mappings": "AACI,CAAA,WACE,KAAA,EACA,QAAA,KACA,YAAA,OACA,gBAAA,OACA,IAAA,gBACA,QAAA,OACA,WAAA,KACA,OAAA,IAAA,MAAA,sBACA,OACA,WAAA,KACA,OAAA,QACA,WAAA,IAAA,IAAA,KACA,YAAA,QACA,UAAA,QACA,YAAA,IACA,MAAA,OACF,CAEA,CAnBA,UAmBA,MAAA,KAAA,WACE,WAAA,QACA,WAAA,EAAA,IAAA,IAAA,SACF,CAEA,CAxBA,UAwBA,OAAA,KAAA,WACE,UAAA,MAAA,IACF,CAEA,CA5BA,UA4BA,eACE,QAAA,IAAA,MAAA,IAAA,qBACA,eAAA,GACF,CAEA,CAjCA,UAiCA,UACE,QAAA,GACA,OAAA,WACF",
+  "names": []
+}

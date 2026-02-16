@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["global-spinner.component.ts"],
-  "sourcesContent": ["\n    .lds-ring div {\n      border: 8px solid var(--par-color-primary);\n      animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\n      border-color: var(--par-color-primary) transparent transparent transparent;\n    }\n    .lds-ring div:nth-child(1) {\n      animation-delay: -0.45s;\n    }\n    .lds-ring div:nth-child(2) {\n      animation-delay: -0.3s;\n    }\n    .lds-ring div:nth-child(3) {\n      animation-delay: -0.15s;\n    }\n    @keyframes lds-ring {\n      0% {\n        transform: rotate(0deg);\n      }\n      100% {\n        transform: rotate(360deg);\n      }\n    }\n  "],
-  "mappings": "AACI,CAAA,SAAA,IACE,OAAA,IAAA,MAAA,IAAA,qBACA,UAAA,SAAA,KAAA,aAAA,EAAA,CAAA,CAAA,CAAA,EAAA,CAAA,GAAA,SACA,aAAA,IAAA,qBAAA,YAAA,YAAA,WACF,CACA,CALA,SAKA,GAAA,cACE,gBAAA,KACF,CACA,CARA,SAQA,GAAA,cACE,gBAAA,IACF,CACA,CAXA,SAWA,GAAA,cACE,gBAAA,KACF,CACA,WAdA,SAeE,GACE,UAAA,OAAA,EACF,CACA,GACE,UAAA,OAAA,OACF,CACF",
-  "names": []
-}

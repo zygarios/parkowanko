@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["add-review.component.ts"],
+  "sourcesContent": ["\n    .step-content {\n      animation: fadeIn 0.3s ease-in-out;\n    }\n    .success-icon {\n      color: var(--par-color-primary);\n    }\n  "],
+  "mappings": "AACI,CAAA,aACE,UAAA,OAAA,IAAA,WACF,CACA,CAAA,aACE,MAAA,IAAA,oBACF",
+  "names": []
+}
