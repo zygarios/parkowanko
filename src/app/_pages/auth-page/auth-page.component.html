@@ -30,11 +30,11 @@
   }
 
   @if (authMode() === authModeType.TOKEN_ERROR) {
-    <div class="flex-1 flex flex-col items-center justify-center pt-5 pb-5 animate-fade-in">
+    <div class="flex-1 flex flex-col items-center justify-center pt-5 pb-5 anim-fade-in">
       <mat-icon class="text-[64px]! w-[64px]! h-[64px]! text-(--par-color-error)! mb-5"
         >error_outline</mat-icon
       >
-      <div class="text-sm text-slate-500 max-w-[300px]">
+      <div class="font-small text-slate-500 max-w-[300px]">
         {{ validationError() }}
       </div>
       <button mat-flat-button class="w-full mt-8" (click)="changeAuthMode(authModeType.LOGIN)">
@@ -110,7 +110,7 @@
         </mat-form-field>
       }
 
-      <div class="flex flex-col gap-4 mt-[15px]">
+      <div class="flex flex-col gap-2 mt-[15px]">
         <button type="submit" mat-flat-button [disabled]="authForm().submitting()">
           @switch (authMode()) {
             @case (authModeType.LOGIN) {
@@ -128,30 +128,41 @@
           }
         </button>
 
+        @if (authMode() === authModeType.LOGIN) {
+          <button
+            type="button"
+            mat-button
+            class="ml-auto font-small"
+            (click)="changeAuthMode(authModeType.FORGOT_PASSWORD)"
+          >
+            Przypomnij hasło
+          </button>
+        }
+
         @if (
           authMode() !== authModeType.RESET_PASSWORD && authMode() !== authModeType.FORGOT_PASSWORD
         ) {
-          <app-social-auth-buttons />
-
           @if (authMode() === authModeType.REGISTER) {
-            <div class="text-xs text-slate-500 mt-2 mb-2">
+            <div class="font-tiny text-slate-500 mt-2 mb-2">
               Kontynuując, akceptujesz naszą
               <a
-                routerLink="/polityka-prywatnosci"
+                role="button"
+                tabindex="0"
                 class="text-par-color-primary font-medium underline cursor-pointer"
-                >Politykę Prywatności</a
+                (click)="openPrivacyPolicy()"
+                (keydown.enter)="openPrivacyPolicy()"
+                >Politykę Prywatności.</a
               >
             </div>
           }
+          <hr class="my-[20px]" />
+          <app-social-auth-buttons />
         }
 
-        <div class="flex gap-5 items-center justify-between font-small">
+        <div class="flex justify-center font-small">
           @if (authMode() === authModeType.LOGIN || authMode() === authModeType.REGISTER) {
-            <button type="button" mat-button (click)="changeAuthMode(authModeType.FORGOT_PASSWORD)">
-              Przypomnij hasło
-            </button>
-            <div class="h-5 w-0.5 bg-(--par-color-primary)"></div>
             <button
+              class="w-full"
               type="button"
               mat-button
               (click)="
@@ -176,12 +187,12 @@
       </div>
     </form>
   } @else {
-    <div class="flex-1 flex flex-col items-center justify-center pt-5 pb-5 animate-fade-in">
+    <div class="flex-1 flex flex-col items-center justify-center pt-5 pb-5 anim-fade-in">
       <mat-icon class="text-[64px]! w-[64px]! h-[64px]! text-(--par-color-primary)! mb-5"
         >mark_email_read</mat-icon
       >
-      <div class="text-lg font-medium mb-2">Link został wysłany!</div>
-      <div class="text-sm text-slate-500 mb-8 max-w-[300px]">
+      <div class="font-big font-medium mb-2">Link został wysłany!</div>
+      <div class="font-small text-slate-500 mb-8 max-w-[300px]">
         Sprawdź swoją skrzynkę mailową. Wysłaliśmy link umożliwiający reset hasła.
       </div>
       <button mat-flat-button class="w-full" (click)="changeAuthMode(authModeType.LOGIN)">

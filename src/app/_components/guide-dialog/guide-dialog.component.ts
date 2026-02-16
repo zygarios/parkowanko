@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-guide-dialog',
-  standalone: true,
   imports: [MatButtonModule, MatDialogModule, MatIconModule],
   templateUrl: './guide-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -12,18 +12,19 @@ import {
   validate,
 } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { extractFirstError } from '../../_others/_helpers/error-extractor';
 import { validationMessages } from '../../_others/_helpers/validation-messages';
 import { AuthService } from '../../_services/_core/auth.service';
 import { GlobalSpinnerService } from '../../_services/_core/global-spinner.service';
 import { SharedUtilsService } from '../../_services/_core/shared-utils.service';
-import { SocialAuthButtonsComponent } from './_components/social-auth-buttons/social-auth-buttons.component';
 
+import { SocialAuthButtonsComponent } from './_components/social-auth-buttons/social-auth-buttons.component';
 import { AuthData, AuthModeType, modeToPathMap } from './auth-page.model';
 
 @Component({
@@ -36,7 +37,6 @@ import { AuthData, AuthModeType, modeToPathMap } from './auth-page.model';
     MatButtonModule,
     FormField,
     NgOptimizedImage,
-    RouterLink,
     SocialAuthButtonsComponent,
   ],
   templateUrl: './auth-page.component.html',
@@ -44,6 +44,7 @@ import { AuthData, AuthModeType, modeToPathMap } from './auth-page.model';
 })
 export class AuthPageComponent {
   private _authService = inject(AuthService);
+  private _dialog = inject(MatDialog);
   private _globalSpinnerService = inject(GlobalSpinnerService);
   private _route = inject(ActivatedRoute);
   private _router = inject(Router);
@@ -131,6 +132,16 @@ export class AuthPageComponent {
     if (segment) {
       this._router.navigate(['/auth', segment]);
     }
+  }
+
+  async openPrivacyPolicy(): Promise<void> {
+    const { PrivacyPolicyDialogComponent } =
+      await import('../privacy-policy/privacy-policy-dialog.component');
+    this._dialog.open(PrivacyPolicyDialogComponent, {
+      maxWidth: '600px',
+      width: '95vw',
+      maxHeight: '80vh',
+    });
   }
 
   submit() {

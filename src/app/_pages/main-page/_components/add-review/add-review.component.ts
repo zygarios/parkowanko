@@ -1,18 +1,11 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal,
-  viewChildren,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { form, required, submit } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatTab, MatTabsModule } from '@angular/material/tabs';
+
 import { firstValueFrom } from 'rxjs';
 import { validationMessages } from '../../../../_others/_helpers/validation-messages';
 import { ReviewsApiService } from '../../../../_services/_api/reviews-api.service';
@@ -20,6 +13,7 @@ import { SharedUtilsService } from '../../../../_services/_core/shared-utils.ser
 import { Review, ReviewSaveData } from '../../../../_types/review.type';
 import { ReviewFormComponent } from './_components/review-form/review-form.component';
 import { Occupancy } from './_types/occupancy.model';
+import { ReviewStep } from './_types/review-step.enum';
 
 @Component({
   selector: 'app-add-review',
@@ -27,15 +21,15 @@ import { Occupancy } from './_types/occupancy.model';
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    MatTabsModule,
+
     MatInputModule,
     MatSelectModule,
     ReviewFormComponent,
   ],
   templateUrl: './add-review.component.html',
   styles: `
-    ::ng-deep mat-tab-header {
-      display: none !important;
+    .step-content {
+      animation: fadeIn 0.3s ease-in-out;
     }
     .success-icon {
       color: var(--par-color-primary);
@@ -54,14 +48,15 @@ export class AddReviewComponent {
     userReview?: Review;
     isReviewForLastNavigatedParking?: boolean;
   }>(MAT_DIALOG_DATA);
-  private _stepsRef = viewChildren(MatTab);
+
+  protected readonly ReviewStep = ReviewStep;
 
   parkingAddress = this._dialogData.parkingAddress;
   isReviewForLastNavigatedParking = this._dialogData.isReviewForLastNavigatedParking;
   skipVoteStep = this._dialogData.skipVoteStep;
-  activeStep = signal(0);
-  isFirstStep = computed(() => this.activeStep() === 0);
-  isLastStep = computed(() => this.activeStep() === this._stepsRef().length - 1);
+  activeStep = signal<ReviewStep>(ReviewStep.Vote);
+  isFirstStep = computed(() => this.activeStep() === ReviewStep.Vote);
+  isLastStep = computed(() => this.activeStep() === ReviewStep.ThankYou);
 
   review = signal<ReviewSaveData>({
     parkingPointId: this._dialogData.parkingPointId,
@@ -82,27 +77,12 @@ export class AddReviewComponent {
     if (!this._dialogData.parkingPointId && this._dialogData.parkingPointId !== 0) {
       throw new Error('Formularz dodawania opinii wymaga przekazanie parkingPointId w dialogData');
     }
-    if (this._dialogData.skipVoteStep) this.nextStep();
+    if (this._dialogData.skipVoteStep) this.activeStep.set(ReviewStep.Comment);
   }
 
   addVote(isLike: boolean) {
     this.review.update((review) => ({ ...review, isLike }));
-    this.nextStep();
-  }
-
-  nextStep() {
-    this.activeStep.update((step) => {
-      if (this.isLastStep()) return step;
-      return ++step;
-    });
-  }
-
-  previousStep() {
-    this.activeStep.update((step) => {
-      if (this.skipVoteStep && step === 1) return step;
-      if (step === 0) return step;
-      return --step;
-    });
+    this.activeStep.set(ReviewStep.Comment);
   }
 
   submitReview() {
@@ -128,7 +108,7 @@ export class AddReviewComponent {
             : 'Opinia dodana! Przyszli kierowcy będą ci wdzięczni. ;)',
           'SUCCESS',
         );
-        this._dialogRef.close();
+        this.activeStep.set(ReviewStep.ThankYou);
         return;
       } catch (_) {
         this._sharedUtilsService.openSnackbar(

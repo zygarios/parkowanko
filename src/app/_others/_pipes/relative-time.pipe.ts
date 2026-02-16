@@ -2,7 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'relativeTime',
-  standalone: true,
 })
 export class RelativeTimePipe implements PipeTransform {
   transform(value: Date | string | number): string {

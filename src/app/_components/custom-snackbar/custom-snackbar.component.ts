@@ -10,7 +10,6 @@ export interface CustomSnackbarData {
 
 @Component({
   selector: 'app-custom-snackbar',
-  standalone: true,
   imports: [MatIconModule, MatButtonModule],
   templateUrl: './custom-snackbar.component.html',
   styles: [],

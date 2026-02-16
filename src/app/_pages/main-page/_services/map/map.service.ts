@@ -1,12 +1,10 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
-import {
-  booleanPointInPolygon,
-  buffer,
-  distance,
-  featureCollection,
-  nearestPoint,
-  point,
-} from '@turf/turf';
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
+import { buffer } from '@turf/buffer';
+import { distance } from '@turf/distance';
+import { featureCollection, point } from '@turf/helpers';
+import { nearestPoint } from '@turf/nearest-point';
+
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import * as maplibregl from 'maplibre-gl';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';

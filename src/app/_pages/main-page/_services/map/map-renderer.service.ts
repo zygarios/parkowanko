@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { circle, distance, point } from '@turf/turf';
+import { circle } from '@turf/circle';
+import { distance } from '@turf/distance';
+import { point } from '@turf/helpers';
+
 import type { FeatureCollection, LineString } from 'geojson';
 import * as maplibregl from 'maplibre-gl';
 import { LocationCoords } from '../../../../_types/location-coords.type';
