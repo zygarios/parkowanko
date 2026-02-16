@@ -1,0 +1,10 @@
+#!/bin/sh
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$branch" = "main" ] || [ "$branch" = "prep" ]; then
+  echo "🚫 BEZPOŚREDNIE COMMITY DO $branch SĄ ZABLOKOWANE! 🚫"
+  echo "Jesteś na branchu '$branch'. Ten branch służy tylko do merge'owania."
+  echo "Proszę utwórz nowy branch dla swoich zmian:"
+  echo "  git checkout -b feature/twoja-nazwa-zmiany"
+  exit 1
+fi

@@ -7,7 +7,8 @@
     "start:remote": "ng serve --host 0.0.0.0 --ssl",
     "deploy:branch:preproduction": "npm i --force && ng build --configuration preproduction --base-href /parkowanko/ && npx angular-cli-ghpages --dir dist/browser",
     "deploy:branch:production": "git push",
-    "build:production": "npm i --force && ng build --configuration production"
+    "build:production": "npm i --force && ng build --configuration production",
+    "prepare": "husky"
   },
   "prettier": {
     "printWidth": 100,
@@ -52,6 +53,7 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@types/geojson": "^7946.0.16",
     "angular-cli-ghpages": "^3.0.2",
+    "husky": "^9.1.7",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.18",
