@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, finalize, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { extractFirstError } from '../../_others/_helpers/error-extractor';
+import { RouterPaths } from '../../_others/_helpers/router-paths';
 import {
   AuthResponse,
   AuthResponseAfterRefresh,
@@ -12,6 +13,7 @@ import {
   RegisterSaveData,
 } from '../../_types/auth/auth.model';
 import { User } from '../../_types/auth/user.type';
+import { GlobalSpinnerService } from './global-spinner.service';
 import { SharedUtilsService } from './shared-utils.service';
 
 interface JwtPayload {
@@ -25,80 +27,98 @@ export class AuthService {
   private _http = inject(HttpClient);
   private _router = inject(Router);
   private _sharedUtilsService = inject(SharedUtilsService);
+  private _globalSpinnerService = inject(GlobalSpinnerService);
 
   private _tokenExpirationTimer?: ReturnType<typeof setTimeout>;
   private _currentUser = signal<User | null>(null);
-  private _isAuthenticating = signal(false);
 
   currentUser = this._currentUser.asReadonly();
   isLoggedIn = computed(() => !!this._currentUser());
-  isAuthenticating = this._isAuthenticating.asReadonly();
 
   constructor() {
     this._tryAutoLogin();
   }
 
   login(data: LoginSaveData): Observable<AuthResponse> {
-    this._isAuthenticating.set(true);
+    this._globalSpinnerService.show();
     return this._http.post<AuthResponse>(`${environment.apiUrl}/auth/login/`, data).pipe(
-      tap((res) => this._setAuthData(res)),
+      tap((res) => this.handleAuthSuccess(res)),
       catchError((err: HttpErrorResponse) => {
-        this._isAuthenticating.set(false);
         const errorMsg = extractFirstError(err.error);
         this._sharedUtilsService.openSnackbar(errorMsg || 'Nieprawidłowy login lub hasło', 'ERROR');
         return throwError(() => err);
       }),
-      finalize(() => this._isAuthenticating.set(false)),
+      finalize(() => this._globalSpinnerService.hide()),
     );
   }
 
-  register(data: RegisterSaveData): Observable<AuthResponse> {
-    this._isAuthenticating.set(true);
-    return this._http.post<AuthResponse>(`${environment.apiUrl}/auth/register/`, data).pipe(
-      tap((res) => this._setAuthData(res)),
+  register(data: RegisterSaveData): Observable<void> {
+    this._globalSpinnerService.show();
+    return this._http.post<void>(`${environment.apiUrl}/auth/register/`, data).pipe(
       catchError((err: HttpErrorResponse) => {
-        this._isAuthenticating.set(false);
         if (err.status === 400) {
           const errorMsg = extractFirstError(err.error);
           this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
         }
         return throwError(() => err);
       }),
-      finalize(() => this._isAuthenticating.set(false)),
+      finalize(() => this._globalSpinnerService.hide()),
     );
   }
 
-  refreshToken(refresh: string): Observable<AuthResponseAfterRefresh> {
+  confirmEmailAfterRegister(token: string): Observable<AuthResponse> {
+    this._globalSpinnerService.show();
     return this._http
-      .post<AuthResponseAfterRefresh>(`${environment.apiUrl}/auth/refresh/`, { refresh })
-      .pipe(tap((res) => this._setAuthAfterRefreshTokens(res)));
+      .post<AuthResponse>(`${environment.apiUrl}/auth/register/confirm-email/`, { key: token })
+      .pipe(
+        tap((res) => this.handleAuthSuccess(res)),
+        finalize(() => this._globalSpinnerService.hide()),
+      );
   }
 
-  requestPasswordReset(email: string): Observable<void> {
-    return this._http.post<void>(`${environment.apiUrl}/auth/password-reset/`, { email }).pipe(
-      catchError((err: HttpErrorResponse) => {
-        const errorMsg = extractFirstError(err.error);
-        this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
-        return throwError(() => err);
-      }),
-    );
-  }
-
-  validatePasswordResetToken(token: string): Observable<{ status: string }> {
+  resendConfirmationEmail(email: string): Observable<void> {
+    this._globalSpinnerService.show();
     return this._http
-      .post<{ status: string }>(`${environment.apiUrl}/auth/password-reset/validate_token/`, {
-        token,
-      })
+      .post<void>(`${environment.apiUrl}/auth/register/resend-confirm-email/`, { email })
       .pipe(
         catchError((err: HttpErrorResponse) => {
           const errorMsg = extractFirstError(err.error);
           this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
           return throwError(() => err);
         }),
+        finalize(() => this._globalSpinnerService.hide()),
       );
   }
 
+  refreshToken(refresh: string): Observable<AuthResponseAfterRefresh> {
+    return this._http
+      .post<AuthResponseAfterRefresh>(`${environment.apiUrl}/auth/token/refresh/`, { refresh })
+      .pipe(tap((res) => this._setAuthAfterRefreshTokens(res)));
+  }
+
+  requestPasswordReset(email: string): Observable<void> {
+    this._globalSpinnerService.show();
+    return this._http.post<void>(`${environment.apiUrl}/auth/password-reset/`, { email }).pipe(
+      catchError((err: HttpErrorResponse) => {
+        const errorMsg = extractFirstError(err.error);
+        this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
+        return throwError(() => err);
+      }),
+      finalize(() => this._globalSpinnerService.hide()),
+    );
+  }
+
+  validatePasswordResetToken(token: string): Observable<{ status: string }> {
+    this._globalSpinnerService.show();
+    return this._http
+      .post<{ status: string }>(`${environment.apiUrl}/auth/password-reset/validate-token/`, {
+        token,
+      })
+      .pipe(finalize(() => this._globalSpinnerService.hide()));
+  }
+
   confirmPasswordReset(data: PasswordResetConfirmData): Observable<{ status: string }> {
+    this._globalSpinnerService.show();
     return this._http
       .post<{ status: string }>(`${environment.apiUrl}/auth/password-reset/confirm/`, data)
       .pipe(
@@ -107,18 +127,35 @@ export class AuthService {
           this._sharedUtilsService.openSnackbar(errorMsg, 'ERROR');
           return throwError(() => err);
         }),
+        finalize(() => this._globalSpinnerService.hide()),
       );
   }
 
-  handleSocialAuthSuccess(res: AuthResponse): void {
-    this._setAuthData(res);
+  deleteAccount(): Observable<void> {
+    this._globalSpinnerService.show();
+    return this._http.delete<void>(`${environment.apiUrl}/auth/user/delete/`).pipe(
+      tap(() => this.logout()),
+      catchError((err: HttpErrorResponse) => {
+        const errorMsg = extractFirstError(err.error);
+        this._sharedUtilsService.openSnackbar(errorMsg || 'Błąd podczas usuwania konta', 'ERROR');
+        return throwError(() => err);
+      }),
+      finalize(() => this._globalSpinnerService.hide()),
+    );
+  }
+
+  handleAuthSuccess(res: AuthResponse): void {
+    this._currentUser.set(res.user);
+    localStorage.setItem('auth_data', JSON.stringify(res));
+    this._setupAutoLogoutFromToken(res.access);
+    this._router.navigate([RouterPaths.MAIN], { replaceUrl: true });
   }
 
   logout(): void {
     clearTimeout(this._tokenExpirationTimer);
     this._currentUser.set(null);
     localStorage.removeItem('auth_data');
-    this._router.navigate(['/auth']);
+    this._router.navigate([RouterPaths.AUTH_LOGIN]);
   }
 
   getAccessToken(): string | null {
@@ -144,22 +181,16 @@ export class AuthService {
     }
   }
 
-  private _setAuthData(res: AuthResponse): void {
-    this._currentUser.set(res.user);
-    localStorage.setItem('auth_data', JSON.stringify(res));
-    const exp = this._decodeJwt(res.access)?.exp;
+  private _setupAutoLogoutFromToken(token: string): void {
+    const exp = this._decodeJwt(token)?.exp;
     if (exp) {
       this._setupAutoLogout(exp);
     }
-    this._router.navigate(['/']);
   }
 
   private _setAuthAfterRefreshTokens(res: AuthResponseAfterRefresh): void {
     const storedAuth = this._getStoredAuth();
     if (!storedAuth) return;
-
-    const exp = this._decodeJwt(res.access)?.exp;
-    if (!exp) return;
 
     localStorage.setItem(
       'auth_data',
@@ -170,7 +201,7 @@ export class AuthService {
       }),
     );
 
-    this._setupAutoLogout(exp);
+    this._setupAutoLogoutFromToken(res.access);
   }
 
   private _setupAutoLogout(exp: number): void {

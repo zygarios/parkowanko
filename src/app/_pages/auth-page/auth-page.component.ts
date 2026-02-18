@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   email,
@@ -17,13 +17,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { extractFirstError } from '../../_others/_helpers/error-extractor';
+import { combineLatest, firstValueFrom } from 'rxjs';
 import { validationMessages } from '../../_others/_helpers/validation-messages';
 import { AuthService } from '../../_services/_core/auth.service';
-import { GlobalSpinnerService } from '../../_services/_core/global-spinner.service';
 import { SharedUtilsService } from '../../_services/_core/shared-utils.service';
+import { SocialLoginService } from '../../_services/_core/social-login.service';
+import { AuthResponse } from '../../_types/auth/auth.model';
 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterPaths } from '../../_others/_helpers/router-paths';
 import { SocialAuthButtonsComponent } from './_components/social-auth-buttons/social-auth-buttons.component';
 import { AuthData, AuthModeType, modeToPathMap } from './auth-page.model';
 
@@ -45,17 +47,44 @@ import { AuthData, AuthModeType, modeToPathMap } from './auth-page.model';
 export class AuthPageComponent {
   private _authService = inject(AuthService);
   private _dialog = inject(MatDialog);
-  private _globalSpinnerService = inject(GlobalSpinnerService);
   private _route = inject(ActivatedRoute);
-  private _router = inject(Router);
+  public router = inject(Router);
   private _sharedUtilsService = inject(SharedUtilsService);
+  private _socialLoginService = inject(SocialLoginService);
 
   isPasswordHidden = signal(true);
   isRepeatedPasswordHidden = signal(true);
   authMode = signal<AuthModeType>(AuthModeType.LOGIN);
   authModeType = AuthModeType;
   resetPasswordToken = signal<string | null>(null);
-  validationError = signal<string | null>(null);
+  registeredEmail = signal<string | null>(null);
+
+  showLoadingSpinner = computed(() => this.authMode() === AuthModeType.FINISH_REGISTER_GOOGLE);
+  showTitle = computed(() => this.showForm());
+
+  showForm = computed(() =>
+    [
+      AuthModeType.LOGIN,
+      AuthModeType.REGISTER,
+      AuthModeType.FORGOT_PASSWORD,
+      AuthModeType.RESET_PASSWORD,
+    ].includes(this.authMode()),
+  );
+
+  titleText = computed(() => {
+    switch (this.authMode()) {
+      case AuthModeType.LOGIN:
+        return 'Logowanie';
+      case AuthModeType.REGISTER:
+        return 'Rejestracja';
+      case AuthModeType.FORGOT_PASSWORD:
+        return 'Przypomnienie hasła';
+      case AuthModeType.RESET_PASSWORD:
+        return 'Resetowanie hasła';
+      default:
+        return '';
+    }
+  });
 
   private authModel = signal<AuthData>({
     username: '',
@@ -65,20 +94,104 @@ export class AuthPageComponent {
   });
 
   constructor() {
-    this._handleAuthModeFromUrl();
-    this._handleResetPasswordToken();
+    this._handleUrlData();
   }
 
-  private _handleAuthModeFromUrl() {
-    this._route.params.subscribe((params) => {
-      const segment = params['mode']?.toLowerCase();
-      const mode = Array.from(modeToPathMap.entries()).find(([_, s]) => s === segment)?.[0];
-      if (mode) {
-        this.authMode.set(mode);
-      } else {
-        this._router.navigate([`/auth/${modeToPathMap.get(AuthModeType.LOGIN)}`]);
+  private _handleUrlData() {
+    combineLatest([this._route.params, this._route.queryParams])
+      .pipe(takeUntilDestroyed())
+      .subscribe(async ([params, queryParams]) => {
+        const { code, access, refresh, expiresIn, token } = queryParams as any;
+
+        // 1. Obsługa zalogowania (Bezpośrednie tokeny z backendu lub wymiana kodu)
+        if (access && refresh) {
+          this._handleDirectTokenLogin(access, refresh, expiresIn);
+          return;
+        }
+
+        if (code) {
+          await this._handleCodeExchange(code);
+          return;
+        }
+
+        // 2. Synchronizacja trybu autoryzacji z trasą
+        this._syncAuthModeWithRoute(params['mode']);
+
+        // 3. Obsługa tokenów specjalnych (Reset hasła / Potwierdzenie email)
+        if (token) {
+          await this._handleValidationToken(token);
+        }
+      });
+  }
+
+  /**
+   * Obsługuje przypadek, gdy backend przekierowuje nas bezpośrednio z gotowymi tokenami JWT.
+   */
+  private _handleDirectTokenLogin(access: string, refresh: string, expiresIn?: string) {
+    this.authMode.set(AuthModeType.FINISH_REGISTER_GOOGLE);
+    const authRes: AuthResponse = {
+      access,
+      refresh,
+      expiresIn: Number(expiresIn) || 3600,
+      user: null as any, // TODO: Docelowo backend powinien wystawić endpoint do pobrania usera (/auth/me)
+    };
+    this._authService.handleAuthSuccess(authRes);
+  }
+
+  /**
+   * Obsługuje przypadek FRONT-DRIVEN, gdzie dostajemy "code" i wymieniamy go calleem do API.
+   */
+  private async _handleCodeExchange(code: string) {
+    this.authMode.set(AuthModeType.FINISH_REGISTER_GOOGLE);
+    try {
+      await firstValueFrom(this._socialLoginService.loginWithGoogle(code));
+    } catch {
+      this.changeAuthMode(AuthModeType.LOGIN);
+    }
+  }
+
+  /**
+   * Mapuje parametry trasy na odpowiedni AuthModeType.
+   */
+  private _syncAuthModeWithRoute(modeSegment?: string) {
+    const segment = modeSegment?.toLowerCase();
+    const mode = Array.from(modeToPathMap.entries()).find(
+      ([_, path]) => path.endsWith(`/${segment}`) || path === segment,
+    )?.[0];
+
+    // Sprawdzenie czy jesteśmy na specyficznym pathu dla callbacku Google
+    const isSocialCallback = window.location.pathname.endsWith(RouterPaths.FINISH_REGISTER_GOOGLE);
+
+    if (mode) {
+      this.authMode.set(mode);
+    } else if (isSocialCallback) {
+      this.authMode.set(AuthModeType.FINISH_REGISTER_GOOGLE);
+    } else {
+      this.router.navigate([RouterPaths.AUTH_LOGIN]);
+    }
+  }
+
+  /**
+   * Obsługuje tokeny weryfikacyjne dla resetu hasła i aktywacji konta.
+   */
+  private async _handleValidationToken(token: string) {
+    const currentMode = this.authMode();
+
+    if (currentMode === AuthModeType.RESET_PASSWORD) {
+      try {
+        await firstValueFrom(this._authService.validatePasswordResetToken(token));
+        this.resetPasswordToken.set(token);
+      } catch {
+        this.changeAuthMode(AuthModeType.TOKEN_ERROR);
       }
-    });
+    } else if (currentMode === AuthModeType.CONFIRM_EMAIL_AFTER_REGISTER) {
+      try {
+        await firstValueFrom(this._authService.confirmEmailAfterRegister(token));
+        this._sharedUtilsService.openSnackbar('Konto zostało aktywowane!', 'SUCCESS');
+      } catch {
+        this.changeAuthMode(AuthModeType.TOKEN_ERROR);
+      }
+    }
   }
 
   authForm = form(this.authModel, (path) => {
@@ -128,9 +241,11 @@ export class AuthPageComponent {
   }
 
   changeAuthMode(mode: AuthModeType) {
-    const segment = modeToPathMap.get(mode);
-    if (segment) {
-      this._router.navigate(['/auth', segment]);
+    const fullPath = modeToPathMap.get(mode);
+    if (fullPath) {
+      this.router.navigate([fullPath]);
+    } else {
+      this.authMode.set(mode);
     }
   }
 
@@ -146,54 +261,57 @@ export class AuthPageComponent {
 
   submit() {
     submit(this.authForm, async () => {
+      const mode = this.authMode();
       const { username, email, password, repeatedPassword } = this.authModel();
+      const resetToken = this.resetPasswordToken();
 
       try {
-        this._globalSpinnerService.show();
+        switch (mode) {
+          case AuthModeType.LOGIN:
+            await firstValueFrom(this._authService.login({ email, password }));
+            break;
 
-        if (this.authMode() === AuthModeType.LOGIN) {
-          await firstValueFrom(this._authService.login({ email, password }));
-        } else if (this.authMode() === AuthModeType.REGISTER) {
-          await firstValueFrom(this._authService.register({ username, email, password }));
-        } else if (this.authMode() === AuthModeType.FORGOT_PASSWORD) {
-          await firstValueFrom(this._authService.requestPasswordReset(email));
-          this.authMode.set(AuthModeType.EMAIL_SENT);
-        } else if (this.authMode() === AuthModeType.RESET_PASSWORD) {
-          const token = this.resetPasswordToken();
-          if (!token) return;
-          await firstValueFrom(
-            this._authService.confirmPasswordReset({ token, password: repeatedPassword }),
-          );
-          this._sharedUtilsService.openSnackbar('Hasło zostało zmienione', 'SUCCESS');
-          this._router.navigate([`/auth/${modeToPathMap.get(AuthModeType.LOGIN)}`]);
+          case AuthModeType.REGISTER:
+            await firstValueFrom(this._authService.register({ username, email, password }));
+            this.registeredEmail.set(email);
+            this.changeAuthMode(AuthModeType.REGISTER_EMAIL_SENT);
+            break;
+
+          case AuthModeType.FORGOT_PASSWORD:
+            await firstValueFrom(this._authService.requestPasswordReset(email));
+            this.changeAuthMode(AuthModeType.FORGOT_PASSWORD_EMAIL_SENT);
+            break;
+
+          case AuthModeType.RESET_PASSWORD:
+            if (!resetToken) return;
+            await firstValueFrom(
+              this._authService.confirmPasswordReset({
+                token: resetToken,
+                password: repeatedPassword,
+              }),
+            );
+            this._sharedUtilsService.openSnackbar('Hasło zostało zmienione', 'SUCCESS');
+            this.router.navigate([RouterPaths.AUTH_LOGIN]);
+            break;
         }
       } catch (err: any) {
-        console.error(err);
-      } finally {
-        this._globalSpinnerService.hide();
-        return;
+        console.error(`Błąd podczas akcji ${mode}:`, err);
       }
     });
   }
 
-  private _handleResetPasswordToken() {
-    this._route.queryParams.subscribe(async (params) => {
-      const token = params['token'];
-      if (token && this.authMode() === AuthModeType.RESET_PASSWORD) {
-        try {
-          this._globalSpinnerService.show();
-          await firstValueFrom(this._authService.validatePasswordResetToken(token));
-          this.resetPasswordToken.set(token);
-        } catch (err: any) {
-          const errorMsg = extractFirstError(err.error);
-          this.validationError.set(
-            errorMsg || 'Link do resetowania hasła jest nieprawidłowy lub wygasł',
-          );
-          this.authMode.set(AuthModeType.TOKEN_ERROR);
-        } finally {
-          this._globalSpinnerService.hide();
-        }
-      }
-    });
+  async resendConfirmationEmail() {
+    const email = this.registeredEmail();
+    if (!email) return;
+
+    try {
+      await firstValueFrom(this._authService.resendConfirmationEmail(email));
+      this._sharedUtilsService.openSnackbar(
+        'Email został wysłany ponownie. Sprawdź swoją skrzynkę.',
+        'SUCCESS',
+      );
+    } catch (err: any) {
+      console.error(err);
+    }
   }
 }

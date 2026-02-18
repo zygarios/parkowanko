@@ -1,8 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { FacebookAuthService } from '../../../../_services/_core/facebook-auth.service';
 import { GoogleAuthService } from '../../../../_services/_core/google-auth.service';
-import { SocialLoginService } from '../../../../_services/_core/social-login.service';
 
 @Component({
   selector: 'app-social-auth-buttons',
@@ -43,34 +40,6 @@ import { SocialLoginService } from '../../../../_services/_core/social-login.ser
           />
         </svg>
         <span class="hidden sm:inline">Google</span>
-      </button>
-
-      <!-- Facebook -->
-      <button
-        id="social-login-facebook"
-        type="button"
-        class="social-btn"
-        [disabled]="isLoading()"
-        (click)="loginWithFacebook()"
-        aria-label="Zaloguj przez Facebook"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
-            fill="#1877F2"
-          />
-          <path
-            d="M16.671 15.427l.532-3.47h-3.328V9.707c0-.949.465-1.874 1.956-1.874h1.516V4.88s-1.374-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669v2.653H7.078v3.47h3.047v8.385a12.09 12.09 0 001.997.165c.675 0 1.336-.056 1.984-.165v-8.385h2.796z"
-            fill="white"
-          />
-        </svg>
-        <span class="hidden sm:inline">Facebook</span>
       </button>
     </div>
   `,
@@ -116,8 +85,6 @@ import { SocialLoginService } from '../../../../_services/_core/social-login.ser
 })
 export class SocialAuthButtonsComponent {
   private _googleAuth = inject(GoogleAuthService);
-  private _facebookAuth = inject(FacebookAuthService);
-  private _socialLogin = inject(SocialLoginService);
 
   isLoading = signal(false);
 
@@ -126,40 +93,17 @@ export class SocialAuthButtonsComponent {
     this.isLoading.set(true);
 
     try {
-      const code = await this._googleAuth.requestCode();
-      await firstValueFrom(this._socialLogin.loginWithGoogle(code));
+      await this._googleAuth.loginWithRedirect();
     } catch (err: unknown) {
+      this.isLoading.set(false);
       if (err instanceof Error && !this._isUserCancellation(err)) {
         console.error('Google login error:', err);
       }
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  async loginWithFacebook(): Promise<void> {
-    if (this.isLoading()) return;
-    this.isLoading.set(true);
-
-    try {
-      const accessToken = await this._facebookAuth.login();
-      await firstValueFrom(this._socialLogin.loginWithFacebook(accessToken));
-    } catch (err: unknown) {
-      if (err instanceof Error && !this._isUserCancellation(err)) {
-        console.error('Facebook login error:', err);
-      }
-    } finally {
-      this.isLoading.set(false);
     }
   }
 
   private _isUserCancellation(err: Error): boolean {
     const msg = err.message.toLowerCase();
-    return (
-      msg.includes('popup_closed') ||
-      msg.includes('popup_failed') ||
-      msg.includes('access_denied') ||
-      msg.includes('cancelled')
-    );
+    return msg.includes('access_denied') || msg.includes('cancelled');
   }
 }
