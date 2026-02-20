@@ -56,18 +56,18 @@
 
 /* TYPOGRAPHY */
 
-.font-large {
+.par-font-large {
   font-size: 24px;
 }
 
-.font-big {
+.par-font-big {
   font-size: 20px;
 }
 
-.font-small {
+.par-font-small {
   font-size: 14px;
 }
 
-.font-tiny {
+.par-font-tiny {
   font-size: 12px;
 }

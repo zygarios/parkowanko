@@ -19,13 +19,6 @@ import { SharedUtilsService } from './shared-utils.service';
  *     (https://oauth2.googleapis.com/token) using GOOGLE_CLIENT_SECRET
  *   → Verifies id_token, extracts user info, creates/finds user
  *   → Returns AuthResponse { access, refresh, expiresIn, user }
- *
- * Facebook (Access Token Flow):
- *   POST /auth/social/facebook/
- *   Body: { access_token: string }
- *   → Backend verifies token via Graph API debug_token endpoint
- *   → Fetches user info from /me?fields=id,name,email
- *   → Creates/finds user, returns AuthResponse
  */
 @Injectable({ providedIn: 'root' })
 export class SocialLoginService {
@@ -37,9 +30,11 @@ export class SocialLoginService {
   loginWithGoogle(code: string): Observable<AuthResponse> {
     this._globalSpinnerService.show();
     return this._http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/social/google/`, { code })
+      .post<AuthResponse>(`${environment.apiUrl}/auth/social/google/`, {
+        code,
+      })
       .pipe(
-        tap((res) => this._authService.handleSocialAuthSuccess(res)),
+        tap((res) => this._authService.handleAuthSuccess(res)),
         catchError((err: HttpErrorResponse) => {
           this._sharedUtilsService.openSnackbar('Błąd logowania przez Google', 'ERROR');
           return throwError(() => err);
@@ -48,16 +43,16 @@ export class SocialLoginService {
       );
   }
 
-  loginWithFacebook(accessToken: string): Observable<AuthResponse> {
+  loginWithGoogleCredential(credential: string): Observable<AuthResponse> {
     this._globalSpinnerService.show();
     return this._http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/social/facebook/`, {
-        access_token: accessToken,
+      .post<AuthResponse>(`${environment.apiUrl}/auth/social/google/credential/`, {
+        credential,
       })
       .pipe(
-        tap((res) => this._authService.handleSocialAuthSuccess(res)),
+        tap((res) => this._authService.handleAuthSuccess(res)),
         catchError((err: HttpErrorResponse) => {
-          this._sharedUtilsService.openSnackbar('Błąd logowania przez Facebook', 'ERROR');
+          this._sharedUtilsService.openSnackbar('Błąd logowania przez Google', 'ERROR');
           return throwError(() => err);
         }),
         finalize(() => this._globalSpinnerService.hide()),
