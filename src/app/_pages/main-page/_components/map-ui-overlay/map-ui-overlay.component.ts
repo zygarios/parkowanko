@@ -4,8 +4,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { GuideDialogComponent } from '../../../../_components/guide-dialog/guide-dialog.component';
+import { RouterPaths } from '../../../../_others/_helpers/router-paths';
 import { ParkingsApiService } from '../../../../_services/_api/parkings-api.service';
 import { AuthService } from '../../../../_services/_core/auth.service';
 import { GlobalSpinnerService } from '../../../../_services/_core/global-spinner.service';
@@ -42,6 +44,7 @@ export class MapUiOverlayComponent {
   private _mapPoisControllerService = inject(MapPoisControllerService);
   private _sharedUtilsService = inject(SharedUtilsService);
   private _globalSpinnerService = inject(GlobalSpinnerService);
+  private _router = inject(Router);
 
   selectedAddress = signal<GeocodeFeature | null>(null);
   isAddingPoiActive = signal<boolean>(false);
@@ -65,6 +68,10 @@ export class MapUiOverlayComponent {
     this._matDialog.open(GuideDialogComponent, {
       autoFocus: false,
     });
+  }
+
+  openSettingsPage() {
+    this._router.navigate([RouterPaths.SETTINGS]);
   }
 
   startAddingPoi() {

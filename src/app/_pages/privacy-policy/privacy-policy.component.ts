@@ -16,7 +16,7 @@ import { PrivacyPolicyContentComponent } from './privacy-policy-content.componen
           <button mat-icon-button routerLink="/" aria-label="Wróć do aplikacji">
             <mat-icon>home</mat-icon>
           </button>
-          <h1 class="font-big m-0">Polityka Prywatności</h1>
+          <h1 class="par-font-big m-0">Polityka Prywatności</h1>
         </header>
 
         <hr />

@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   selector: 'app-privacy-policy-content',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <p class="italic text-[#666] mb-[30px] font-small">
+    <p class="italic text-[#666] mb-[30px] par-font-small">
       Ostatnia aktualizacja: 26 stycznia 2026 r.
     </p>
 
@@ -16,7 +16,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </p>
 
       <section>
-        <h2 class="mt-[30px] text-[--par-color-primary] font-large font-bold">
+        <h2 class="mt-[30px] text-[--par-color-primary] par-font-large font-bold">
           1. Kto jest administratorem Twoich danych?
         </h2>
         <p>
@@ -27,11 +27,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </section>
 
       <section>
-        <h2 class="mt-[30px] text-[--par-color-primary] font-large font-bold">
+        <h2 class="mt-[30px] text-[--par-color-primary] par-font-large font-bold">
           2. Jakie dane gromadzimy i dlaczego?
         </h2>
 
-        <h3 class="mt-5 font-big font-bold">A. Dane rejestracyjne</h3>
+        <h3 class="mt-5 par-font-big font-bold">A. Dane rejestracyjne</h3>
         <p>Podczas zakładania konta prosimy o podanie:</p>
         <ul class="list-disc pl-5">
           <li>
@@ -48,7 +48,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
           </li>
         </ul>
 
-        <h3 class="mt-5 font-big font-bold">B. Lokalizacja (GPS)</h3>
+        <h3 class="mt-5 par-font-big font-bold">B. Lokalizacja (GPS)</h3>
         <p>
           Aplikacja Parkowanko opiera się na usługach lokalizacyjnych. Za Twoją zgodą Aplikacja
           uzyskuje dostęp do <strong>dokładnej lokalizacji GPS</strong> w celu:
@@ -65,7 +65,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </section>
 
       <section>
-        <h2 class="mt-[30px] text-[--par-color-primary] font-large font-bold">
+        <h2 class="mt-[30px] text-[--par-color-primary] par-font-large font-bold">
           3. Usługi podmiotów trzecich
         </h2>
         <p>W celu zapewnienia najwyższej jakości, korzystamy z usług zaufanych partnerów:</p>
@@ -81,7 +81,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </section>
 
       <section>
-        <h2 class="mt-[30px] text-[--par-color-primary] font-large font-bold">4. Pamięć Lokalna</h2>
+        <h2 class="mt-[30px] text-[--par-color-primary] par-font-large font-bold">
+          4. Pamięć Lokalna
+        </h2>
         <p>Aplikacja korzysta z technologii <strong>LocalStorage</strong> do:</p>
         <ul class="list-disc pl-5">
           <li>
@@ -93,7 +95,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </section>
 
       <section>
-        <h2 class="mt-[30px] text-[--par-color-primary] font-large font-bold">5. Twoje prawa</h2>
+        <h2 class="mt-[30px] text-[--par-color-primary] par-font-large font-bold">
+          5. Twoje prawa
+        </h2>
         <p>Zgodnie z RODO, masz prawo do:</p>
         <ul class="list-disc pl-5">
           <li>Dostępu do swoich danych oraz otrzymania ich kopii.</li>
