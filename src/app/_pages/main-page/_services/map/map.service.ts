@@ -369,7 +369,10 @@ export class MapService {
         };
       } catch (err) {
         this._globalSpinnerService.hide();
-        this._sharedUtilsService.openSnackbar('Nie udało się pobrać lokalizacji GPS.', 'ERROR');
+        this._sharedUtilsService.openSnackbar(
+          'GPS jest niedostępny. Włącz go w ustawieniach.',
+          'ERROR',
+        );
         return;
       }
     }
