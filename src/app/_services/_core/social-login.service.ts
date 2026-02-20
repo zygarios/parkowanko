@@ -42,4 +42,20 @@ export class SocialLoginService {
         finalize(() => this._globalSpinnerService.hide()),
       );
   }
+
+  loginWithGoogleCredential(credential: string): Observable<AuthResponse> {
+    this._globalSpinnerService.show();
+    return this._http
+      .post<AuthResponse>(`${environment.apiUrl}/auth/social/google/credential/`, {
+        credential,
+      })
+      .pipe(
+        tap((res) => this._authService.handleAuthSuccess(res)),
+        catchError((err: HttpErrorResponse) => {
+          this._sharedUtilsService.openSnackbar('Błąd logowania przez Google', 'ERROR');
+          return throwError(() => err);
+        }),
+        finalize(() => this._globalSpinnerService.hide()),
+      );
+  }
 }
