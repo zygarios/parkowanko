@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["social-auth-buttons.component.ts"],
+  "sourcesContent": ["\n    #google-btn-container {\n      margin-top: 0.5rem;\n    }\n\n    /* Zapewnienie, że przycisk Google jest wycentrowany i responsywny */\n    :host ::ng-deep .S9790d-Pd933ed {\n      border-radius: 0.75rem !important;\n    }\n  "],
+  "mappings": "AACI,CAAA,qBACE,WAAA,KACF,CAGA,MAAA,UAAA,CAAA,6BACE,gBACF",
+  "names": []
+}

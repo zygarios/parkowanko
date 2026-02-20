@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["settings-page.component.ts"],
+  "sourcesContent": ["\n    :host {\n      display: block;\n      min-height: 100vh;\n    }\n  "],
+  "mappings": "AACI,MACE,QAAA,MACA,WAAA,KACF",
+  "names": []
+}

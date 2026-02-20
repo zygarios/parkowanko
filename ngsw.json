@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1771256750711,
+  "timestamp": 1771586002865,
   "index": "/parkowanko/index.html",
   "assetGroups": [
     {
@@ -21,7 +21,6 @@
         "ignoreVary": true
       },
       "urls": [
-        "/parkowanko/icons/logo-parkowanko.png",
         "/parkowanko/icons/logo-parkowanko.svg",
         "/parkowanko/icons/parking-free-poi.svg",
         "/parkowanko/icons/parking-marker.svg",
@@ -36,10 +35,12 @@
         "/parkowanko/icons/pwa/icon-72x72.png",
         "/parkowanko/icons/pwa/icon-96x96.png",
         "/parkowanko/icons/target-location.svg",
-        "/parkowanko/images/screenshots/screenshot-1-map.png",
-        "/parkowanko/images/screenshots/screenshot-2-details.png",
-        "/parkowanko/images/screenshots/screenshot-3-search.png",
-        "/parkowanko/images/screenshots/screenshot-4-review.png",
+        "/parkowanko/images/screenshots/screenshot_phone_add_new_parking.png",
+        "/parkowanko/images/screenshots/screenshot_phone_add_review.png",
+        "/parkowanko/images/screenshots/screenshot_phone_add_review_success.png",
+        "/parkowanko/images/screenshots/screenshot_phone_edit_location.png",
+        "/parkowanko/images/screenshots/screenshot_phone_map.png",
+        "/parkowanko/images/screenshots/screenshot_phone_reviews.png",
         "/parkowanko/osm_bright.json"
       ],
       "patterns": []
@@ -76,25 +77,26 @@
     }
   ],
   "hashTable": {
-    "/parkowanko/icons/logo-parkowanko.png": "48f739e859d2cfd65cc6c5a96bea62eeeccdd0f5",
     "/parkowanko/icons/logo-parkowanko.svg": "e3ab83ec1a7924e7fe91368b34371a1a378417e5",
     "/parkowanko/icons/parking-free-poi.svg": "606673b2cddfdcbfd69af12be421265d129e0f04",
     "/parkowanko/icons/parking-marker.svg": "e83a961106973808f23afbc2f5bafa0eebde18a5",
-    "/parkowanko/icons/pwa/icon-128x128.png": "b2cdc8dac6d32363aeb0eaa8376c14bc276f5e32",
-    "/parkowanko/icons/pwa/icon-144x144.png": "26327d691e933e68559aaf060195846aaa580f98",
-    "/parkowanko/icons/pwa/icon-152x152.png": "290c2c81477b4e9833e2f881b962232166270269",
-    "/parkowanko/icons/pwa/icon-192x192.png": "2c0b85db28a0ece143c3de5b18ec3cc055c729b3",
-    "/parkowanko/icons/pwa/icon-256x256.png": "85f7f16db88d27723394aa94797fac38604faa9a",
-    "/parkowanko/icons/pwa/icon-384x384.png": "e3530eb093568d36de6485cb549a6fd2ba02481c",
-    "/parkowanko/icons/pwa/icon-48x48.png": "8328b282928d353db51d99d5102acec68abf70b8",
-    "/parkowanko/icons/pwa/icon-512x512.png": "83f1fad52408b10c3881b40773028602e80931bc",
-    "/parkowanko/icons/pwa/icon-72x72.png": "4771a8c19ad7e19f1488738e12ab6b674f811384",
-    "/parkowanko/icons/pwa/icon-96x96.png": "777495f6783a1089020bd94cc66a8fd952a69169",
+    "/parkowanko/icons/pwa/icon-128x128.png": "a38c31e5a000c33f750117317e49b6fac6b26312",
+    "/parkowanko/icons/pwa/icon-144x144.png": "43a24c300328716783882082abc2ae63b00d6f23",
+    "/parkowanko/icons/pwa/icon-152x152.png": "6a452102d301e4000de3aa333cfda9518ca95071",
+    "/parkowanko/icons/pwa/icon-192x192.png": "0b8fc6a238d79a2d0a55871dc4c14ae2ee540438",
+    "/parkowanko/icons/pwa/icon-256x256.png": "4b3ce4f418f7e5c24d622bdc32904d46279e7f5d",
+    "/parkowanko/icons/pwa/icon-384x384.png": "9ffc7a175212254c3be4d0677437c9f9af0100cc",
+    "/parkowanko/icons/pwa/icon-48x48.png": "3cd1fa2eb4d7ffa7d12c695dc91aae4e512dbcac",
+    "/parkowanko/icons/pwa/icon-512x512.png": "5161cedefd664b4e80b34062b310f46fa792f3e5",
+    "/parkowanko/icons/pwa/icon-72x72.png": "952c6cabca23ef6fc537d78d4d1e7a20aa0dcc1a",
+    "/parkowanko/icons/pwa/icon-96x96.png": "3a6011ccd663dfd963072bf99670abd033e844d3",
     "/parkowanko/icons/target-location.svg": "f33893cd99122a1c3751cc74ac90d74e3b508c71",
-    "/parkowanko/images/screenshots/screenshot-1-map.png": "7daed672b384ec7eff2f72171a779fd04fcf907e",
-    "/parkowanko/images/screenshots/screenshot-2-details.png": "3c4e13172dacb35509ecc86ba63f84faa47f1ca8",
-    "/parkowanko/images/screenshots/screenshot-3-search.png": "58f28d64f5d139a2d687a1363820bdb59c591206",
-    "/parkowanko/images/screenshots/screenshot-4-review.png": "3ec6e1ca9aaa23855c22add5e7c8944522dbad75",
+    "/parkowanko/images/screenshots/screenshot_phone_add_new_parking.png": "34632e912620a2ef4f1f9977ba19ec8f60cec0d8",
+    "/parkowanko/images/screenshots/screenshot_phone_add_review.png": "be44eaa5cf7dcdf25b8932b16088299ef183d939",
+    "/parkowanko/images/screenshots/screenshot_phone_add_review_success.png": "899002ce2dd6ff94a4c2b34466fb0a4663bf74ed",
+    "/parkowanko/images/screenshots/screenshot_phone_edit_location.png": "c700b04a4508978c6498287e883c54411a04f05b",
+    "/parkowanko/images/screenshots/screenshot_phone_map.png": "a03ef14d8bb6a42b080778a5aee6e8c0dcc0b46c",
+    "/parkowanko/images/screenshots/screenshot_phone_reviews.png": "38e7e2e46ae52333b53fc6904a5bbf350425368a",
     "/parkowanko/osm_bright.json": "a5e90945134f7efb47daca8c794cfe91c81a224f"
   },
   "navigationUrls": [
