@@ -54,3 +54,5 @@ gradle-wrapper.jar
 # Sensitive Android files
 android-twa/android.keystore
 android-twa/gradle.properties
+
+android
